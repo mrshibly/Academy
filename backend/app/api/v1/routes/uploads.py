@@ -1,0 +1,33 @@
+"""File upload route — validates MIME type and size, uploads to S3."""
+from __future__ import annotations
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from app.core.dependencies import get_current_active_user
+from app.models.user import User
+
+router = APIRouter()
+
+ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf", "video/mp4"}
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
+
+@router.post("", status_code=201)
+async def upload_file(file: UploadFile = File(...), user: User = Depends(get_current_active_user)):
+    """Upload a file to object storage. Returns the file URL."""
+    if file.content_type not in ALLOWED_MIME_TYPES:
+        raise HTTPException(status_code=422, detail=f"Unsupported file type: {file.content_type}")
+
+    contents = await file.read()
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=422, detail="File exceeds maximum size of 50MB.")
+
+    # Upload to S3
+    import uuid
+    import boto3
+    from app.core.config import get_settings
+    settings = get_settings()
+    s3_client = boto3.client("s3", region_name=settings.S3_REGION, endpoint_url=settings.S3_ENDPOINT_URL, aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+    file_key = f"uploads/{user.id}/{uuid.uuid4()}/{file.filename}"
+    s3_client.put_object(Bucket=settings.S3_BUCKET_NAME, Key=file_key, Body=contents, ContentType=file.content_type)
+
+    file_url = f"{settings.S3_ENDPOINT_URL}/{settings.S3_BUCKET_NAME}/{file_key}" if settings.S3_ENDPOINT_URL else f"https://{settings.S3_BUCKET_NAME}.s3.{settings.S3_REGION}.amazonaws.com/{file_key}"
+
+    return {"url": file_url, "filename": file.filename, "size": len(contents)}

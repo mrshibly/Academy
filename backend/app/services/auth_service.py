@@ -1,0 +1,166 @@
+"""Auth service — registration, login, token management, password reset, email verification."""
+from __future__ import annotations
+from datetime import datetime, timezone
+from uuid import UUID
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.exceptions import ConflictError, UnauthorizedError, NotFoundError, ValidationError
+from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token, decode_token, create_email_verification_token, create_password_reset_token
+from app.core.config import get_settings
+from app.models.role import Role, UserRole
+from app.repositories.user_repository import UserRepository
+
+class AuthService:
+    """Handles all authentication and authorization business logic."""
+
+    def __init__(self, db: AsyncSession) -> None:
+        self.db = db
+        self.user_repo = UserRepository(db)
+
+    async def register(self, email: str, password: str, full_name: str) -> dict:
+        """
+        Register a new user with email/password.
+
+        Args:
+            email: User's email address.
+            password: Plaintext password (will be hashed).
+            full_name: User's display name.
+
+        Returns:
+            Dict with user_id and verification token.
+
+        Raises:
+            ConflictError: If the email is already registered.
+        """
+        existing = await self.user_repo.get_by_email(email)
+        if existing is not None:
+            raise ConflictError(message="An account with this email already exists.")
+
+        hashed = hash_password(password)
+        user = await self.user_repo.create(email=email, hashed_password=hashed, full_name=full_name)
+
+        # Assign default 'student' role
+        role_stmt = select(Role).where(Role.name == "student")
+        role = (await self.db.execute(role_stmt)).scalar_one_or_none()
+        if role:
+            user_role = UserRole(user_id=user.id, role_id=role.id)
+            self.db.add(user_role)
+
+        await self.db.commit()
+
+        verification_token = create_email_verification_token(str(user.id))
+        return {"user_id": str(user.id), "verification_token": verification_token}
+
+    async def login(self, email: str, password: str) -> dict:
+        """
+        Authenticate user and return token pair.
+
+        Args:
+            email: User's email.
+            password: Plaintext password.
+
+        Returns:
+            Dict with access_token, refresh_token, expires_in.
+
+        Raises:
+            UnauthorizedError: If credentials are invalid.
+        """
+        user = await self.user_repo.get_by_email(email)
+        if user is None or user.hashed_password is None:
+            raise UnauthorizedError(message="Invalid email or password.")
+
+        if not verify_password(password, user.hashed_password):
+            raise UnauthorizedError(message="Invalid email or password.")
+
+        if not user.is_active:
+            raise UnauthorizedError(message="Account is deactivated.")
+
+        roles = [ur.role.name for ur in user.user_roles]
+        settings = get_settings()
+        access_token = create_access_token(str(user.id), roles=roles)
+        refresh_token = create_refresh_token(str(user.id))
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "expires_in": settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        }
+
+    async def refresh_token(self, refresh_token_str: str) -> dict:
+        """
+        Validate a refresh token and issue a new access/refresh pair.
+
+        Raises:
+            UnauthorizedError: If the refresh token is invalid or expired.
+        """
+        payload = decode_token(refresh_token_str)
+        if payload.get("type") != "refresh":
+            raise UnauthorizedError(message="Invalid token type.")
+
+        user_id = payload.get("sub")
+        user = await self.user_repo.get_by_id(UUID(user_id))
+        if user is None or not user.is_active:
+            raise UnauthorizedError(message="User not found or inactive.")
+
+        roles = [ur.role.name for ur in user.user_roles]
+        settings = get_settings()
+        new_access = create_access_token(str(user.id), roles=roles)
+        new_refresh = create_refresh_token(str(user.id))
+
+        return {
+            "access_token": new_access,
+            "refresh_token": new_refresh,
+            "token_type": "bearer",
+            "expires_in": settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        }
+
+    async def verify_email(self, token: str) -> None:
+        """
+        Verify a user's email address using the verification token.
+
+        Raises:
+            ValidationError: If the token is invalid or user not found.
+        """
+        payload = decode_token(token)
+        if payload.get("type") != "email_verification":
+            raise ValidationError(message="Invalid verification token.")
+
+        user = await self.user_repo.get_by_id(UUID(payload["sub"]))
+        if user is None:
+            raise NotFoundError(resource="User")
+
+        await self.user_repo.update(user, is_verified=True)
+        await self.db.commit()
+
+    async def request_password_reset(self, email: str) -> str | None:
+        """
+        Generate a password reset token if the email exists.
+
+        Returns the token (to be sent via email), or None if user not found
+        (to prevent email enumeration, callers should still return 200).
+        """
+        user = await self.user_repo.get_by_email(email)
+        if user is None:
+            return None
+        return create_password_reset_token(str(user.id))
+
+    async def reset_password(self, token: str, new_password: str) -> None:
+        """
+        Reset a user's password using a valid reset token.
+
+        Raises:
+            ValidationError: If the token is invalid.
+            NotFoundError: If the user is not found.
+        """
+        payload = decode_token(token)
+        if payload.get("type") != "password_reset":
+            raise ValidationError(message="Invalid reset token.")
+
+        user = await self.user_repo.get_by_id(UUID(payload["sub"]))
+        if user is None:
+            raise NotFoundError(resource="User")
+
+        hashed = hash_password(new_password)
+        await self.user_repo.update(user, hashed_password=hashed)
+        await self.db.commit()
