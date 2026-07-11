@@ -21,7 +21,9 @@ class CourseService:
         return course
 
     async def create_course(self, instructor_id: UUID, **kwargs):
+        from sqlalchemy.orm.attributes import set_committed_value
         course = await self.repo.create(instructor_id=instructor_id, status=CourseStatus.DRAFT, **kwargs)
+        set_committed_value(course, "modules", [])
         await self.db.commit()
         return course
 

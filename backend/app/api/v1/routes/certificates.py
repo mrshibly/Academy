@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
-from app.core.dependencies import get_current_active_user
+from app.core.dependencies import get_current_active_user, require_role
 from app.core.exceptions import NotFoundError
 from app.models.user import User
 from app.schemas.certificate import CertificateRead, CertificateVerifyResponse
@@ -27,3 +27,23 @@ async def my_certificates(user: User = Depends(get_current_active_user), db: Asy
     svc = CertificateService(db)
     certs = await svc.list_by_user_id(user.id)
     return [CertificateRead.model_validate(c) for c in certs]
+
+@router.get("", status_code=200, dependencies=[Depends(require_role("admin"))])
+async def list_certificates(db: AsyncSession = Depends(get_db)):
+    """Admin: list all certificates with user and course info."""
+    svc = CertificateService(db)
+    items = await svc.list_all_certificates()
+    return [
+        {
+            "id": str(c.id),
+            "verification_id": str(c.verification_id),
+            "user_id": str(c.user_id),
+            "user_name": c.user.full_name,
+            "user_email": c.user.email,
+            "course_id": str(c.course_id),
+            "course_title": c.course.title,
+            "pdf_url": c.pdf_url,
+            "issued_at": c.issued_at.isoformat(),
+        }
+        for c in items
+    ]

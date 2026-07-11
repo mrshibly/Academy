@@ -47,3 +47,19 @@ class EnrollmentRepository:
         stmt = select(func.count()).select_from(LessonProgress).where(LessonProgress.enrollment_id == enrollment_id, LessonProgress.status == ProgressStatus.COMPLETED)
         completed = (await self.db.execute(stmt)).scalar() or 0
         return round((completed / total_lessons) * 100, 1)
+
+    async def list_all(self) -> list[Enrollment]:
+        stmt = select(Enrollment).options(
+            selectinload(Enrollment.user),
+            selectinload(Enrollment.course)
+        ).order_by(Enrollment.enrolled_at.desc())
+        result = await self.db.execute(stmt)
+        return list(result.scalars().all())
+
+    async def delete(self, enrollment_id: UUID) -> None:
+        stmt = select(Enrollment).where(Enrollment.id == enrollment_id)
+        result = await self.db.execute(stmt)
+        enrollment = result.scalar_one_or_none()
+        if enrollment:
+            await self.db.delete(enrollment)
+            await self.db.flush()

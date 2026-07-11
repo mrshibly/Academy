@@ -25,3 +25,11 @@ class ResearchRepository:
         self.db.add(pub)
         await self.db.flush()
         return pub
+
+    async def delete(self, pub_id: UUID) -> None:
+        from uuid import UUID
+        result = await self.db.execute(select(Publication).where(Publication.id == pub_id))
+        pub = result.scalar_one_or_none()
+        if pub:
+            await self.db.delete(pub)
+            await self.db.flush()

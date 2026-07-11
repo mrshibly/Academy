@@ -47,3 +47,10 @@ class CareerRepository:
             select(JobApplication).where(JobApplication.job_id == job_id).order_by(JobApplication.created_at.desc())
         )
         return list(result.scalars().all())
+
+    async def delete_job(self, job_id: UUID) -> None:
+        result = await self.db.execute(select(JobPosting).where(JobPosting.id == job_id))
+        job = result.scalar_one_or_none()
+        if job:
+            await self.db.delete(job)
+            await self.db.flush()

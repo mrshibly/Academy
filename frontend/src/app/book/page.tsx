@@ -35,12 +35,35 @@ export default function BookPage() {
     if (!selectedSlot) return;
 
     setLoading(true);
-    // Simulate API booking call against backend router
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const [time, modifier] = selectedSlot.split(" ");
+      let [hoursStr, minutes] = time.split(":");
+      let hours = parseInt(hoursStr, 10);
+      if (modifier === "PM" && hours !== 12) hours += 12;
+      if (modifier === "AM" && hours === 12) hours = 0;
+      
+      const scheduled_time = `${selectedDate}T${String(hours).padStart(2, "0")}:${minutes}:00Z`;
+
+      const response = await fetch("/api/v1/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduled_time,
+          client_name: name,
+          client_email: email,
+          company_name: phone ? `Phone: ${phone}` : "Individual",
+          notes
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to register consultation slot.");
+      }
+
       setSuccess(true);
     } catch (err) {
       console.error(err);
+      alert("Error scheduling appointment slot. Please try another slot.");
     } finally {
       setLoading(false);
     }

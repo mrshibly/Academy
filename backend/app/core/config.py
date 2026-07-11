@@ -8,6 +8,7 @@ variables — never hardcoded. See `.env.example` for the full list.
 from functools import lru_cache
 from typing import List
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -75,6 +76,15 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
     GITHUB_CLIENT_ID: str = ""
     GITHUB_CLIENT_SECRET: str = ""
+
+    @model_validator(mode="after")
+    def validate_production_settings(self) -> "Settings":
+        if self.ENVIRONMENT in ("production", "staging"):
+            if "sqlite" in self.DATABASE_URL.lower():
+                raise ValueError("In staging or production environment, DATABASE_URL cannot be a local SQLite database.")
+            if self.JWT_SECRET_KEY == "CHANGE_ME_GENERATE_A_SECURE_RANDOM_KEY":
+                raise ValueError("In staging or production environment, JWT_SECRET_KEY must be changed from the default value.")
+        return self
 
 
 @lru_cache

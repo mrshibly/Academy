@@ -35,3 +35,7 @@ class CareerService:
 
     async def list_applications(self, job_id: UUID) -> list[JobApplication]:
         return await self.repo.list_applications(job_id)
+
+    async def delete_job(self, job_id: UUID) -> None:
+        await self.repo.delete_job(job_id)
+        await self.db.commit()

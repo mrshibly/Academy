@@ -23,3 +23,8 @@ class ResearchService:
         pub = await self.repo.create(**kwargs)
         await self.db.commit()
         return pub
+
+    async def delete_publication(self, pub_id: UUID) -> None:
+        from uuid import UUID
+        await self.repo.delete(pub_id)
+        await self.db.commit()

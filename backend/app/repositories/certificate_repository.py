@@ -23,6 +23,14 @@ class CertificateRepository:
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
+    async def list_all(self) -> list[Certificate]:
+        stmt = select(Certificate).options(
+            selectinload(Certificate.user),
+            selectinload(Certificate.course)
+        ).order_by(Certificate.issued_at.desc())
+        result = await self.db.execute(stmt)
+        return list(result.scalars().all())
+
     async def get_by_enrollment_id(self, enrollment_id: UUID) -> Certificate | None:
         stmt = select(Certificate).where(Certificate.enrollment_id == enrollment_id)
         result = await self.db.execute(stmt)

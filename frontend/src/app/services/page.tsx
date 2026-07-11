@@ -1,5 +1,11 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BrainCircuit, ShieldAlert, Laptop, MessageSquareQuote, CheckCircle } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Enterprise AI & Cybersecurity Auditing Services — Academy Bangladesh",
+  description: "Elite penetration testing, Web/Mobile audits, custom LLM agent engineering, and Next.js web application development services in Bangladesh.",
+};
 
 export default function ServicesPage() {
   return (

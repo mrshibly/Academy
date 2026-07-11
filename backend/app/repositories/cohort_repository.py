@@ -22,3 +22,10 @@ class CohortRepository:
         self.db.add(cohort)
         await self.db.flush()
         return cohort
+
+    async def delete(self, cohort_id: UUID) -> None:
+        result = await self.db.execute(select(Cohort).where(Cohort.id == cohort_id))
+        cohort = result.scalar_one_or_none()
+        if cohort:
+            await self.db.delete(cohort)
+            await self.db.flush()

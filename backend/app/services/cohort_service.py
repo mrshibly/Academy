@@ -48,3 +48,7 @@ class CohortService:
 
         await self.db.commit()
         return enrolled_count
+
+    async def delete_cohort(self, cohort_id: UUID) -> None:
+        await self.repo.delete(cohort_id)
+        await self.db.commit()

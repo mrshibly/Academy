@@ -5,6 +5,8 @@ import { Shield, BookOpen, User, PhoneCall } from "lucide-react";
 import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
+import Navbar from "./Navbar";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,36 +31,7 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <AuthProvider>
-          {/* Navigation Header */}
-          <header className="header">
-          <div className="container nav">
-            <Link href="/" className="logo">
-              <Shield className="text-accent" style={{ color: "var(--accent-blue)" }} size={28} />
-              <span>Academy<span style={{ color: "var(--accent-blue)" }}>.</span></span>
-            </Link>
-            
-            <nav style={{ display: "flex", alignItems: "center", gap: "2.5rem" }}>
-              <ul className="nav-links">
-                <li><Link href="/" className="nav-link">Home</Link></li>
-                <li><Link href="/services" className="nav-link">Services</Link></li>
-                <li><Link href="/academy" className="nav-link">Academy</Link></li>
-                <li><Link href="/research" className="nav-link">Research</Link></li>
-                <li><Link href="/careers" className="nav-link">Careers</Link></li>
-              </ul>
-              
-              <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                <Link href="/book" className="btn btn-outline" style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}>
-                  <PhoneCall size={16} />
-                  <span>Book Consultation</span>
-                </Link>
-                <Link href="/login" className="btn btn-primary" style={{ padding: "0.5rem 1.25rem", fontSize: "0.875rem" }}>
-                  <User size={16} />
-                  <span>Login</span>
-                </Link>
-              </div>
-            </nav>
-          </div>
-        </header>
+          <Navbar />
 
         {/* Main Content Area */}
         <main style={{ minHeight: "calc(100vh - 4.5rem - 12rem)" }}>

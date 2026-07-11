@@ -8,9 +8,9 @@
   --text-secondary: #475569;
   --text-muted: #94a3b8;
   
-  --accent-blue: #0ea5e9;
-  --accent-blue-hover: #0284c7;
-  --accent-teal: #0d9488;
+  --accent-blue: #10b981;
+  --accent-blue-hover: #059669;
+  --accent-teal: #0f766e;
   --accent-emerald: #10b981;
   --accent-violet: #8b5cf6;
 
@@ -231,5 +231,44 @@ a {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
+}
+
+@media (max-width: 900px) {
+  .mobile-toggle {
+    display: block !important;
+  }
+  .nav-menu {
+    position: absolute;
+    top: 4.5rem;
+    left: 0;
+    right: 0;
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 1.5rem !important;
+    padding: 2rem 1.5rem;
+    display: none !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  }
+  .nav-menu.open {
+    display: flex !important;
+  }
+  .nav-links {
+    flex-direction: column;
+    gap: 1rem !important;
+  }
+  .nav-actions {
+    flex-direction: column;
+    align-items: stretch !important;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+  }
+  .nav-actions .btn {
+    width: 100%;
+  }
+  .dropdown-item {
+    padding: 0.75rem 1rem !important;
+  }
 }
 

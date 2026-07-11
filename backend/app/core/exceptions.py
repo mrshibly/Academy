@@ -112,11 +112,12 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(_request: Request, exc: RequestValidationError) -> JSONResponse:
+        from fastapi.encoders import jsonable_encoder
         return _error_response(
             status_code=422,
             code="VALIDATION_ERROR",
             message="Request validation failed.",
-            details={"errors": exc.errors()},
+            details={"errors": jsonable_encoder(exc.errors())},
         )
 
     @app.exception_handler(StarletteHTTPException)

@@ -63,3 +63,10 @@ class EnrollmentService:
 
         await self.db.commit()
         return progress
+
+    async def list_all_enrollments(self):
+        return await self.enroll_repo.list_all()
+
+    async def delete_enrollment(self, enrollment_id: UUID) -> None:
+        await self.enroll_repo.delete(enrollment_id)
+        await self.db.commit()

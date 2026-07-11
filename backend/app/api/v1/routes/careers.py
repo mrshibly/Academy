@@ -21,8 +21,6 @@ async def list_jobs(db: AsyncSession = Depends(get_db)):
 async def get_job(slug: str, db: AsyncSession = Depends(get_db)):
     svc = CareerService(db)
     job = await svc.get_job_by_slug(slug)
-    return [JobPostingRead.model_validate(job)][0]  # Just helper parsing or return directly:
-    # Actually just return the validated schema
     return JobPostingRead.model_validate(job)
 
 @router.post("/{slug}/apply", response_model=MessageResponse, status_code=201)
@@ -42,3 +40,10 @@ async def list_applications(job_id: UUID, db: AsyncSession = Depends(get_db)):
     svc = CareerService(db)
     apps = await svc.list_applications(job_id)
     return [JobApplicationRead.model_validate(a) for a in apps]
+
+@router.delete("/{job_id}", response_model=MessageResponse, status_code=200, dependencies=[Depends(require_role("admin"))])
+async def delete_job(job_id: UUID, db: AsyncSession = Depends(get_db)):
+    """Admin: delete a job posting."""
+    svc = CareerService(db)
+    await svc.delete_job(job_id)
+    return MessageResponse(message="Job posting deleted successfully.")

@@ -18,10 +18,27 @@ export default function QuotePage() {
     setLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await fetch("/api/v1/contacts/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          company: company || null,
+          service_type: serviceType,
+          budget_range: budgetRange,
+          details
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to register quote request.");
+      }
+
       setSuccess(true);
     } catch (err) {
       console.error(err);
+      alert("Error submitting request. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -90,10 +107,10 @@ export default function QuotePage() {
                   <div style={{ flex: "1 1 200px" }}>
                     <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)" }}>Est. Budget Range</label>
                     <select value={budgetRange} onChange={(e) => setBudgetRange(e.target.value)} style={{ width: "100%", padding: "0.65rem", borderRadius: "6px", border: "1px solid var(--border-color)", marginTop: "0.25rem", outline: "none", background: "white", fontFamily: "inherit" }}>
-                      <option value="$5,000 - $10,000">$5,000 - $10,000</option>
-                      <option value="$10,000 - $25,000">$10,000 - $25,000</option>
-                      <option value="$25,000 - $50,000">$25,000 - $50,000</option>
-                      <option value="$50,000+">$50,000+</option>
+                      <option value="৳1,00,000 - ৳5,00,000">৳1,00,000 - ৳5,00,000 BDT</option>
+                      <option value="৳5,00,000 - ৳10,00,000">৳5,00,000 - ৳10,00,000 BDT</option>
+                      <option value="৳10,00,000 - ৳25,00,000">৳10,00,000 - ৳25,00,000 BDT</option>
+                      <option value="৳25,00,000+">৳25,00,000+ BDT</option>
                     </select>
                   </div>
                 </div>

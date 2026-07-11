@@ -29,3 +29,10 @@ async def enroll_users(cohort_id: UUID, data: CohortEnrollRequest, db: AsyncSess
     svc = CohortService(db)
     enrolled_count = await svc.enroll_users(cohort_id, data.user_ids)
     return MessageResponse(message=f"Enrolled {enrolled_count} users into cohort.")
+
+@router.delete("/{cohort_id}", response_model=MessageResponse, status_code=200, dependencies=[Depends(require_role("admin"))])
+async def delete_cohort(cohort_id: UUID, db: AsyncSession = Depends(get_db)):
+    """Admin: delete a training cohort."""
+    svc = CohortService(db)
+    await svc.delete_cohort(cohort_id)
+    return MessageResponse(message="Cohort deleted successfully.")
