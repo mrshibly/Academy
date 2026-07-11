@@ -95,7 +95,10 @@ class PaymentError(AppException):
 def _error_response(status_code: int, code: str, message: str, details: Dict[str, Any] | None = None) -> JSONResponse:
     return JSONResponse(
         status_code=status_code,
-        content={"error": {"code": code, "message": message, "details": details or {}}},
+        content={
+            "error": {"code": code, "message": message, "details": details or {}},
+            "detail": message  # Backward compatibility for frontend showMessage displays
+        },
     )
 
 
@@ -126,6 +129,31 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code=exc.status_code,
             code="HTTP_ERROR",
             message=str(exc.detail),
+        )
+
+    from sqlalchemy.exc import IntegrityError
+
+    @app.exception_handler(IntegrityError)
+    async def integrity_exception_handler(_request: Request, exc: IntegrityError) -> JSONResponse:
+        error_msg = str(exc.orig) if exc.orig else str(exc)
+        message = "Database integrity violation."
+        code = "INTEGRITY_ERROR"
+        status_code = 400
+        
+        if "courses.slug" in error_msg.lower():
+            message = "A course with this slug already exists."
+            code = "ALREADY_EXISTS"
+            status_code = 409
+        elif "users.email" in error_msg.lower():
+            message = "A user with this email address already registered."
+            code = "ALREADY_EXISTS"
+            status_code = 409
+            
+        return _error_response(
+            status_code=status_code,
+            code=code,
+            message=message,
+            details={"error_message": error_msg}
         )
 
     @app.exception_handler(Exception)
