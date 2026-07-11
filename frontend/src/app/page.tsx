@@ -5,35 +5,60 @@ export default function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="hero">
-        <div className="container" style={{ padding: "4rem 0" }}>
-          <span style={{
-            display: "inline-block",
-            background: "rgba(14, 165, 233, 0.1)",
-            color: "var(--accent-blue)",
-            padding: "0.4rem 1rem",
-            borderRadius: "9999px",
-            fontSize: "0.85rem",
-            fontWeight: 600,
-            marginBottom: "1.5rem"
-          }}>
-            Secure AI & Cybersecurity Services
-          </span>
-          <h1 className="hero-title" style={{ maxWidth: "55rem", margin: "0 auto 1.5rem auto" }}>
-            The Convergence of Applied AI & Offensive Security
-          </h1>
-          <p className="hero-subtitle">
-            Enterprise AI architectures, advanced penetration testing services, and professional-grade practitioner bootcamps to future-proof your organization.
-          </p>
-          
-          <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
-            <Link href="/academy" className="btn btn-accent">
-              <span>Explore Academy</span>
-              <ArrowRight size={18} />
-            </Link>
-            <Link href="/book" className="btn btn-outline">
-              <span>Book Consultation</span>
-            </Link>
+      <section className="hero" style={{ padding: "5rem 0", overflow: "hidden" }}>
+        <div className="container" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
+          <div style={{ textAlign: "left" }}>
+            <span style={{
+              display: "inline-block",
+              background: "rgba(14, 165, 233, 0.1)",
+              color: "var(--accent-blue)",
+              padding: "0.4rem 1rem",
+              borderRadius: "9999px",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              marginBottom: "1.5rem"
+            }}>
+              Secure AI & Cybersecurity Services
+            </span>
+            <h1 className="hero-title" style={{ margin: "0 0 1.5rem 0", textAlign: "left", lineHeight: "1.15" }}>
+              The Convergence of Applied AI & Offensive Security
+            </h1>
+            <p className="hero-subtitle" style={{ margin: "0 0 2rem 0", textAlign: "left" }}>
+              Enterprise AI architectures, advanced penetration testing services, and professional-grade practitioner bootcamps to future-proof your organization.
+            </p>
+            
+            <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-start" }}>
+              <Link href="/academy" className="btn btn-accent">
+                <span>Explore Academy</span>
+                <ArrowRight size={18} />
+              </Link>
+              <Link href="/book" className="btn btn-outline">
+                <span>Book Consultation</span>
+              </Link>
+            </div>
+          </div>
+          <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+            <div className="hero-image-wrapper" style={{
+              position: "relative",
+              borderRadius: "16px",
+              overflow: "hidden",
+              boxShadow: "0 20px 50px rgba(0, 0, 0, 0.08)",
+              background: "white",
+              padding: "1rem",
+              border: "1px solid var(--border-color)",
+              animation: "float 6s ease-in-out infinite"
+            }}>
+              <img 
+                src="/hero-illustration.png" 
+                alt="AI and Cybersecurity Shield" 
+                style={{
+                  maxWidth: "100%",
+                  height: "auto",
+                  borderRadius: "12px",
+                  display: "block"
+                }}
+              />
+            </div>
           </div>
         </div>
       </section>
