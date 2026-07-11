@@ -71,7 +71,7 @@ async def seed() -> None:
             db.add(UserRole(user_id=admin_user.id, role_id=roles["admin"].id))
 
         await db.commit()
-        print("✅ Seed complete: roles, permissions, and admin user created.")
+        print("[SUCCESS] Seed complete: roles, permissions, and admin user created.")
 
 
 if __name__ == "__main__":

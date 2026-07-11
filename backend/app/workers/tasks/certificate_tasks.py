@@ -45,4 +45,30 @@ def generate_certificate_task(self, enrollment_id: str, user_name: str, course_t
 
     file_url = f"{settings.S3_ENDPOINT_URL}/{settings.S3_BUCKET_NAME}/{file_key}" if settings.S3_ENDPOINT_URL else f"https://{settings.S3_BUCKET_NAME}.s3.{settings.S3_REGION}.amazonaws.com/{file_key}"
 
+    # Save to the database
+    from app.db.session import async_session_factory
+    from app.models.certificate import Certificate
+    from app.models.enrollment import Enrollment
+    import asyncio
+
+    async def save_to_db():
+        async with async_session_factory() as db:
+            from sqlalchemy import select
+            stmt = select(Enrollment).where(Enrollment.id == uuid.UUID(enrollment_id))
+            res = await db.execute(stmt)
+            enrollment = res.scalar_one_or_none()
+            if enrollment:
+                cert = Certificate(
+                    enrollment_id=enrollment.id,
+                    user_id=enrollment.user_id,
+                    course_id=enrollment.course_id,
+                    verification_id=uuid.UUID(verification_id),
+                    pdf_url=file_url,
+                    issued_at=datetime.now(timezone.utc)
+                )
+                db.add(cert)
+                await db.commit()
+
+    asyncio.run(save_to_db())
+
     return {"verification_id": verification_id, "pdf_url": file_url, "enrollment_id": enrollment_id}

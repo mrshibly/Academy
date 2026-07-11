@@ -28,9 +28,14 @@ class Settings(BaseSettings):
 
     # ---- Database ----
     DATABASE_URL: str
+    DB_POOL_SIZE: int = 20
+    DB_MAX_OVERFLOW: int = 10
+    DB_POOL_RECYCLE: int = 3600
+    DB_POOL_TIMEOUT: int = 30
 
     # ---- Redis ----
     REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_CACHE_DEFAULT_TTL: int = 300  # seconds
 
     # ---- JWT ----
     JWT_SECRET_KEY: str

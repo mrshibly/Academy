@@ -1,22 +1,25 @@
 """Auth routes — register, login, refresh, verify email, password reset."""
 from __future__ import annotations
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, RefreshRequest, PasswordResetRequest, PasswordResetConfirm, EmailVerificationRequest, MessageResponse
 from app.services.auth_service import AuthService
+from app.core.rate_limit import limiter
 
 router = APIRouter()
 
 @router.post("/register", response_model=MessageResponse, status_code=201)
-async def register(data: RegisterRequest, db: AsyncSession = Depends(get_db)) -> MessageResponse:
+@limiter.limit("5/minute")
+async def register(request: Request, data: RegisterRequest, db: AsyncSession = Depends(get_db)) -> MessageResponse:
     """Register a new user account. Email verification required."""
     svc = AuthService(db)
     result = await svc.register(email=data.email, password=data.password, full_name=data.full_name)
     return MessageResponse(message="Registration successful. Please verify your email.")
 
 @router.post("/login", response_model=TokenResponse, status_code=200)
-async def login(data: LoginRequest, response: Response, db: AsyncSession = Depends(get_db)) -> TokenResponse:
+@limiter.limit("5/minute")
+async def login(request: Request, data: LoginRequest, response: Response, db: AsyncSession = Depends(get_db)) -> TokenResponse:
     """Authenticate and receive access + refresh tokens."""
     svc = AuthService(db)
     tokens = await svc.login(email=data.email, password=data.password)

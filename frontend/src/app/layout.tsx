@@ -1,0 +1,119 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
+import { Shield, BookOpen, User, PhoneCall } from "lucide-react";
+import { AuthProvider } from "@/context/AuthContext";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Academy — AI Dev & Cybersecurity Platform",
+  description: "Enterprise AI Development, Defensive & Offensive Cybersecurity Services, and Professional Practitioner Academy.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
+        <AuthProvider>
+          {/* Navigation Header */}
+          <header className="header">
+          <div className="container nav">
+            <Link href="/" className="logo">
+              <Shield className="text-accent" style={{ color: "var(--accent-blue)" }} size={28} />
+              <span>Academy<span style={{ color: "var(--accent-blue)" }}>.</span></span>
+            </Link>
+            
+            <nav style={{ display: "flex", alignItems: "center", gap: "2.5rem" }}>
+              <ul className="nav-links">
+                <li><Link href="/" className="nav-link">Home</Link></li>
+                <li><Link href="/services" className="nav-link">Services</Link></li>
+                <li><Link href="/academy" className="nav-link">Academy</Link></li>
+                <li><Link href="/research" className="nav-link">Research</Link></li>
+                <li><Link href="/careers" className="nav-link">Careers</Link></li>
+              </ul>
+              
+              <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                <Link href="/book" className="btn btn-outline" style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}>
+                  <PhoneCall size={16} />
+                  <span>Book Consultation</span>
+                </Link>
+                <Link href="/login" className="btn btn-primary" style={{ padding: "0.5rem 1.25rem", fontSize: "0.875rem" }}>
+                  <User size={16} />
+                  <span>Login</span>
+                </Link>
+              </div>
+            </nav>
+          </div>
+        </header>
+
+        {/* Main Content Area */}
+        <main style={{ minHeight: "calc(100vh - 4.5rem - 12rem)" }}>
+          {children}
+        </main>
+
+        {/* Footer */}
+        <footer style={{ backgroundColor: "#0f172a", color: "#f8fafc", padding: "4rem 0 2rem 0" }}>
+          <div className="container" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "3rem" }}>
+            <div>
+              <div className="logo" style={{ color: "#ffffff", marginBottom: "1rem" }}>
+                <Shield style={{ color: "var(--accent-blue)" }} size={24} />
+                <span>Academy.</span>
+              </div>
+              <p style={{ color: "#94a3b8", fontSize: "0.9rem" }}>
+                Leading security and artificial intelligence service provider & practitioner development training institute.
+              </p>
+            </div>
+            <div>
+              <h4 style={{ color: "#ffffff", fontSize: "1.05rem", fontWeight: 600, marginBottom: "1.25rem" }}>Services</h4>
+              <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.9rem", color: "#cbd5e1" }}>
+                <li><Link href="/services/ai-dev">AI Agent Architectures</Link></li>
+                <li><Link href="/services/pentesting">Offensive Penetration Testing</Link></li>
+                <li><Link href="/services/cloud-sec">Cloud Security</Link></li>
+                <li><Link href="/services/app-pentest">Web & Mobile Pentesting</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 style={{ color: "#ffffff", fontSize: "1.05rem", fontWeight: 600, marginBottom: "1.25rem" }}>Academy</h4>
+              <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.9rem", color: "#cbd5e1" }}>
+                <li><Link href="/academy">Cybersecurity Track</Link></li>
+                <li><Link href="/academy">AI & LLM Training</Link></li>
+                <li><Link href="/academy">Live bootcamps</Link></li>
+                <li><Link href="/academy">Certifications</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 style={{ color: "#ffffff", fontSize: "1.05rem", fontWeight: 600, marginBottom: "1.25rem" }}>Contact</h4>
+              <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.9rem", color: "#cbd5e1" }}>
+                <li>Email: info@academy.dev</li>
+                <li>Phone: +1 (555) 019-2831</li>
+                <li>Address: Silicon Valley, CA</li>
+              </ul>
+            </div>
+          </div>
+          <div className="container" style={{ borderTop: "1px solid #1e293b", marginTop: "3rem", paddingTop: "1.5rem", display: "flex", justifyContent: "space-between", fontSize: "0.85rem", color: "#94a3b8" }}>
+            <span>&copy; {new Date().getFullYear()} Academy Platform. All rights reserved.</span>
+            <div style={{ display: "flex", gap: "1.5rem" }}>
+              <Link href="/privacy">Privacy Policy</Link>
+              <Link href="/terms">Terms of Service</Link>
+            </div>
+          </div>
+        </footer>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}

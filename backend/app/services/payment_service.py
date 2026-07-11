@@ -102,10 +102,32 @@ class PaymentService:
             session = event["data"]["object"]
             order_id = session.get("metadata", {}).get("order_id")
             if order_id:
-                stmt = select(Order).where(Order.id == UUID(order_id))
+                from sqlalchemy.orm import selectinload
+                stmt = select(Order).where(Order.id == UUID(order_id)).options(selectinload(Order.items))
                 order = (await self.db.execute(stmt)).scalar_one_or_none()
                 if order:
                     order.status = OrderStatus.PAID
                     order.gateway_event_id = event["id"]
+                    
+                    # Create enrollments
+                    from app.services.enrollment_service import EnrollmentService
+                    enroll_svc = EnrollmentService(self.db)
+                    for item in order.items:
+                        if item.item_type == ItemType.COURSE:
+                            try:
+                                await enroll_svc.enroll(order.user_id, item.item_id)
+                            except Exception:
+                                pass
+                                
+                    # Queue notification email
+                    from app.workers.tasks.email_tasks import send_email_task
+                    from app.repositories.user_repository import UserRepository
+                    user_repo = UserRepository(self.db)
+                    user = await user_repo.get_by_id(order.user_id)
+                    if user:
+                        send_email_task.delay(
+                            to_email=user.email,
+                            subject="Payment Confirmation — Academy",
+                            body_html=f"<h3>Hello {user.full_name},</h3><p>Your payment for Order #{order.id} was successful! You have been enrolled in your courses.</p>"
+                        )
                     await self.db.commit()
-                    # Enrollment creation is triggered separately after payment confirmation

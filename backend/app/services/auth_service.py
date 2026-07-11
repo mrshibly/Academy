@@ -49,6 +49,16 @@ class AuthService:
         await self.db.commit()
 
         verification_token = create_email_verification_token(str(user.id))
+        
+        # Trigger welcome/verification email background task
+        from app.workers.tasks.email_tasks import send_email_task
+        verification_url = f"{get_settings().ALLOWED_ORIGINS}/verify-email?token={verification_token}"
+        send_email_task.delay(
+            to_email=user.email,
+            subject="Verify Your Email — Academy",
+            body_html=f"<h3>Welcome to Academy!</h3><p>Please click the link below to verify your email address:</p><p><a href='{verification_url}'>Verify Email</a></p>"
+        )
+
         return {"user_id": str(user.id), "verification_token": verification_token}
 
     async def login(self, email: str, password: str) -> dict:
@@ -143,7 +153,19 @@ class AuthService:
         user = await self.user_repo.get_by_email(email)
         if user is None:
             return None
-        return create_password_reset_token(str(user.id))
+        
+        token = create_password_reset_token(str(user.id))
+        
+        # Trigger reset email background task
+        from app.workers.tasks.email_tasks import send_email_task
+        reset_url = f"{get_settings().ALLOWED_ORIGINS}/reset-password?token={token}"
+        send_email_task.delay(
+            to_email=user.email,
+            subject="Reset Your Password — Academy",
+            body_html=f"<h3>Password Reset Request</h3><p>Please click the link below to reset your password:</p><p><a href='{reset_url}'>Reset Password</a></p>"
+        )
+
+        return token
 
     async def reset_password(self, token: str, new_password: str) -> None:
         """
