@@ -385,7 +385,9 @@ pytest app/tests/unit/test_auth_service.py
 ### Production Checklist
 
 - [ ] Set `ENVIRONMENT=production` and `DEBUG=false`
-- [ ] Use a strong, unique `JWT_SECRET_KEY`
+- [ ] Use a strong, unique `JWT_SECRET_KEY` (Enforced: The app will fail to start in production if the default `CHANGE_ME_GENERATE_A_SECURE_RANDOM_KEY` placeholder is used)
+- [ ] Set `DATABASE_URL` to a production PostgreSQL database (Enforced: The app will block starting if a local SQLite database is used with `ENVIRONMENT=production` or `staging`)
+- [ ] Configure `REDIS_URL` pointing to a running Redis instance (Enforced: Silent in-memory fallback for rate limiting is disabled in production/staging; a functional Redis connection check is performed during startup)
 - [ ] Configure real Stripe keys (not test keys)
 - [ ] Set up proper SMTP for transactional emails
 - [ ] Configure S3 bucket with proper IAM policies
