@@ -77,19 +77,30 @@ export default function LearnPage() {
         })
       });
 
-      if (res.ok) {
-        setCompletedLessonIds((prev) => {
-          const next = new Set(prev);
-          if (next.has(lessonId)) {
-            next.delete(lessonId);
-          } else {
-            next.add(lessonId);
-          }
-          return next;
-        });
+      if (res.status === 401) {
+        alert("Your session has expired. Please log in again.");
+        router.push("/login");
+        return;
       }
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        alert(body.detail || "Failed to update progress.");
+        return;
+      }
+
+      setCompletedLessonIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(lessonId)) {
+          next.delete(lessonId);
+        } else {
+          next.add(lessonId);
+        }
+        return next;
+      });
     } catch (err) {
       console.error(err);
+      alert("Network error updating progress.");
     }
   };
 
