@@ -29,6 +29,7 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin):
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     oauth_provider: Mapped[str | None] = mapped_column(String(50), nullable=True)
     oauth_provider_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    signature_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
 
     # Relationships
     user_roles: Mapped[List["UserRole"]] = relationship("UserRole", back_populates="user", lazy="selectin")

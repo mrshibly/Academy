@@ -13,7 +13,17 @@ from app.services.user_service import UserService
 router = APIRouter()
 
 def _user_to_read(user: User) -> UserRead:
-    return UserRead(id=user.id, email=user.email, full_name=user.full_name, avatar_url=user.avatar_url, is_active=user.is_active, is_verified=user.is_verified, roles=[ur.role.name for ur in user.user_roles], created_at=user.created_at)
+    return UserRead(
+        id=user.id,
+        email=user.email,
+        full_name=user.full_name,
+        avatar_url=user.avatar_url,
+        signature_url=user.signature_url,
+        is_active=user.is_active,
+        is_verified=user.is_verified,
+        roles=[ur.role.name for ur in user.user_roles],
+        created_at=user.created_at
+    )
 
 @router.get("/me", response_model=UserRead, status_code=200)
 async def get_me(user: User = Depends(get_current_active_user)) -> UserRead:

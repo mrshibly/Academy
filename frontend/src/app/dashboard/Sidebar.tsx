@@ -25,6 +25,7 @@ import {
   GraduationCap,
   Sun,
   Moon,
+  User,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -78,6 +79,12 @@ const adminSections: NavSection[] = [
       { label: "Inbox", href: "/dashboard/admin/contacts", icon: <MessageSquare size={18} /> },
     ],
   },
+  {
+    title: "Account",
+    items: [
+      { label: "Profile Settings", href: "/dashboard/profile", icon: <User size={18} /> },
+    ],
+  },
 ];
 
 const instructorSections: NavSection[] = [
@@ -94,6 +101,12 @@ const instructorSections: NavSection[] = [
       { label: "Blog Workspace", href: "/dashboard/instructor/blog", icon: <FileText size={18} /> },
     ],
   },
+  {
+    title: "Account",
+    items: [
+      { label: "Profile Settings", href: "/dashboard/profile", icon: <User size={18} /> },
+    ],
+  },
 ];
 
 const studentSections: NavSection[] = [
@@ -107,6 +120,12 @@ const studentSections: NavSection[] = [
     title: "Learning Tracks",
     items: [
       { label: "Browse Academy", href: "/academy", icon: <BookOpen size={18} /> },
+    ],
+  },
+  {
+    title: "Account",
+    items: [
+      { label: "Profile Settings", href: "/dashboard/profile", icon: <User size={18} /> },
     ],
   },
 ];

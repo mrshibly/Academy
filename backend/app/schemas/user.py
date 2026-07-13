@@ -9,6 +9,7 @@ class UserRead(BaseModel):
     email: EmailStr
     full_name: str
     avatar_url: str | None = None
+    signature_url: str | None = None
     is_active: bool
     is_verified: bool
     roles: list[str] = []
@@ -18,6 +19,7 @@ class UserRead(BaseModel):
 class UserUpdate(BaseModel):
     full_name: str | None = Field(None, min_length=1, max_length=255)
     avatar_url: str | None = None
+    signature_url: str | None = None
 
 class UserCreate(BaseModel):
     email: EmailStr

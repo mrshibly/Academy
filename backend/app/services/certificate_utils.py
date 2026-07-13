@@ -18,21 +18,208 @@ async def generate_certificate_in_process(
     user_name: str,
     course_title: str
 ) -> Certificate | None:
-    """Generate a graduation certificate PDF and save database record synchronously."""
+    """Generate a high-fidelity PDF certificate and save database record synchronously."""
     settings = get_settings()
     verification_id = uuid.uuid4()
     issued_at_str = datetime.now(timezone.utc).strftime("%B %d, %Y")
 
+    # Find enrollment, course and instructor signature
+    stmt = select(Enrollment).where(Enrollment.id == enrollment_id)
+    res = await db.execute(stmt)
+    enrollment = res.scalar_one_or_none()
+    
+    instructor_name = "Course Instructor"
+    signature_img_html = ""
+    
+    if enrollment:
+        from app.models.course import Course
+        from app.models.user import User
+        course_stmt = select(Course).where(Course.id == enrollment.course_id)
+        course = (await db.execute(course_stmt)).scalar_one_or_none()
+        if course:
+            course_title = course.title
+            instructor_stmt = select(User).where(User.id == course.instructor_id)
+            instructor = (await db.execute(instructor_stmt)).scalar_one_or_none()
+            if instructor:
+                instructor_name = instructor.full_name
+                if instructor.signature_url:
+                    signature_img_html = f'<img src="{instructor.signature_url}" style="max-height: 50px; max-width: 200px; position: absolute; bottom: 5px; left: 20px; object-fit: contain;" />'
+
     html_content = f"""
-    <html><body style="font-family:Arial;text-align:center;padding:60px;">
-    <h1 style="color:#1a365d;">Certificate of Completion</h1>
-    <p style="font-size:24px;margin-top:40px;">This certifies that</p>
-    <h2 style="color:#2d3748;font-size:32px;">{user_name}</h2>
-    <p style="font-size:20px;">has successfully completed</p>
-    <h3 style="color:#1a365d;font-size:28px;">{course_title}</h3>
-    <p style="margin-top:40px;">Issued: {issued_at_str}</p>
-    <p style="font-size:12px;color:#718096;">Verification ID: {verification_id}</p>
-    </body></html>
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        @page {{
+          size: A4 landscape;
+          margin: 0;
+        }}
+        body {{
+          margin: 0;
+          padding: 0;
+          font-family: 'Helvetica Neue', Arial, sans-serif;
+          background: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+        }}
+        .cert-container {{
+          width: 297mm;
+          height: 210mm;
+          position: relative;
+          box-sizing: border-box;
+          border: 20px solid transparent;
+          background-image: linear-gradient(white, white), linear-gradient(135deg, #0ea5e9, #4f46e5);
+          background-origin: border-box;
+          background-clip: content-box, border-box;
+          padding: 60px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+        }}
+        .header {{
+          text-align: center;
+          margin-top: 10px;
+        }}
+        .brand-title {{
+          font-size: 14px;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: #64748b;
+          font-weight: 800;
+        }}
+        .brand-url {{
+          font-size: 11px;
+          color: #94a3b8;
+          margin-top: 2px;
+        }}
+        .title-section {{
+          text-align: center;
+        }}
+        .main-title {{
+          font-size: 48px;
+          font-weight: 700;
+          color: #1e3a8a;
+          margin: 0;
+          letter-spacing: 0.05em;
+        }}
+        .divider {{
+          width: 250px;
+          height: 2px;
+          background: linear-gradient(to right, transparent, #1e3a8a, transparent);
+          margin: 8px auto;
+        }}
+        .sub-title {{
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: #475569;
+          font-weight: 700;
+          margin-top: 5px;
+        }}
+        .student-name {{
+          font-family: Georgia, serif;
+          font-size: 44px;
+          font-style: italic;
+          color: #1d4ed8;
+          margin: 15px 0;
+          text-align: center;
+          font-weight: 600;
+        }}
+        .course-info {{
+          font-size: 16px;
+          color: #475569;
+          text-align: center;
+          max-width: 650px;
+          line-height: 1.5;
+        }}
+        .course-title {{
+          font-weight: 800;
+          color: #0f172a;
+        }}
+        .footer-section {{
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          padding: 0 40px;
+          margin-bottom: 10px;
+          box-sizing: border-box;
+        }}
+        .footer-col {{
+          display: flex;
+          flex-direction: column;
+          width: 240px;
+          position: relative;
+        }}
+        .signature-line {{
+          border-bottom: 2px solid #cbd5e1;
+          height: 45px;
+          margin-bottom: 10px;
+          position: relative;
+        }}
+        .col-label {{
+          font-size: 12px;
+          font-weight: 800;
+          color: #0f172a;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }}
+        .col-sublabel {{
+          font-size: 10px;
+          color: #64748b;
+          text-transform: uppercase;
+          margin-top: 2px;
+          font-weight: 600;
+        }}
+      </style>
+    </head>
+    <body>
+      <div class="cert-container">
+        <div class="header">
+          <div class="brand-title">ACADEMY PLATFORM</div>
+          <div class="brand-url">www.academy.dev</div>
+        </div>
+
+        <div class="title-section">
+          <h1 class="main-title">CERTIFICATE</h1>
+          <div class="sub-title">OF COMPLETION</div>
+          <div class="divider"></div>
+          <p style="font-size: 11px; color: #64748b; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 0;">
+            We proudly present this certificate to
+          </p>
+        </div>
+
+        <div class="student-name">{user_name}</div>
+
+        <div class="course-info">
+          for successfully completing the specialized learning curriculum of<br>
+          <span class="course-title">{course_title}</span>
+        </div>
+
+        <div class="footer-section">
+          <div class="footer-col" style="text-align: left;">
+            <div class="signature-line">
+              {signature_img_html}
+            </div>
+            <div class="col-label">{instructor_name}</div>
+            <div class="col-sublabel">Course Instructor</div>
+          </div>
+          
+          <div class="footer-col" style="text-align: right;">
+            <div style="height: 45px; display: flex; flex-direction: column; justify-content: flex-end; margin-bottom: 10px;">
+              <div style="font-size: 10px; font-weight: 600; color: #475569; margin-bottom: 2px;">ISSUING DATE: {issued_at_str}</div>
+              <div style="font-size: 10px; font-weight: 600; color: #475569;">CREDENTIAL ID: {verification_id}</div>
+            </div>
+            <div class="col-label">VERIFIED CREDENTIAL</div>
+            <div class="col-sublabel">verification.academy.dev</div>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
     """
 
     try:
@@ -65,16 +252,10 @@ async def generate_certificate_in_process(
             else f"https://{settings.S3_BUCKET_NAME}.s3.{settings.S3_REGION}.amazonaws.com/{file_key}"
         )
     except Exception as e:
-        # Fallback file URL if S3 is unavailable
         import logging
         logging.getLogger("uvicorn.error").warning(f"S3 upload failed for certificate, using fallback: {e}")
         file_url = f"/api/v1/certificates/fallback/{verification_id}.pdf"
 
-    # Find enrollment
-    stmt = select(Enrollment).where(Enrollment.id == enrollment_id)
-    res = await db.execute(stmt)
-    enrollment = res.scalar_one_or_none()
-    
     if enrollment:
         # Check if certificate already exists to avoid unique constraint violations
         existing_stmt = select(Certificate).where(Certificate.enrollment_id == enrollment_id)
