@@ -58,14 +58,33 @@ class EnrollmentService:
             course_stmt = select(Course).where(Course.id == enrollment.course_id)
             course = (await self.db.execute(course_stmt)).scalar_one()
             
-            # Dispatch background task for PDF generation
+            # Check if Redis broker is online first before calling Celery to avoid blocking hangs
+            redis_online = False
             try:
-                generate_certificate_task.delay(str(enrollment.id), user.full_name, course.title)
-            except Exception as e:
+                import socket
+                from urllib.parse import urlparse
+                from app.core.config import get_settings
+                redis_url = get_settings().REDIS_URL
+                if redis_url:
+                    parsed = urlparse(redis_url)
+                    host = parsed.hostname or "127.0.0.1"
+                    port = parsed.port or 6379
+                    with socket.create_connection((host, port), timeout=0.2):
+                        redis_online = True
+            except Exception:
+                redis_online = False
+
+            if redis_online:
+                try:
+                    generate_certificate_task.delay(str(enrollment.id), user.full_name, course.title)
+                except Exception as e:
+                    import logging
+                    logging.getLogger("uvicorn.error").warning(f"Celery dispatch failed: {e}")
+                    redis_online = False
+
+            if not redis_online:
                 import logging
-                logging.getLogger("uvicorn.error").warning(
-                    f"Could not dispatch certificate generation task (Redis/Celery offline): {e}. Falling back to synchronous generation..."
-                )
+                logging.getLogger("uvicorn.error").info("Redis offline. Generating certificate synchronously in-process...")
                 from app.services.certificate_utils import generate_certificate_in_process
                 await generate_certificate_in_process(self.db, enrollment.id, user.full_name, course.title)
 
