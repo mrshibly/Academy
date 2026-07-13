@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.core.dependencies import get_current_active_user, require_role
 from app.models.user import User
-from app.schemas.user import UserRead, UserUpdate, UserRoleUpdate
+from app.schemas.user import UserRead, UserUpdate, UserRoleUpdate, UserCreate
 from app.schemas.common import PaginatedResponse
 from app.schemas.auth import MessageResponse
 from app.services.user_service import UserService
@@ -26,6 +26,18 @@ async def update_me(data: UserUpdate, user: User = Depends(get_current_active_us
     svc = UserService(db)
     updated = await svc.update_profile(user.id, **data.model_dump(exclude_unset=True))
     return _user_to_read(updated)
+
+@router.post("", response_model=UserRead, status_code=201, dependencies=[Depends(require_role("admin"))])
+async def create_user(data: UserCreate, db: AsyncSession = Depends(get_db)):
+    """Create a new user manually (admin only)."""
+    svc = UserService(db)
+    user = await svc.create_user(
+        email=data.email,
+        password_plain=data.password,
+        full_name=data.full_name,
+        roles=data.roles
+    )
+    return _user_to_read(user)
 
 @router.get("", response_model=PaginatedResponse[UserRead], status_code=200, dependencies=[Depends(require_role("admin"))])
 async def list_users(page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100), db: AsyncSession = Depends(get_db)):

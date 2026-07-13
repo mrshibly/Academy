@@ -1,45 +1,16 @@
-# Academy Platform Overhaul — Task Tracker
+# Checklist: Role-Based Dashboard Separation & Signups
 
-## Phase 1: Admin Dashboard Sidebar + Google OAuth
+## Phase 1: Backend Role Restrictions & Promotion
+- [x] Enforce student-only signup in `AuthService` (`register` and `oauth_login_or_register`)
+- [x] Add admin-only manual user creation in `routes/users.py`
+- [x] Add admin-only role promotion endpoint in `routes/users.py`
 
-### Dashboard Layout System
-- [x] Create `dashboard/layout.tsx` — sidebar layout, no public navbar/footer
-- [x] Create `dashboard/Sidebar.tsx` — collapsible sidebar with grouped nav items
-- [x] Modify root `layout.tsx` — hide navbar/footer for `/dashboard/*` routes
+## Phase 2: Frontend Signups & Role Selection
+- [x] Verify `register/page.tsx` has no public role selectors
+- [x] Add manual user creation dialog in `dashboard/admin/users/page.tsx`
+- [x] Add promotion dropdown menu to `dashboard/admin/users/page.tsx`
 
-### Admin Dashboard Decomposition
-- [x] Refactor `admin/page.tsx` — SecOps overview only (~150 lines)
-- [x] Create `admin/courses/page.tsx` — Course manager
-- [x] Create `admin/users/page.tsx` — User directory
-- [x] Create `admin/blog/page.tsx` — Blog CMS
-- [x] Create `admin/bookings/page.tsx` — Bookings list
-- [x] Create `admin/services/page.tsx` — Service catalog CMS
-- [x] Create `admin/research/page.tsx` — Research publications
-- [x] Create `admin/careers/page.tsx` — Careers CMS + applications
-- [x] Create `admin/contacts/page.tsx` — Inbox
-- [x] Create `admin/tickets/page.tsx` — Support desk
-- [x] Create `admin/enrollments/page.tsx` — Enrollment management
-- [x] Create `admin/certificates/page.tsx` — Certificate management
-- [x] Create `admin/cohorts/page.tsx` — Cohort management
-
-### Google OAuth Integration
-- [x] Add `authlib` to `pyproject.toml`
-- [x] Create `backend/app/api/v1/routes/oauth.py` — OAuth routes
-- [x] Add `oauth_login_or_register` to `auth_service.py`
-- [x] Register OAuth router in `router.py`
-- [x] Add "Continue with Google" button to login page
-- [x] Add "Sign up with Google" button to register page
-
-## Phase 2: Data Quality + Auth Robustness
-- [x] Token auto-refresh in `AuthContext.tsx`
-- [x] `ProtectedRoute.tsx` component
-- [x] `Toast.tsx` global notification system
-- [x] `DataTable.tsx` reusable component
-
-## Phase 3: Polish + Production Hardening
-- [x] Password complexity validation
-- [x] Account lockout
-- [x] `readyz` probe with real DB/Redis checks
-- [x] Dark mode toggle
-- [x] Skeleton loading screens
-- [x] Self-hosted hero image
+## Phase 3: Dashboard Layouts
+- [x] Enhance Student Dashboard `dashboard/student/page.tsx`
+- [x] Build out Instructor Dashboard `dashboard/instructor/page.tsx`
+- [x] Verify role routing redirects in `login/page.tsx`

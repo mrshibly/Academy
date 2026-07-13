@@ -10,6 +10,10 @@ export default function AdminUsersPage() {
   const [fetching, setFetching] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  
+  const [newUserForm, setNewUserForm] = useState({
+    email: "", password: "", full_name: "", role: "instructor"
+  });
 
   const headers = { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
 
@@ -35,6 +39,32 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/v1/users", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          email: newUserForm.email,
+          password: newUserForm.password,
+          full_name: newUserForm.full_name,
+          roles: [newUserForm.role]
+        })
+      });
+      if (res.ok) {
+        showMessage("User created successfully!");
+        setNewUserForm({ email: "", password: "", full_name: "", role: "instructor" });
+        fetchUsers();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        showMessage(body.detail || "Failed to create user.", "error");
+      }
+    } catch {
+      showMessage("Error connecting to server.", "error");
+    }
+  };
 
   const handleUpdateRole = async (userId: string, selectedRole: string) => {
     try {
@@ -80,7 +110,7 @@ export default function AdminUsersPage() {
         <h1 style={{ fontSize: "1.75rem", fontWeight: 800, display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <Users size={24} style={{ color: "var(--accent-blue)" }} /> User Directory
         </h1>
-        <p style={{ color: "var(--text-secondary)", marginTop: "0.25rem" }}>Manage platform user profiles, role elevations, and access overrides</p>
+        <p style={{ color: "var(--text-secondary)", marginTop: "0.25rem" }}>Manage platform user profiles, role elevations, and manual teacher creation</p>
       </div>
 
       {message && (
@@ -95,83 +125,117 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "1.5rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-          <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>Registered Users ({filtered.length})</h2>
-          <div style={{ position: "relative" }}>
-            <Search size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-            <input
-              type="text" placeholder="Search by name or email..."
-              value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "260px" }}
-            />
+      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "2.5rem" }}>
+        {/* User List */}
+        <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "1.5rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+            <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>Registered Users ({filtered.length})</h2>
+            <div style={{ position: "relative" }}>
+              <Search size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+              <input
+                type="text" placeholder="Search by name or email..."
+                value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "220px" }}
+              />
+            </div>
           </div>
+
+          {fetching ? (
+            <p style={{ color: "var(--text-muted)", padding: "3rem 0", textAlign: "center" }}>Loading user list...</p>
+          ) : filtered.length === 0 ? (
+            <p style={{ color: "var(--text-secondary)", textAlign: "center", padding: "3rem 0" }}>No users match the search parameters.</p>
+          ) : (
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
+                <thead>
+                  <tr style={{ background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)", color: "var(--text-secondary)", fontWeight: 600 }}>
+                    <th style={{ padding: "1rem" }}>Full Name</th>
+                    <th style={{ padding: "1rem" }}>Email</th>
+                    <th style={{ padding: "1rem" }}>Roles</th>
+                    <th style={{ padding: "1rem" }}>States</th>
+                    <th style={{ padding: "1rem" }}>Action Override</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((u) => (
+                    <tr key={u.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
+                      <td style={{ padding: "1rem", fontWeight: 600 }}>{u.full_name}</td>
+                      <td style={{ padding: "1rem", fontFamily: "monospace" }}>{u.email}</td>
+                      <td style={{ padding: "1rem" }}>
+                        <select 
+                          value={u.roles[0] || "student"} 
+                          onChange={(e) => handleUpdateRole(u.id, e.target.value)}
+                          style={{ padding: "0.3rem 0.6rem", border: "1px solid var(--border-color)", borderRadius: "4px", background: "white", fontSize: "0.85rem", fontWeight: 600 }}
+                        >
+                          <option value="student">Student</option>
+                          <option value="instructor">Instructor</option>
+                          <option value="corporate_client">Corporate Client</option>
+                          <option value="admin">Administrator</option>
+                        </select>
+                      </td>
+                      <td style={{ padding: "1rem" }}>
+                        <div style={{ display: "flex", gap: "1rem" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: u.is_verified ? "var(--accent-emerald)" : "var(--text-muted)", fontSize: "0.8rem", fontWeight: 500 }}>
+                            {u.is_verified ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                            <span>Verified</span>
+                          </span>
+                          <span style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: u.is_active ? "var(--accent-emerald)" : "#ef4444", fontSize: "0.8rem", fontWeight: 500 }}>
+                            {u.is_active ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                            <span>Active</span>
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ padding: "1rem" }}>
+                        {u.id !== currentUser?.id ? (
+                          <button 
+                            onClick={() => handleDeleteUser(u.id)}
+                            style={{ color: "#ef4444", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontWeight: 600, fontSize: "0.85rem" }}
+                          >
+                            <Trash2 size={16} />
+                            <span>Delete</span>
+                          </button>
+                        ) : (
+                          <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>Self (Current Actor)</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
-        {fetching ? (
-          <p style={{ color: "var(--text-muted)", padding: "3rem 0", textAlign: "center" }}>Loading user list...</p>
-        ) : filtered.length === 0 ? (
-          <p style={{ color: "var(--text-secondary)", textAlign: "center", padding: "3rem 0" }}>No users match the search parameters.</p>
-        ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
-              <thead>
-                <tr style={{ background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)", color: "var(--text-secondary)", fontWeight: 600 }}>
-                  <th style={{ padding: "1rem" }}>Full Name</th>
-                  <th style={{ padding: "1rem" }}>Email</th>
-                  <th style={{ padding: "1rem" }}>Roles</th>
-                  <th style={{ padding: "1rem" }}>States</th>
-                  <th style={{ padding: "1rem" }}>Action Override</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((u) => (
-                  <tr key={u.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
-                    <td style={{ padding: "1rem", fontWeight: 600 }}>{u.full_name}</td>
-                    <td style={{ padding: "1rem", fontFamily: "monospace" }}>{u.email}</td>
-                    <td style={{ padding: "1rem" }}>
-                      <select 
-                        value={u.roles[0] || "student"} 
-                        onChange={(e) => handleUpdateRole(u.id, e.target.value)}
-                        style={{ padding: "0.3rem 0.6rem", border: "1px solid var(--border-color)", borderRadius: "4px", background: "white", fontSize: "0.85rem", fontWeight: 600 }}
-                      >
-                        <option value="student">Student</option>
-                        <option value="instructor">Instructor</option>
-                        <option value="corporate_client">Corporate Client</option>
-                        <option value="admin">Administrator</option>
-                      </select>
-                    </td>
-                    <td style={{ padding: "1rem" }}>
-                      <div style={{ display: "flex", gap: "1rem" }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: u.is_verified ? "var(--accent-emerald)" : "var(--text-muted)", fontSize: "0.8rem", fontWeight: 500 }}>
-                          {u.is_verified ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                          <span>Verified</span>
-                        </span>
-                        <span style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: u.is_active ? "var(--accent-emerald)" : "#ef4444", fontSize: "0.8rem", fontWeight: 500 }}>
-                          {u.is_active ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                          <span>Active</span>
-                        </span>
-                      </div>
-                    </td>
-                    <td style={{ padding: "1rem" }}>
-                      {u.id !== currentUser?.id ? (
-                        <button 
-                          onClick={() => handleDeleteUser(u.id)}
-                          style={{ color: "#ef4444", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontWeight: 600, fontSize: "0.85rem" }}
-                        >
-                          <Trash2 size={16} />
-                          <span>Delete</span>
-                        </button>
-                      ) : (
-                        <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>Self (Current Actor)</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {/* Create User Form */}
+        <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "1.75rem", height: "fit-content", position: "sticky", top: "2rem" }}>
+          <h2 style={{ fontSize: "1.15rem", fontWeight: 700, marginBottom: "1.25rem" }}>Create New User</h2>
+          <form onSubmit={handleCreateUser} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Full Name *</label>
+              <input type="text" required value={newUserForm.full_name} onChange={(e) => setNewUserForm({ ...newUserForm, full_name: e.target.value })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", fontSize: "0.9rem" }} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Email Address *</label>
+              <input type="email" required value={newUserForm.email} onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", fontSize: "0.9rem" }} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Password *</label>
+              <input type="password" required value={newUserForm.password} onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", fontSize: "0.9rem" }} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Role *</label>
+              <select value={newUserForm.role} onChange={(e) => setNewUserForm({ ...newUserForm, role: e.target.value })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", background: "white", fontSize: "0.9rem" }}>
+                <option value="student">Student</option>
+                <option value="instructor">Instructor (Teacher)</option>
+                <option value="corporate_client">Corporate Client</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <button type="submit" className="btn btn-accent" style={{ width: "100%", marginTop: "0.5rem" }}>
+              Create User Profile
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -14,6 +14,24 @@ class UserService:
         self.db = db
         self.user_repo = UserRepository(db)
 
+    async def create_user(self, email: str, password_plain: str, full_name: str, roles: list[str]) -> User:
+        from app.core.exceptions import ConflictError
+        existing = await self.user_repo.get_by_email(email)
+        if existing is not None:
+            raise ConflictError(message="An account with this email already exists.")
+        
+        hashed = hash_password(password_plain)
+        user = await self.user_repo.create(email=email, hashed_password=hashed, full_name=full_name, is_verified=True)
+        
+        for r_name in roles:
+            role_stmt = select(Role).where(Role.name == r_name)
+            role = (await self.db.execute(role_stmt)).scalar_one_or_none()
+            if role:
+                self.db.add(UserRole(user_id=user.id, role_id=role.id))
+                
+        await self.db.commit()
+        return await self.user_repo.get_by_id(user.id)  # type: ignore
+
     async def get_profile(self, user_id: UUID) -> User:
         user = await self.user_repo.get_by_id(user_id)
         if user is None:
