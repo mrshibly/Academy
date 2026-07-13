@@ -12,8 +12,10 @@ api_v1_router = APIRouter()
 
 # ---- Auth ----
 from app.api.v1.routes.auth import router as auth_router
+from app.api.v1.routes.oauth import router as oauth_router
 
 api_v1_router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
+api_v1_router.include_router(oauth_router, prefix="/auth", tags=["Authentication"])
 
 # ---- Users ----
 from app.api.v1.routes.users import router as users_router

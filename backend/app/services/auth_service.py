@@ -7,6 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import ConflictError, UnauthorizedError, NotFoundError, ValidationError
 from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token, decode_token, create_email_verification_token, create_password_reset_token
 from app.core.config import get_settings
+from sqlalchemy.orm import selectinload
+from app.models.user import User
 from app.models.role import Role, UserRole
 from app.repositories.user_repository import UserRepository
 
@@ -60,6 +62,70 @@ class AuthService:
         )
 
         return {"user_id": str(user.id), "verification_token": verification_token}
+
+    async def oauth_login_or_register(
+        self,
+        provider: str,
+        provider_id: str,
+        email: str,
+        full_name: str,
+        avatar_url: str | None = None
+    ) -> dict:
+        """Authenticate or register a user using an OAuth provider."""
+        # 1. Try to find user by provider + provider_id
+        stmt = select(User).where(
+            User.oauth_provider == provider,
+            User.oauth_provider_id == provider_id,
+            User.deleted_at.is_(None)
+        ).options(selectinload(User.user_roles).selectinload(UserRole.role))
+        result = await self.db.execute(stmt)
+        user = result.scalar_one_or_none()
+
+        # 2. If not found by OAuth, try by email
+        if user is None:
+            user = await self.user_repo.get_by_email(email)
+            if user is not None:
+                # Link existing user account to this OAuth provider
+                user.oauth_provider = provider
+                user.oauth_provider_id = provider_id
+                if avatar_url and not user.avatar_url:
+                    user.avatar_url = avatar_url
+                await self.db.flush()
+
+        # 3. If still not found, create new user
+        if user is None:
+            user = await self.user_repo.create(
+                email=email,
+                full_name=full_name,
+                avatar_url=avatar_url,
+                is_verified=True,  # OAuth emails are verified
+                oauth_provider=provider,
+                oauth_provider_id=provider_id,
+                hashed_password=None  # No local password
+            )
+            # Assign default student role
+            role_stmt = select(Role).where(Role.name == "student")
+            role = (await self.db.execute(role_stmt)).scalar_one_or_none()
+            if role:
+                user_role = UserRole(user_id=user.id, role_id=role.id)
+                self.db.add(user_role)
+            await self.db.flush()
+
+        # 4. Commit transaction
+        await self.db.commit()
+
+        # 5. Generate tokens
+        roles = [ur.role.name for ur in user.user_roles]
+        settings = get_settings()
+        access_token = create_access_token(str(user.id), roles=roles)
+        refresh_token = create_refresh_token(str(user.id))
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "expires_in": settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        }
 
     async def login(self, email: str, password: str) -> dict:
         """

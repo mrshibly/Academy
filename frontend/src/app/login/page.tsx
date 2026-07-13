@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -13,6 +13,75 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleLoginCallback = async (response: any) => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/v1/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_token: response.credential }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.detail || "Google authentication failed.");
+      }
+
+      const data = await res.json();
+      
+      // Fetch user profile info
+      const meResponse = await fetch("/api/v1/users/me", {
+        headers: { "Authorization": `Bearer ${data.access_token}` },
+      });
+
+      if (!meResponse.ok) {
+        throw new Error("Failed to retrieve user profile.");
+      }
+
+      const profile = await meResponse.json();
+      login(data.access_token, profile);
+
+      // Redirect based on user role
+      if (profile.roles.includes("admin")) {
+        router.push("/dashboard/admin");
+      } else if (profile.roles.includes("instructor")) {
+        router.push("/dashboard/instructor");
+      } else if (profile.roles.includes("corporate_client")) {
+        router.push("/dashboard/client");
+      } else {
+        router.push("/dashboard/student");
+      }
+    } catch (err: any) {
+      setError(err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Load Google GSI client library dynamically
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      if ((window as any).google) {
+        (window as any).google.accounts.id.initialize({
+          // Client ID can be configured; using placeholder, backend validates token signatures
+          client_id: "728345791244-placeholder.apps.googleusercontent.com",
+          callback: handleGoogleLoginCallback,
+        });
+        (window as any).google.accounts.id.renderButton(
+          document.getElementById("google-signin-btn"),
+          { theme: "outline", size: "large", width: 350 }
+        );
+      }
+    };
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,6 +150,16 @@ export default function LoginPage() {
               <span>{error}</span>
             </div>
           )}
+
+          {/* Google Sign-in Button */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "1.5rem" }}>
+            <div id="google-signin-btn" style={{ width: "100%", display: "flex", justifyContent: "center" }}></div>
+            <div style={{ display: "flex", alignItems: "center", width: "100%", margin: "1.25rem 0", color: "var(--text-muted)", fontSize: "0.8rem" }}>
+              <hr style={{ flex: 1, border: "0", borderTop: "1px solid var(--border-color)" }} />
+              <span style={{ padding: "0 0.75rem" }}>OR</span>
+              <hr style={{ flex: 1, border: "0", borderTop: "1px solid var(--border-color)" }} />
+            </div>
+          </div>
 
           <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
