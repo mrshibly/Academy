@@ -73,7 +73,7 @@ export default function RegisterPage() {
     script.onload = () => {
       if ((window as any).google) {
         (window as any).google.accounts.id.initialize({
-          client_id: "728345791244-placeholder.apps.googleusercontent.com",
+          client_id: "1077790098218-or3jf6egdbmin5u10o6v0m1vnqsi6n9o.apps.googleusercontent.com",
           callback: handleGoogleRegisterCallback,
         });
         (window as any).google.accounts.id.renderButton(

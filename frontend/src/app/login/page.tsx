@@ -72,7 +72,7 @@ export default function LoginPage() {
       if ((window as any).google) {
         (window as any).google.accounts.id.initialize({
           // Client ID can be configured; using placeholder, backend validates token signatures
-          client_id: "728345791244-placeholder.apps.googleusercontent.com",
+          client_id: "1077790098218-or3jf6egdbmin5u10o6v0m1vnqsi6n9o.apps.googleusercontent.com",
           callback: handleGoogleLoginCallback,
         });
         (window as any).google.accounts.id.renderButton(
