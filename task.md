@@ -33,13 +33,13 @@
 ## Phase 2: Data Quality + Auth Robustness
 - [x] Token auto-refresh in `AuthContext.tsx`
 - [x] `ProtectedRoute.tsx` component
-- [ ] `Toast.tsx` global notification system
-- [ ] `DataTable.tsx` reusable component
+- [x] `Toast.tsx` global notification system
+- [x] `DataTable.tsx` reusable component
 
 ## Phase 3: Polish + Production Hardening
-- [ ] Password complexity validation
-- [ ] Account lockout
-- [ ] `readyz` probe with real DB/Redis checks
-- [ ] Dark mode toggle
-- [ ] Skeleton loading screens
-- [ ] Self-hosted hero image
+- [x] Password complexity validation
+- [x] Account lockout
+- [x] `readyz` probe with real DB/Redis checks
+- [x] Dark mode toggle
+- [x] Skeleton loading screens
+- [x] Self-hosted hero image
