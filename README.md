@@ -111,7 +111,7 @@ The backend follows **Clean Architecture** with strict layer separation:
 - Course catalog with filtering (category, level, price) and search
 - Hierarchical content: Courses → Modules → Lessons
 - Student enrollment and per-lesson progress tracking
-- Auto-generated PDF certificates with public verification
+- Auto-generated PDF certificates with instructor signatures, public verification, and resilient in-process fallbacks
 - Cohort management for live bootcamps and corporate training
 - Instructor course authoring (admin approval before publish)
 
@@ -350,7 +350,7 @@ alembic history
 
 ---
 
-## Background Workers
+## Background Workers & Resilient Certificate Generation
 
 Start the Celery worker for background tasks (emails, certificate generation):
 
@@ -362,6 +362,13 @@ Or via Docker Compose (already configured):
 ```bash
 docker compose up celery-worker -d
 ```
+
+### In-Process Fallback Logic
+
+To ensure students are never locked out of their certificates when Redis/Celery is offline or S3 upload fails:
+1. **Redis Health Check**: The service performs a quick non-blocking port ping to check if Redis broker is online before scheduling Celery tasks.
+2. **In-Process Compilation**: If Redis is offline, the certificate is compiled synchronously in-process using WeasyPrint.
+3. **Dynamic On-The-Fly Fallback**: If S3 uploads fail, the platform records the fallback path `/api/v1/certificates/fallback/{verification_id}.pdf` in the database. When requested, the endpoint compiles the HTML/PDF certificate on-the-fly and streams it to the user.
 
 ---
 

@@ -12,40 +12,16 @@ from app.core.config import get_settings
 from app.models.certificate import Certificate
 from app.models.enrollment import Enrollment
 
-async def generate_certificate_in_process(
-    db: AsyncSession,
-    enrollment_id: uuid.UUID,
+def build_certificate_html(
     user_name: str,
-    course_title: str
-) -> Certificate | None:
-    """Generate a high-fidelity PDF certificate and save database record synchronously."""
-    settings = get_settings()
-    verification_id = uuid.uuid4()
-    issued_at_str = datetime.now(timezone.utc).strftime("%B %d, %Y")
-
-    # Find enrollment, course and instructor signature
-    stmt = select(Enrollment).where(Enrollment.id == enrollment_id)
-    res = await db.execute(stmt)
-    enrollment = res.scalar_one_or_none()
-    
-    instructor_name = "Course Instructor"
-    signature_img_html = ""
-    
-    if enrollment:
-        from app.models.course import Course
-        from app.models.user import User
-        course_stmt = select(Course).where(Course.id == enrollment.course_id)
-        course = (await db.execute(course_stmt)).scalar_one_or_none()
-        if course:
-            course_title = course.title
-            instructor_stmt = select(User).where(User.id == course.instructor_id)
-            instructor = (await db.execute(instructor_stmt)).scalar_one_or_none()
-            if instructor:
-                instructor_name = instructor.full_name
-                if instructor.signature_url:
-                    signature_img_html = f'<img src="{instructor.signature_url}" style="max-height: 50px; max-width: 200px; position: absolute; bottom: 5px; left: 20px; object-fit: contain;" />'
-
-    html_content = f"""
+    course_title: str,
+    issued_at_str: str,
+    verification_id: str | uuid.UUID,
+    instructor_name: str,
+    signature_img_html: str
+) -> str:
+    """Build the high-fidelity HTML structure for a completion certificate."""
+    return f"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -222,12 +198,99 @@ async def generate_certificate_in_process(
     </html>
     """
 
+async def render_certificate_pdf_bytes(
+    db: AsyncSession,
+    enrollment_id: uuid.UUID,
+    user_name: str,
+    course_title: str,
+    verification_id: uuid.UUID,
+    issued_at: datetime
+) -> tuple[bytes, str]:
+    """Helper to render certificate HTML or PDF bytes on the fly, returning (bytes, media_type)."""
+    issued_at_str = issued_at.strftime("%B %d, %Y")
+
+    # Find enrollment, course and instructor signature
+    stmt = select(Enrollment).where(Enrollment.id == enrollment_id)
+    res = await db.execute(stmt)
+    enrollment = res.scalar_one_or_none()
+    
+    instructor_name = "Course Instructor"
+    signature_img_html = ""
+    
+    if enrollment:
+        from app.models.course import Course
+        from app.models.user import User
+        course_stmt = select(Course).where(Course.id == enrollment.course_id)
+        course = (await db.execute(course_stmt)).scalar_one_or_none()
+        if course:
+            course_title = course.title
+            instructor_stmt = select(User).where(User.id == course.instructor_id)
+            instructor = (await db.execute(instructor_stmt)).scalar_one_or_none()
+            if instructor:
+                instructor_name = instructor.full_name
+                if instructor.signature_url:
+                    signature_img_html = f'<img src="{instructor.signature_url}" style="max-height: 50px; max-width: 200px; position: absolute; bottom: 5px; left: 20px; object-fit: contain;" />'
+
+    html_content = build_certificate_html(
+        user_name=user_name,
+        course_title=course_title,
+        issued_at_str=issued_at_str,
+        verification_id=verification_id,
+        instructor_name=instructor_name,
+        signature_img_html=signature_img_html
+    )
+
     try:
         from weasyprint import HTML
         pdf_bytes = HTML(string=html_content).write_pdf()
+        media_type = "application/pdf"
     except Exception:
         # Fallback: store HTML content as-is if WeasyPrint is unavailable
         pdf_bytes = html_content.encode()
+        media_type = "text/html"
+
+    return pdf_bytes, media_type
+
+
+async def generate_certificate_in_process(
+    db: AsyncSession,
+    enrollment_id: uuid.UUID,
+    user_name: str,
+    course_title: str
+) -> Certificate | None:
+    """Generate a high-fidelity PDF certificate and save database record synchronously."""
+    settings = get_settings()
+    verification_id = uuid.uuid4()
+    issued_at = datetime.now(timezone.utc)
+
+    # Find enrollment, course and instructor signature
+    stmt = select(Enrollment).where(Enrollment.id == enrollment_id)
+    res = await db.execute(stmt)
+    enrollment = res.scalar_one_or_none()
+
+    if enrollment:
+        # Check if certificate already exists to avoid unique constraint violations
+        existing_stmt = select(Certificate).where(Certificate.enrollment_id == enrollment_id)
+        existing_cert = (await db.execute(existing_stmt)).scalar_one_or_none()
+        if existing_cert:
+            return existing_cert
+
+        from app.models.user import User
+        from app.models.course import Course
+        user_stmt = select(User).where(User.id == enrollment.user_id)
+        user_obj = (await db.execute(user_stmt)).scalar_one()
+        user_name = user_obj.full_name
+
+        course_stmt = select(Course).where(Course.id == enrollment.course_id)
+        course_obj = (await db.execute(course_stmt)).scalar_one()
+        course_title = course_obj.title
+    else:
+        return None
+
+    # Generate PDF / HTML bytes
+    pdf_bytes, media_type = await render_certificate_pdf_bytes(
+        db, enrollment_id, user_name, course_title, verification_id, issued_at
+    )
 
     file_key = f"certificates/{enrollment_id}/{verification_id}.pdf"
     
@@ -244,7 +307,7 @@ async def generate_certificate_in_process(
             Bucket=settings.S3_BUCKET_NAME,
             Key=file_key,
             Body=pdf_bytes,
-            ContentType="application/pdf"
+            ContentType=media_type
         )
         file_url = (
             f"{settings.S3_ENDPOINT_URL}/{settings.S3_BUCKET_NAME}/{file_key}"
@@ -256,23 +319,65 @@ async def generate_certificate_in_process(
         logging.getLogger("uvicorn.error").warning(f"S3 upload failed for certificate, using fallback: {e}")
         file_url = f"/api/v1/certificates/fallback/{verification_id}.pdf"
 
-    if enrollment:
-        # Check if certificate already exists to avoid unique constraint violations
-        existing_stmt = select(Certificate).where(Certificate.enrollment_id == enrollment_id)
-        existing_cert = (await db.execute(existing_stmt)).scalar_one_or_none()
-        if existing_cert:
-            return existing_cert
-            
-        cert = Certificate(
-            enrollment_id=enrollment.id,
-            user_id=enrollment.user_id,
-            course_id=enrollment.course_id,
-            verification_id=verification_id,
-            pdf_url=file_url,
-            issued_at=datetime.now(timezone.utc)
-        )
-        db.add(cert)
-        await db.flush()
-        return cert
-        
-    return None
+    cert = Certificate(
+        enrollment_id=enrollment.id,
+        user_id=enrollment.user_id,
+        course_id=enrollment.course_id,
+        verification_id=verification_id,
+        pdf_url=file_url,
+        issued_at=issued_at
+    )
+    db.add(cert)
+    await db.flush()
+    return cert
+
+async def get_certificate_pdf_bytes_by_verification_id(
+    db: AsyncSession,
+    verification_id: uuid.UUID
+) -> tuple[bytes, str] | None:
+    """Retrieve certificate details and compile/render PDF or HTML dynamically."""
+    from sqlalchemy.orm import selectinload
+    from app.models.user import User
+    from app.models.course import Course
+
+    stmt = (
+        select(Certificate)
+        .where(Certificate.verification_id == verification_id)
+        .options(selectinload(Certificate.user), selectinload(Certificate.course))
+    )
+    res = await db.execute(stmt)
+    cert = res.scalar_one_or_none()
+    if cert is None:
+        return None
+
+    user_name = cert.user.full_name
+    course_title = cert.course.title
+    issued_at_str = cert.issued_at.strftime("%B %d, %Y")
+
+    instructor_name = "Course Instructor"
+    signature_img_html = ""
+    instructor_stmt = select(User).where(User.id == cert.course.instructor_id)
+    instructor = (await db.execute(instructor_stmt)).scalar_one_or_none()
+    if instructor:
+        instructor_name = instructor.full_name
+        if instructor.signature_url:
+            signature_img_html = f'<img src="{instructor.signature_url}" style="max-height: 50px; max-width: 200px; position: absolute; bottom: 5px; left: 20px; object-fit: contain;" />'
+
+    html_content = build_certificate_html(
+        user_name=user_name,
+        course_title=course_title,
+        issued_at_str=issued_at_str,
+        verification_id=verification_id,
+        instructor_name=instructor_name,
+        signature_img_html=signature_img_html
+    )
+
+    try:
+        from weasyprint import HTML
+        pdf_bytes = HTML(string=html_content).write_pdf()
+        media_type = "application/pdf"
+    except Exception:
+        pdf_bytes = html_content.encode()
+        media_type = "text/html"
+
+    return pdf_bytes, media_type

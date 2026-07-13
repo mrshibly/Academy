@@ -1,7 +1,7 @@
 """Certificate routes — public verification + user's certificates."""
 from __future__ import annotations
 from uuid import UUID
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.core.dependencies import get_current_active_user, require_role
@@ -27,6 +27,19 @@ async def my_certificates(user: User = Depends(get_current_active_user), db: Asy
     svc = CertificateService(db)
     certs = await svc.list_by_user_id(user.id)
     return [CertificateRead.model_validate(c) for c in certs]
+
+@router.get("/fallback/{verification_id}.pdf", status_code=200)
+async def fallback_certificate(
+    verification_id: UUID,
+    db: AsyncSession = Depends(get_db)
+):
+    """Retrieve fallback certificate PDF or HTML directly."""
+    from app.services.certificate_utils import get_certificate_pdf_bytes_by_verification_id
+    res = await get_certificate_pdf_bytes_by_verification_id(db, verification_id)
+    if res is None:
+        raise NotFoundError(resource="Certificate")
+    pdf_bytes, media_type = res
+    return Response(content=pdf_bytes, media_type=media_type)
 
 @router.get("", status_code=200, dependencies=[Depends(require_role("admin"))])
 async def list_certificates(db: AsyncSession = Depends(get_db)):
