@@ -59,7 +59,13 @@ class EnrollmentService:
             course = (await self.db.execute(course_stmt)).scalar_one()
             
             # Dispatch background task for PDF generation
-            generate_certificate_task.delay(str(enrollment.id), user.full_name, course.title)
+            try:
+                generate_certificate_task.delay(str(enrollment.id), user.full_name, course.title)
+            except Exception as e:
+                import logging
+                logging.getLogger("uvicorn.error").warning(
+                    f"Could not dispatch certificate generation task (Redis/Celery offline): {e}"
+                )
 
         await self.db.commit()
         return progress
