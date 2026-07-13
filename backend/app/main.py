@@ -10,7 +10,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
@@ -18,6 +18,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import setup_logging
+from app.db.session import get_db
 
 
 @asynccontextmanager
@@ -99,9 +100,37 @@ def create_app() -> FastAPI:
         return JSONResponse(content={"status": "ok"})
 
     @application.get("/readyz", tags=["Health"], status_code=200)
-    async def readyz() -> JSONResponse:
+    async def readyz(
+        db = Depends(get_db)
+    ) -> JSONResponse:
         """Readiness probe — the app can serve traffic."""
-        # Future: check DB / Redis connectivity
+        from sqlalchemy import text
+        from app.core.redis_cache import get_redis_client
+
+        errors = []
+        
+        # 1. DB connectivity check
+        try:
+            await db.execute(text("SELECT 1"))
+        except Exception as e:
+            errors.append(f"database_error: {str(e)}")
+
+        # 2. Redis connectivity check
+        try:
+            redis_client = get_redis_client()
+            if redis_client:
+                await redis_client.ping()
+            else:
+                errors.append("redis_error: Client not initialized.")
+        except Exception as e:
+            errors.append(f"redis_error: {str(e)}")
+
+        if errors:
+            return JSONResponse(
+                status_code=503,
+                content={"status": "unhealthy", "errors": errors}
+            )
+
         return JSONResponse(content={"status": "ready"})
 
     return application

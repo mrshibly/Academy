@@ -23,7 +23,10 @@ import {
   ChevronRight,
   Home,
   GraduationCap,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useEffect } from "react";
 
 interface NavItem {
   label: string;
@@ -81,6 +84,29 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+    const initialTheme = savedTheme || "light";
+    setTheme(initialTheme);
+    if (initialTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "light" ? "dark" : "light";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    if (nextTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
 
   const getInitials = () => {
     if (!user || !user.full_name) return "U";
@@ -336,6 +362,31 @@ export default function DashboardSidebar() {
                 {user?.email}
               </div>
             </div>
+            <button
+              onClick={toggleTheme}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#64748b",
+                padding: "0.35rem",
+                borderRadius: "6px",
+                display: "flex",
+                transition: "all 0.15s",
+                marginRight: "0.25rem"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#10b981";
+                e.currentTarget.style.background = "rgba(16, 185, 129, 0.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#64748b";
+                e.currentTarget.style.background = "none";
+              }}
+              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+            >
+              {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+            </button>
             <button
               onClick={logout}
               style={{

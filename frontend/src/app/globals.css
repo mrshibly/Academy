@@ -28,6 +28,16 @@
   --transition-all: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.dark {
+  --bg-primary: #0f172a;
+  --bg-secondary: #020617;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --border-color: #1e293b;
+  --border-focus: #334155;
+}
+
 /* Reset & Base styling */
 * {
   box-sizing: border-box;

@@ -10,7 +10,7 @@ async def test_register_new_user(db_session: AsyncSession) -> None:
     svc = AuthService(db_session)
     result = await svc.register(
         email="test_student@academy.dev",
-        password="securepassword123",
+        password="SecurePassword123!",
         full_name="Test Student"
     )
     assert "user_id" in result
@@ -21,7 +21,7 @@ async def test_register_duplicate_email(db_session: AsyncSession) -> None:
     svc = AuthService(db_session)
     await svc.register(
         email="dup@academy.dev",
-        password="securepassword123",
+        password="SecurePassword123!",
         full_name="Duplicate User"
     )
     with pytest.raises(ConflictError):

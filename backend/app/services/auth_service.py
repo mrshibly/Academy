@@ -130,26 +130,37 @@ class AuthService:
     async def login(self, email: str, password: str) -> dict:
         """
         Authenticate user and return token pair.
-
-        Args:
-            email: User's email.
-            password: Plaintext password.
-
-        Returns:
-            Dict with access_token, refresh_token, expires_in.
-
-        Raises:
-            UnauthorizedError: If credentials are invalid.
         """
+        from app.core.redis_cache import get_redis_client
+        redis_client = get_redis_client()
+        lockout_key = f"lockout:{email.lower()}"
+        attempts_key = f"attempts:{email.lower()}"
+
+        if redis_client:
+            is_locked = await redis_client.get(lockout_key)
+            if is_locked:
+                raise UnauthorizedError(message="Account is temporarily locked due to too many failed attempts. Try again in 15 minutes.")
+
         user = await self.user_repo.get_by_email(email)
         if user is None or user.hashed_password is None:
             raise UnauthorizedError(message="Invalid email or password.")
 
         if not verify_password(password, user.hashed_password):
+            if redis_client:
+                attempts = await redis_client.incr(attempts_key)
+                if attempts == 1:
+                    await redis_client.expire(attempts_key, 900)  # 15 minutes window
+                if attempts >= 5:
+                    await redis_client.set(lockout_key, "locked", ex=900)  # Lock for 15 minutes
+                    await redis_client.delete(attempts_key)
+                    raise UnauthorizedError(message="Too many failed attempts. Your account has been locked for 15 minutes.")
             raise UnauthorizedError(message="Invalid email or password.")
 
         if not user.is_active:
             raise UnauthorizedError(message="Account is deactivated.")
+
+        if redis_client:
+            await redis_client.delete(attempts_key)
 
         roles = [ur.role.name for ur in user.user_roles]
         settings = get_settings()

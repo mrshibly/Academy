@@ -18,6 +18,11 @@ from app.core.config import get_settings
 _redis: aioredis.Redis | None = None
 
 
+def get_redis_client() -> aioredis.Redis | None:
+    """Return the active Redis client reference."""
+    return _redis
+
+
 async def init_cache() -> None:
     """Create and store the async Redis connection pool, falling back gracefully if offline."""
     global _redis
