@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { BookOpen, Plus, Trash2, Edit3, Search, AlertCircle } from "lucide-react";
+import { BookOpen, Plus, Trash2, Edit3, Search, AlertCircle, List } from "lucide-react";
+import SyllabusBuilder from "@/components/SyllabusBuilder";
 
 export default function InstructorCoursesPage() {
   const { token } = useAuth();
@@ -15,6 +16,7 @@ export default function InstructorCoursesPage() {
     title: "", slug: "", description: "", short_description: "", price: 99.0, level: "beginner", duration_hours: 10, status: "draft"
   });
   const [editId, setEditId] = useState<string | null>(null);
+  const [selectedCourseForSyllabus, setSelectedCourseForSyllabus] = useState<{ id: string; slug: string } | null>(null);
 
   const headers = { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
 
@@ -161,6 +163,9 @@ export default function InstructorCoursesPage() {
                       </p>
                     </div>
                     <div style={{ display: "flex", gap: "0.25rem", flexShrink: 0, marginLeft: "1rem" }}>
+                      <button onClick={() => setSelectedCourseForSyllabus({ id: course.id, slug: course.slug })} style={{ color: "var(--accent-violet)", padding: "0.4rem", background: "transparent", border: "none", cursor: "pointer", borderRadius: "6px" }} title="Syllabus">
+                        <List size={16} />
+                      </button>
                       <button onClick={() => handleEdit(course)} style={{ color: "var(--accent-violet)", padding: "0.4rem", background: "transparent", border: "none", cursor: "pointer", borderRadius: "6px" }} title="Edit">
                         <Edit3 size={16} />
                       </button>
@@ -234,6 +239,15 @@ export default function InstructorCoursesPage() {
           </form>
         </div>
       </div>
+
+      {selectedCourseForSyllabus && (
+        <SyllabusBuilder
+          courseId={selectedCourseForSyllabus.id}
+          courseSlug={selectedCourseForSyllabus.slug}
+          token={token || ""}
+          onClose={() => setSelectedCourseForSyllabus(null)}
+        />
+      )}
     </div>
   );
 }

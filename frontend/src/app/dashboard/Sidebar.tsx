@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   Shield,
@@ -113,13 +113,40 @@ const studentSections: NavSection[] = [
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
-  const sections = user?.roles.includes("admin")
+  const getInitialWorkspace = () => {
+    if (pathname.startsWith("/dashboard/admin")) return "admin";
+    if (pathname.startsWith("/dashboard/instructor")) return "instructor";
+    if (pathname.startsWith("/dashboard/client")) return "client";
+    return "student";
+  };
+
+  const [activeWorkspace, setActiveWorkspace] = useState(getInitialWorkspace());
+
+  useEffect(() => {
+    setActiveWorkspace(getInitialWorkspace());
+  }, [pathname]);
+
+  const handleWorkspaceChange = (workspace: string) => {
+    setActiveWorkspace(workspace);
+    if (workspace === "admin") {
+      router.push("/dashboard/admin");
+    } else if (workspace === "instructor") {
+      router.push("/dashboard/instructor");
+    } else if (workspace === "client") {
+      router.push("/dashboard/client");
+    } else {
+      router.push("/dashboard/student");
+    }
+  };
+
+  const sections = activeWorkspace === "admin"
     ? adminSections
-    : user?.roles.includes("instructor")
+    : activeWorkspace === "instructor"
     ? instructorSections
     : studentSections;
 
@@ -343,6 +370,33 @@ export default function DashboardSidebar() {
           {!collapsed && <span>Back to Site</span>}
         </Link>
       </div>
+
+      {/* Workspace Switcher */}
+      {user && user.roles && user.roles.length > 0 && !collapsed && (
+        <div style={{ padding: "0 0.75rem", marginBottom: "1rem" }}>
+          <select
+            value={activeWorkspace}
+            onChange={(e) => handleWorkspaceChange(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.45rem 0.65rem",
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "6px",
+              color: "#e2e8f0",
+              fontSize: "0.8rem",
+              fontWeight: 600,
+              outline: "none",
+              cursor: "pointer"
+            }}
+          >
+            {user.roles.includes("admin") && <option value="admin" style={{ background: "#0f172a" }}>Workspace: Admin</option>}
+            {user.roles.includes("instructor") && <option value="instructor" style={{ background: "#0f172a" }}>Workspace: Instructor</option>}
+            {user.roles.includes("corporate_client") && <option value="client" style={{ background: "#0f172a" }}>Workspace: Client</option>}
+            <option value="student" style={{ background: "#0f172a" }}>Workspace: Student</option>
+          </select>
+        </div>
+      )}
 
       {/* User Profile + Logout */}
       <div

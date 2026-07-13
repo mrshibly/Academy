@@ -12,6 +12,7 @@ export default function AdminBlogPage() {
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [blogForm, setBlogForm] = useState({ title: "", slug: "", content: "", excerpt: "", status: "draft" });
   const [editId, setEditId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("all");
 
   const headers = { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
 
@@ -103,10 +104,16 @@ export default function AdminBlogPage() {
     }
   };
 
-  const filtered = blogs.filter(b =>
-    b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.slug.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const pendingCount = blogs.filter(b => b.status === "draft").length;
+
+  const filtered = blogs.filter(b => {
+    const matchesSearch = b.title.toLowerCase().includes(searchQuery.toLowerCase()) || b.slug.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!matchesSearch) return false;
+
+    if (activeTab === "pending") return b.status === "draft";
+    if (activeTab === "published") return b.status === "published";
+    return true;
+  });
 
   return (
     <div>
@@ -128,6 +135,47 @@ export default function AdminBlogPage() {
           {message.text}
         </div>
       )}
+
+      {/* Tab Selector */}
+      <div style={{ display: "flex", gap: "1.5rem", borderBottom: "1px solid var(--border-color)", marginBottom: "2rem", paddingBottom: "0.25rem" }}>
+        {[
+          { id: "all", label: "All Articles", count: blogs.length },
+          { id: "pending", label: "Pending Approval", count: pendingCount },
+          { id: "published", label: "Published", count: blogs.filter(b => b.status === "published").length }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              background: "none",
+              border: "none",
+              padding: "0.5rem 0.25rem",
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              color: activeTab === tab.id ? "var(--accent-blue)" : "var(--text-secondary)",
+              borderBottom: activeTab === tab.id ? "2px solid var(--accent-blue)" : "2px solid transparent",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              marginBottom: "-5px",
+              transition: "all 0.15s"
+            }}
+          >
+            <span>{tab.label}</span>
+            <span style={{
+              fontSize: "0.75rem",
+              background: tab.id === "pending" && tab.count > 0 ? "#ef4444" : "var(--bg-secondary)",
+              color: tab.id === "pending" && tab.count > 0 ? "white" : "var(--text-secondary)",
+              padding: "0.1rem 0.4rem",
+              borderRadius: "10px",
+              fontWeight: 700
+            }}>
+              {tab.count}
+            </span>
+          </button>
+        ))}
+      </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "2.5rem" }}>
         {/* Listing */}
