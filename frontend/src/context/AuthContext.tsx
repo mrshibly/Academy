@@ -22,10 +22,60 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      window.atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const login = (newToken: string, userProfile: UserProfile) => {
+    setToken(newToken);
+    setUser(userProfile);
+    localStorage.setItem("token", newToken);
+    localStorage.setItem("user", JSON.stringify(userProfile));
+  };
+
+  const logout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    // Optionally trigger backend logout to clear HTTPOnly cookie
+    fetch("/api/v1/auth/logout", { method: "POST" }).catch(() => {});
+  };
+
+  const performRefresh = async () => {
+    try {
+      const res = await fetch("/api/v1/auth/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setToken(data.access_token);
+        localStorage.setItem("token", data.access_token);
+      } else {
+        logout();
+      }
+    } catch (e) {
+      console.error("Token refresh failed:", e);
+    }
+  };
 
   useEffect(() => {
     // Load stored token & user on startup
@@ -43,19 +93,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = (newToken: string, userProfile: UserProfile) => {
-    setToken(newToken);
-    setUser(userProfile);
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("user", JSON.stringify(userProfile));
-  };
+  // Set up token refresh timer
+  useEffect(() => {
+    if (!token) return;
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-  };
+    const decoded = parseJwt(token);
+    if (!decoded || !decoded.exp) return;
+
+    const expMs = decoded.exp * 1000;
+    const delay = expMs - Date.now() - 60000; // refresh 1 minute before expiry
+
+    if (delay <= 0) {
+      performRefresh();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      performRefresh();
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ user, token, loading, login, logout }}>

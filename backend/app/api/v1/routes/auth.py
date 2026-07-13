@@ -27,11 +27,28 @@ async def login(request: Request, data: LoginRequest, response: Response, db: As
     response.set_cookie(key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True, samesite="strict", max_age=7 * 24 * 3600)
     return TokenResponse(access_token=tokens["access_token"], expires_in=tokens["expires_in"])
 
+from fastapi import Cookie
+from app.core.exceptions import UnauthorizedError
+
 @router.post("/refresh", response_model=TokenResponse, status_code=200)
-async def refresh(data: RefreshRequest, response: Response, db: AsyncSession = Depends(get_db)) -> TokenResponse:
+async def refresh(
+    response: Response,
+    data: RefreshRequest | None = None,
+    refresh_token: str | None = Cookie(default=None),
+    db: AsyncSession = Depends(get_db)
+) -> TokenResponse:
     """Exchange a refresh token for a new token pair."""
+    token_str = None
+    if data and data.refresh_token:
+        token_str = data.refresh_token
+    elif refresh_token:
+        token_str = refresh_token
+
+    if not token_str:
+        raise UnauthorizedError(message="Refresh token missing.")
+
     svc = AuthService(db)
-    tokens = await svc.refresh_token(data.refresh_token)
+    tokens = await svc.refresh_token(token_str)
     response.set_cookie(key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True, samesite="strict", max_age=7 * 24 * 3600)
     return TokenResponse(access_token=tokens["access_token"], expires_in=tokens["expires_in"])
 
