@@ -372,7 +372,7 @@ export default function DashboardSidebar() {
       </div>
 
       {/* Workspace Switcher */}
-      {user && user.roles && user.roles.some((r: string) => ["admin", "instructor", "corporate_client"].includes(r)) && !collapsed && (
+      {user && user.roles && user.roles.includes("admin") && !collapsed && (
         <div style={{ padding: "0 0.75rem", marginBottom: "1rem" }}>
           <select
             value={activeWorkspace}
