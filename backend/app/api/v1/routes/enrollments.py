@@ -77,10 +77,20 @@ async def get_enrollment_detail(
         raise ForbiddenError(message="You do not have permission to access this enrollment.")
         
     from app.schemas.course import CourseRead
+    from app.services.certificate_service import CertificateService
+    cert_svc = CertificateService(db)
+    certificate = await cert_svc.get_by_enrollment_id(enrollment_id)
+    
     return {
         "id": str(enrollment.id),
         "user_id": str(enrollment.user_id),
         "status": enrollment.status.value,
         "course": CourseRead.model_validate(enrollment.course).model_dump(),
-        "completed_lessons": [str(p.lesson_id) for p in enrollment.lesson_progress if p.status.value == "completed"]
+        "completed_lessons": [str(p.lesson_id) for p in enrollment.lesson_progress if p.status.value == "completed"],
+        "certificate": {
+            "id": str(certificate.id),
+            "verification_id": str(certificate.verification_id),
+            "pdf_url": certificate.pdf_url,
+            "issued_at": certificate.issued_at.isoformat()
+        } if certificate else None
     }

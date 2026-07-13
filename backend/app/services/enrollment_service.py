@@ -64,8 +64,10 @@ class EnrollmentService:
             except Exception as e:
                 import logging
                 logging.getLogger("uvicorn.error").warning(
-                    f"Could not dispatch certificate generation task (Redis/Celery offline): {e}"
+                    f"Could not dispatch certificate generation task (Redis/Celery offline): {e}. Falling back to synchronous generation..."
                 )
+                from app.services.certificate_utils import generate_certificate_in_process
+                await generate_certificate_in_process(self.db, enrollment.id, user.full_name, course.title)
 
         await self.db.commit()
         return progress

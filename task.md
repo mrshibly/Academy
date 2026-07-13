@@ -12,3 +12,8 @@
 ## Phase 3: Tabbed Directories & Badges
 - [x] Implement tab filtering and pending counters in Admin Courses Page
 - [x] Implement tab filtering and pending counters in Admin Blog Page
+- [/] Implement quiz player layout in LMS learn page
+- [/] Implement graduation UI section and certificate download button in LMS learn page
+- [x] Create database query utility for synchronous certificate generation
+- [x] Update enrollment progress handler fallback to run synchronous certificate generation in-process
+- [x] Add certificate key payload to GET /api/v1/enrollments/{enrollment_id} API endpoint
