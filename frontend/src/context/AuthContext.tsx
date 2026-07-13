@@ -84,7 +84,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (storedToken && storedUser) {
       setToken(storedToken);
       try {
-        setUser(JSON.parse(storedUser));
+        const parsed = JSON.parse(storedUser);
+        setUser(parsed);
+        
+        // Background sync to fetch fresh roles/profile details from backend
+        fetch("/api/v1/users/me", {
+          headers: { "Authorization": `Bearer ${storedToken}` }
+        })
+        .then(res => {
+          if (res.ok) return res.json();
+          throw new Error("Stale session");
+        })
+        .then(freshProfile => {
+          setUser(freshProfile);
+          localStorage.setItem("user", JSON.stringify(freshProfile));
+        })
+        .catch(() => {
+          // Keep existing cached user if background sync fails
+        });
       } catch (e) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
