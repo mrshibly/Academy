@@ -53,7 +53,8 @@ class PaymentService:
                 total += float(course.price)
 
         # Create pending order
-        order = Order(user_id=user_id, total_amount=total, currency="USD")
+        order_currency = "BDT" if (len(order_items_data) > 0 and course.currency.upper() == "BDT") else "USD"
+        order = Order(user_id=user_id, total_amount=total, currency=order_currency)
         self.db.add(order)
         await self.db.flush()
 
@@ -61,21 +62,70 @@ class PaymentService:
             self.db.add(OrderItem(order_id=order.id, **oi_data))
         await self.db.flush()
 
-        try:
-            session = stripe.checkout.Session.create(
-                line_items=line_items,
-                mode="payment",
-                success_url=f"{get_settings().ALLOWED_ORIGINS}/payment/success?order_id={order.id}",
-                cancel_url=f"{get_settings().ALLOWED_ORIGINS}/payment/cancel",
-                metadata={"order_id": str(order.id)},
+        settings = get_settings()
+        use_sslcommerz = (order_currency == "BDT") or (settings.STRIPE_SECRET_KEY == "sk_test_xxx" or not settings.STRIPE_SECRET_KEY)
+
+        if use_sslcommerz:
+            import httpx
+            from app.repositories.user_repository import UserRepository
+            user_repo = UserRepository(self.db)
+            user = await user_repo.get_by_id(user_id)
+            cus_name = user.full_name if user else "Customer"
+            cus_email = user.email if user else "customer@academy.dev"
+
+            gateway_url = (
+                "https://sandbox.sslcommerz.com/gwprocess/v4/api.php"
+                if settings.SSLCOMMERZ_IS_SANDBOX
+                else "https://gwprocess.sslcommerz.com/gwprocess/v4/api.php"
             )
-        except stripe.error.StripeError as e:
-            raise PaymentError(message=str(e)) from e
 
-        order.gateway_payment_id = session.id
-        await self.db.commit()
+            payload = {
+                "store_id": settings.SSLCOMMERZ_STORE_ID,
+                "store_passwd": settings.SSLCOMMERZ_STORE_PASSWD,
+                "total_amount": str(total),
+                "currency": order_currency,
+                "tran_id": str(order.id),
+                "success_url": f"{settings.ALLOWED_ORIGINS}/api/v1/payments/sslcommerz/success?order_id={order.id}",
+                "fail_url": f"{settings.ALLOWED_ORIGINS}/api/v1/payments/sslcommerz/fail?order_id={order.id}",
+                "cancel_url": f"{settings.ALLOWED_ORIGINS}/api/v1/payments/sslcommerz/cancel?order_id={order.id}",
+                "cus_name": cus_name,
+                "cus_email": cus_email,
+                "cus_phone": "01700000000",
+                "cus_add1": "Dhaka",
+                "cus_city": "Dhaka",
+                "cus_country": "Bangladesh",
+                "shipping_method": "NO",
+                "product_name": course.title if len(order_items_data) > 0 else "Course Tuition",
+                "product_category": "Education",
+                "product_profile": "non-physical-goods"
+            }
 
-        return {"checkout_url": session.url, "order_id": str(order.id)}
+            async with httpx.AsyncClient() as client:
+                response = await client.post(gateway_url, data=payload, timeout=10.0)
+                if response.status_code != 200:
+                    raise PaymentError(message=f"SSLCommerz gateway responded with code {response.status_code}")
+                res_data = response.json()
+                if res_data.get("status") == "SUCCESS":
+                    order.gateway_payment_id = res_data.get("sessionkey")
+                    await self.db.commit()
+                    return {"checkout_url": res_data.get("GatewayPageURL"), "order_id": str(order.id)}
+                else:
+                    raise PaymentError(message=res_data.get("failedreason") or "SSLCommerz session creation failed.")
+        else:
+            try:
+                session = stripe.checkout.Session.create(
+                    line_items=line_items,
+                    mode="payment",
+                    success_url=f"{settings.ALLOWED_ORIGINS}/payment/success?order_id={order.id}",
+                    cancel_url=f"{settings.ALLOWED_ORIGINS}/payment/cancel",
+                    metadata={"order_id": str(order.id)},
+                )
+            except stripe.error.StripeError as e:
+                raise PaymentError(message=str(e)) from e
+
+            order.gateway_payment_id = session.id
+            await self.db.commit()
+            return {"checkout_url": session.url, "order_id": str(order.id)}
 
     async def handle_webhook(self, payload: bytes, sig_header: str) -> None:
         """

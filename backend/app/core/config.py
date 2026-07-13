@@ -56,6 +56,11 @@ class Settings(BaseSettings):
     STRIPE_SECRET_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""
 
+    # ---- SSLCommerz ----
+    SSLCOMMERZ_STORE_ID: str = ""
+    SSLCOMMERZ_STORE_PASSWD: str = ""
+    SSLCOMMERZ_IS_SANDBOX: bool = True
+
     # ---- S3 / Object Storage ----
     S3_BUCKET_NAME: str = "academy-uploads"
     S3_REGION: str = "us-east-1"
