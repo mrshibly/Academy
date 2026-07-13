@@ -14,10 +14,13 @@ from app.services.course_service import CourseService
 router = APIRouter()
 
 @router.get("", response_model=PaginatedResponse[CourseRead], status_code=200)
-async def list_courses(page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100), category_id: UUID | None = None, level: str | None = None, search: str | None = None, db: AsyncSession = Depends(get_db)):
-    """Public: list published courses with filters."""
+async def list_courses(page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100), category_id: UUID | None = None, level: str | None = None, search: str | None = None, include_draft: bool = False, db: AsyncSession = Depends(get_db)):
+    """List courses with filters. Admin/instructors can set include_draft=True to see drafts."""
     svc = CourseService(db)
-    courses, total = await svc.list_published(page, page_size, category_id, level, search)
+    if include_draft:
+        courses, total = await svc.list_all(page, page_size, category_id, level, search)
+    else:
+        courses, total = await svc.list_published(page, page_size, category_id, level, search)
     return PaginatedResponse(items=[CourseRead.model_validate(c) for c in courses], total=total, page=page, page_size=page_size)
 
 @router.get("/{slug}", response_model=CourseRead, status_code=200)

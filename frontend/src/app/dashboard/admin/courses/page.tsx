@@ -24,7 +24,7 @@ export default function AdminCoursesPage() {
 
   const fetchCourses = async () => {
     try {
-      const res = await fetch("/api/v1/courses?page=1&page_size=100", { headers });
+      const res = await fetch("/api/v1/courses?page=1&page_size=100&include_draft=true", { headers });
       if (res.ok) { const body = await res.json(); setCourses(body.items || []); }
     } catch (err) { console.error(err); }
     finally { setFetching(false); }

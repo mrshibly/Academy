@@ -25,6 +25,20 @@ class CourseRepository:
         result = await self.db.execute(stmt)
         return list(result.scalars().unique().all()), int(total)
 
+    async def list_all(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None) -> tuple[list[Course], int]:
+        base = select(Course).where(Course.deleted_at.is_(None))
+        if category_id:
+            base = base.where(Course.category_id == category_id)
+        if level:
+            base = base.where(Course.level == level)
+        if search:
+            base = base.where(or_(Course.title.ilike(f"%{search}%"), Course.short_description.ilike(f"%{search}%")))
+        count_stmt = select(func.count()).select_from(base.subquery())
+        total = (await self.db.execute(count_stmt)).scalar() or 0
+        stmt = base.options(selectinload(Course.modules).selectinload(Module.lessons)).offset((page - 1) * page_size).limit(page_size).order_by(Course.created_at.desc())
+        result = await self.db.execute(stmt)
+        return list(result.scalars().unique().all()), int(total)
+
     async def get_by_slug(self, slug: str) -> Course | None:
         stmt = select(Course).where(Course.slug == slug, Course.deleted_at.is_(None)).options(selectinload(Course.modules).selectinload(Module.lessons))
         result = await self.db.execute(stmt)

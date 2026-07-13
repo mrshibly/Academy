@@ -14,6 +14,9 @@ class CourseService:
     async def list_published(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None):
         return await self.repo.list_published(page, page_size, category_id, level, search)
 
+    async def list_all(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None):
+        return await self.repo.list_all(page, page_size, category_id, level, search)
+
     async def get_course_detail(self, slug: str):
         course = await self.repo.get_by_slug(slug)
         if course is None:
