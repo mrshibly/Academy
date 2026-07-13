@@ -22,6 +22,8 @@ export default function SyllabusBuilder({ courseId, courseSlug, token, onClose }
   const [activeModuleForLesson, setActiveModuleForLesson] = useState<string | null>(null);
   const [newLessonTitle, setNewLessonTitle] = useState("");
   const [lessonType, setLessonType] = useState("text");
+  const [newLessonBody, setNewLessonBody] = useState("");
+  const [newLessonUrl, setNewLessonUrl] = useState("");
 
   const headers = { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
 
@@ -85,12 +87,16 @@ export default function SyllabusBuilder({ courseId, courseSlug, token, onClose }
           title: newLessonTitle,
           order,
           content_type: lessonType,
+          content_body: newLessonBody || null,
+          content_url: newLessonUrl || null,
           is_free_preview: false
         })
       });
 
       if (res.ok) {
         setNewLessonTitle("");
+        setNewLessonBody("");
+        setNewLessonUrl("");
         setActiveModuleForLesson(null);
         fetchCourseDetails();
       } else {
@@ -199,6 +205,17 @@ export default function SyllabusBuilder({ courseId, courseSlug, token, onClose }
                         <input
                           type="text" required placeholder="Lecture Title..."
                           value={newLessonTitle} onChange={(e) => setNewLessonTitle(e.target.value)}
+                          style={{ width: "100%", padding: "0.4rem 0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", fontSize: "0.85rem" }}
+                        />
+                        <textarea
+                          placeholder="Lecture Description / Markdown Content..."
+                          rows={3}
+                          value={newLessonBody} onChange={(e) => setNewLessonBody(e.target.value)}
+                          style={{ width: "100%", padding: "0.4rem 0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", fontSize: "0.85rem", resize: "vertical" }}
+                        />
+                        <input
+                          type="text" placeholder="Video / Resource URL (Optional)..."
+                          value={newLessonUrl} onChange={(e) => setNewLessonUrl(e.target.value)}
                           style={{ width: "100%", padding: "0.4rem 0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", fontSize: "0.85rem" }}
                         />
                         <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
