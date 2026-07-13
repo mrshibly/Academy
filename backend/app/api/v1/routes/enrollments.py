@@ -81,6 +81,23 @@ async def get_enrollment_detail(
     cert_svc = CertificateService(db)
     certificate = await cert_svc.get_by_enrollment_id(enrollment_id)
     
+    if not certificate and enrollment.status.value == "completed":
+        from app.services.certificate_utils import generate_certificate_in_process
+        from app.models.user import User
+        from app.models.course import Course
+        from sqlalchemy import select
+        
+        # Load user and course info for synchronous generation
+        user_stmt = select(User).where(User.id == enrollment.user_id)
+        grad_user = (await db.execute(user_stmt)).scalar_one()
+        
+        course_stmt = select(Course).where(Course.id == enrollment.course_id)
+        course = (await db.execute(course_stmt)).scalar_one()
+        
+        certificate = await generate_certificate_in_process(db, enrollment_id, grad_user.full_name, course.title)
+        if certificate:
+            await db.commit()
+    
     return {
         "id": str(enrollment.id),
         "user_id": str(enrollment.user_id),
