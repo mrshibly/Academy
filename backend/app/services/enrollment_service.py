@@ -47,9 +47,15 @@ class EnrollmentService:
         # Calculate completion percentage
         completion_pct = await self.enroll_repo.get_completion_pct(enrollment_id, total_lessons)
 
-        if completion_pct >= 100.0 and enrollment.status != EnrollmentStatus.COMPLETED:
-            enrollment.status = EnrollmentStatus.COMPLETED
-            enrollment.completed_at = datetime.now(timezone.utc)
+        # Check if certificate exists to determine if we should generate one
+        from app.models.certificate import Certificate
+        cert_stmt = select(Certificate).where(Certificate.enrollment_id == enrollment.id)
+        existing_cert = (await self.db.execute(cert_stmt)).scalar_one_or_none()
+
+        if completion_pct >= 100.0 and (enrollment.status != EnrollmentStatus.COMPLETED or not existing_cert):
+            if enrollment.status != EnrollmentStatus.COMPLETED:
+                enrollment.status = EnrollmentStatus.COMPLETED
+                enrollment.completed_at = datetime.now(timezone.utc)
             
             # Fetch user and course info for certificate generation
             user_stmt = select(User).where(User.id == enrollment.user_id)
