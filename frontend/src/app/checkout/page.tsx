@@ -37,9 +37,12 @@ function CheckoutContent() {
             "Authorization": `Bearer ${token}`
           },
           body: JSON.stringify({
-            course_id: courseId,
-            success_url: `${window.location.origin}/dashboard/student?payment=success`,
-            cancel_url: `${window.location.origin}/academy?payment=cancelled`
+            items: [
+              {
+                item_type: "course",
+                item_id: courseId
+              }
+            ]
           })
         });
 
