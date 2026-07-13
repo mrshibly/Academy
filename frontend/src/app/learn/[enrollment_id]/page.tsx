@@ -24,6 +24,8 @@ export default function LearnPage() {
   const [quizPassed, setQuizPassed] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
 
+  const totalLessons = modules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0);
+
   // Reset quiz states when lesson changes
   useEffect(() => {
     setQuizAnswers({});
@@ -114,8 +116,7 @@ export default function LearnPage() {
         }
         
         // If this completion marks the entire syllabus finished, fetch the certificate!
-        const total = modules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0);
-        if (next.size === total && !isCompleted) {
+        if (next.size === totalLessons && !isCompleted) {
           setTimeout(async () => {
             try {
               const freshRes = await fetch(`/api/v1/enrollments/${enrollmentId}`, {
