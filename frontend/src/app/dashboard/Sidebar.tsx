@@ -80,11 +80,48 @@ const adminSections: NavSection[] = [
   },
 ];
 
+const instructorSections: NavSection[] = [
+  {
+    title: "Overview",
+    items: [
+      { label: "Dashboard", href: "/dashboard/instructor", icon: <BarChart3 size={18} /> },
+    ],
+  },
+  {
+    title: "Teaching Workspace",
+    items: [
+      { label: "My Courses", href: "/dashboard/instructor/courses", icon: <BookOpen size={18} /> },
+      { label: "Blog Workspace", href: "/dashboard/instructor/blog", icon: <FileText size={18} /> },
+    ],
+  },
+];
+
+const studentSections: NavSection[] = [
+  {
+    title: "Overview",
+    items: [
+      { label: "Dashboard", href: "/dashboard/student", icon: <Home size={18} /> },
+    ],
+  },
+  {
+    title: "Learning Tracks",
+    items: [
+      { label: "Browse Academy", href: "/academy", icon: <BookOpen size={18} /> },
+    ],
+  },
+];
+
 export default function DashboardSidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  const sections = user?.roles.includes("admin")
+    ? adminSections
+    : user?.roles.includes("instructor")
+    ? instructorSections
+    : studentSections;
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
@@ -201,7 +238,7 @@ export default function DashboardSidebar() {
           padding: collapsed ? "1rem 0.5rem" : "1rem 0.75rem",
         }}
       >
-        {adminSections.map((section) => (
+        {sections.map((section) => (
           <div key={section.title} style={{ marginBottom: "1.5rem" }}>
             {!collapsed && (
               <div

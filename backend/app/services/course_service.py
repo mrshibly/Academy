@@ -11,11 +11,11 @@ class CourseService:
         self.db = db
         self.repo = CourseRepository(db)
 
-    async def list_published(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None):
-        return await self.repo.list_published(page, page_size, category_id, level, search)
+    async def list_published(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None, instructor_id: UUID | None = None):
+        return await self.repo.list_published(page, page_size, category_id, level, search, instructor_id)
 
-    async def list_all(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None):
-        return await self.repo.list_all(page, page_size, category_id, level, search)
+    async def list_all(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None, instructor_id: UUID | None = None):
+        return await self.repo.list_all(page, page_size, category_id, level, search, instructor_id)
 
     async def get_course_detail(self, slug: str):
         course = await self.repo.get_by_slug(slug)
@@ -36,6 +36,8 @@ class CourseService:
             raise NotFoundError(resource="Course")
         if not is_admin and course.instructor_id != actor_id:
             raise ForbiddenError(message="You can only edit your own courses.")
+        if not is_admin and "status" in kwargs:
+            kwargs["status"] = CourseStatus.DRAFT
         course = await self.repo.update(course, **kwargs)
         await self.db.commit()
         return course

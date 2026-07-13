@@ -14,13 +14,33 @@ from app.services.course_service import CourseService
 router = APIRouter()
 
 @router.get("", response_model=PaginatedResponse[CourseRead], status_code=200)
-async def list_courses(page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100), category_id: UUID | None = None, level: str | None = None, search: str | None = None, include_draft: bool = False, db: AsyncSession = Depends(get_db)):
-    """List courses with filters. Admin/instructors can set include_draft=True to see drafts."""
+async def list_courses(page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100), category_id: UUID | None = None, level: str | None = None, search: str | None = None, db: AsyncSession = Depends(get_db)):
+    """Public: list published courses with filters."""
     svc = CourseService(db)
-    if include_draft:
-        courses, total = await svc.list_all(page, page_size, category_id, level, search)
-    else:
-        courses, total = await svc.list_published(page, page_size, category_id, level, search)
+    courses, total = await svc.list_published(page, page_size, category_id, level, search)
+    return PaginatedResponse(items=[CourseRead.model_validate(c) for c in courses], total=total, page=page, page_size=page_size)
+
+@router.get("/managed", response_model=PaginatedResponse[CourseRead], status_code=200)
+async def list_managed_courses(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    category_id: UUID | None = None,
+    level: str | None = None,
+    search: str | None = None,
+    user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Instructor/Admin workspace: list courses they manage (instructors only see their own)."""
+    svc = CourseService(db)
+    is_admin = any(ur.role.name == "admin" for ur in user.user_roles)
+    is_instructor = any(ur.role.name == "instructor" for ur in user.user_roles)
+    
+    if not is_admin and not is_instructor:
+        from app.core.exceptions import ForbiddenError
+        raise ForbiddenError(message="Only instructors and administrators can view managed courses.")
+        
+    instructor_filter = None if is_admin else user.id
+    courses, total = await svc.list_all(page, page_size, category_id, level, search, instructor_id=instructor_filter)
     return PaginatedResponse(items=[CourseRead.model_validate(c) for c in courses], total=total, page=page, page_size=page_size)
 
 @router.get("/{slug}", response_model=CourseRead, status_code=200)

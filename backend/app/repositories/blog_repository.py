@@ -20,6 +20,17 @@ class BlogRepository:
         result = await self.db.execute(base.offset((page - 1) * page_size).limit(page_size).order_by(BlogPost.published_at.desc()))
         return list(result.scalars().all()), int(total)
 
+    async def list_all(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, author_id: UUID | None = None) -> tuple[list[BlogPost], int]:
+        """List all (draft & published), non-deleted posts with pagination."""
+        base = select(BlogPost).where(BlogPost.deleted_at.is_(None))
+        if author_id:
+            base = base.where(BlogPost.author_id == author_id)
+        if category_id:
+            base = base.where(BlogPost.category_id == category_id)
+        total = (await self.db.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
+        result = await self.db.execute(base.offset((page - 1) * page_size).limit(page_size).order_by(BlogPost.created_at.desc()))
+        return list(result.scalars().all()), int(total)
+
     async def get_by_slug(self, slug: str) -> BlogPost | None:
         result = await self.db.execute(select(BlogPost).where(BlogPost.slug == slug, BlogPost.deleted_at.is_(None)))
         return result.scalar_one_or_none()

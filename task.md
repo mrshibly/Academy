@@ -1,16 +1,18 @@
-# Checklist: Role-Based Dashboard Separation & Signups
+# Checklist: Role-Based Dashboards & Approval Pipeline
 
-## Phase 1: Backend Role Restrictions & Promotion
-- [x] Enforce student-only signup in `AuthService` (`register` and `oauth_login_or_register`)
-- [x] Add admin-only manual user creation in `routes/users.py`
-- [x] Add admin-only role promotion endpoint in `routes/users.py`
+## Phase 1: Backend Restrictions & Listing
+- [x] Enforce status = draft on blog post creation/update if actor is not admin in `blog_service.py`
+- [x] Add `instructor_id` parameter to `list_published` and `list_all` in `CourseRepository`
+- [x] Add `instructor_id` parameter to list methods in `CourseService`
+- [x] Revert public `/api/v1/courses` endpoint to public published-only listing
+- [x] Implement secure `/api/v1/courses/managed` endpoint for instructors/admins
 
-## Phase 2: Frontend Signups & Role Selection
-- [x] Verify `register/page.tsx` has no public role selectors
-- [x] Add manual user creation dialog in `dashboard/admin/users/page.tsx`
-- [x] Add promotion dropdown menu to `dashboard/admin/users/page.tsx`
+## Phase 2: Frontend Dynamic Sidebar & Route Guards
+- [x] Implement dynamic navigation sections based on user role in `Sidebar.tsx`
+- [x] Upgrade route protection in `ProtectedRoute.tsx` to handle role restrictions (implemented in DashboardLayout)
 
-## Phase 3: Dashboard Layouts
-- [x] Enhance Student Dashboard `dashboard/student/page.tsx`
-- [x] Build out Instructor Dashboard `dashboard/instructor/page.tsx`
-- [x] Verify role routing redirects in `login/page.tsx`
+## Phase 3: Frontend Workspaces & Approvals
+- [x] Create Instructor Courses Page `dashboard/instructor/courses/page.tsx`
+- [x] Create Instructor Blog Page `dashboard/instructor/blog/page.tsx`
+- [x] Add "Pending Approval" tab & publish button to Admin Courses Page `dashboard/admin/courses/page.tsx`
+- [x] Add "Pending Approval" view & publish button to Admin Blog Page `dashboard/admin/blog/page.tsx`

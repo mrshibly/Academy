@@ -11,8 +11,10 @@ class CourseRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def list_published(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None) -> tuple[list[Course], int]:
+    async def list_published(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None, instructor_id: UUID | None = None) -> tuple[list[Course], int]:
         base = select(Course).where(Course.status == CourseStatus.PUBLISHED, Course.deleted_at.is_(None))
+        if instructor_id:
+            base = base.where(Course.instructor_id == instructor_id)
         if category_id:
             base = base.where(Course.category_id == category_id)
         if level:
@@ -25,8 +27,10 @@ class CourseRepository:
         result = await self.db.execute(stmt)
         return list(result.scalars().unique().all()), int(total)
 
-    async def list_all(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None) -> tuple[list[Course], int]:
+    async def list_all(self, page: int = 1, page_size: int = 20, category_id: UUID | None = None, level: str | None = None, search: str | None = None, instructor_id: UUID | None = None) -> tuple[list[Course], int]:
         base = select(Course).where(Course.deleted_at.is_(None))
+        if instructor_id:
+            base = base.where(Course.instructor_id == instructor_id)
         if category_id:
             base = base.where(Course.category_id == category_id)
         if level:

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { usePathname } from "next/navigation";
 import DashboardSidebar from "./Sidebar";
 
 export default function DashboardLayout({
@@ -12,13 +13,28 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (loading) return;
     if (!user) {
       router.push("/login");
+      return;
     }
-  }, [user, loading, router]);
+
+    const is_admin = user.roles.includes("admin");
+    const is_instructor = user.roles.includes("instructor");
+
+    if (pathname.startsWith("/dashboard/admin") && !is_admin) {
+      if (is_instructor) {
+        router.push("/dashboard/instructor");
+      } else {
+        router.push("/dashboard/student");
+      }
+    } else if (pathname.startsWith("/dashboard/instructor") && !is_instructor && !is_admin) {
+      router.push("/dashboard/student");
+    }
+  }, [user, loading, router, pathname]);
 
   if (loading) {
     return (

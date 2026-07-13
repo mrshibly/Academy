@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { FileText, Plus, Trash2, Edit3, Search } from "lucide-react";
+import { FileText, Plus, Trash2, Edit3, Search, AlertCircle } from "lucide-react";
 
-export default function AdminBlogPage() {
+export default function InstructorBlogPage() {
   const { token } = useAuth();
   const [blogs, setBlogs] = useState<any[]>([]);
   const [fetching, setFetching] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  
   const [blogForm, setBlogForm] = useState({ title: "", slug: "", content: "", excerpt: "", status: "draft" });
   const [editId, setEditId] = useState<string | null>(null);
 
@@ -43,9 +44,16 @@ export default function AdminBlogPage() {
     try {
       const url = editId ? `/api/v1/blog/${editId}` : "/api/v1/blog";
       const method = editId ? "PATCH" : "POST";
-      const res = await fetch(url, { method, headers, body: JSON.stringify(blogForm) });
+      
+      // Enforce status to draft for instructors
+      const payload = {
+        ...blogForm,
+        status: "draft"
+      };
+
+      const res = await fetch(url, { method, headers, body: JSON.stringify(payload) });
       if (res.ok) {
-        showMessage(editId ? "Blog post updated successfully!" : "Blog post created successfully!");
+        showMessage(editId ? "Article saved as draft! Pending admin review." : "Article submitted as draft! Pending admin review.");
         setBlogForm({ title: "", slug: "", content: "", excerpt: "", status: "draft" });
         setEditId(null);
         fetchBlogs();
@@ -65,38 +73,19 @@ export default function AdminBlogPage() {
       slug: post.slug,
       content: post.content || "",
       excerpt: post.excerpt || "",
-      status: post.status
+      status: "draft"
     });
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this blog post?")) return;
+    if (!confirm("Are you sure you want to delete this blog draft?")) return;
     try {
       const res = await fetch(`/api/v1/blog/${id}`, { method: "DELETE", headers });
       if (res.ok) {
-        showMessage("Blog post deleted.");
+        showMessage("Blog post draft deleted.");
         fetchBlogs();
       } else {
-        showMessage("Failed to delete post.", "error");
-      }
-    } catch {
-      showMessage("Error connecting to server.", "error");
-    }
-  };
-
-  const handleApprove = async (id: string) => {
-    if (!confirm("Approve and publish this blog post?")) return;
-    try {
-      const res = await fetch(`/api/v1/blog/${id}`, {
-        method: "PATCH",
-        headers,
-        body: JSON.stringify({ status: "published" })
-      });
-      if (res.ok) {
-        showMessage("Blog post published successfully!");
-        fetchBlogs();
-      } else {
-        showMessage("Failed to publish blog post.", "error");
+        showMessage("Failed to delete blog post.", "error");
       }
     } catch {
       showMessage("Error connecting to server.", "error");
@@ -112,9 +101,9 @@ export default function AdminBlogPage() {
     <div>
       <div style={{ marginBottom: "2rem" }}>
         <h1 style={{ fontSize: "1.75rem", fontWeight: 800, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <FileText size={24} style={{ color: "var(--accent-blue)" }} /> Blog Manager
+          <FileText size={24} style={{ color: "var(--accent-violet)" }} /> Blog Workspace
         </h1>
-        <p style={{ color: "var(--text-secondary)", marginTop: "0.25rem" }}>Manage articles, news, and approve posts submitted by instructors</p>
+        <p style={{ color: "var(--text-secondary)", marginTop: "0.25rem" }}>Author articles, news, and technical guidelines. Submission defaults to draft, awaiting admin approval.</p>
       </div>
 
       {message && (
@@ -133,7 +122,7 @@ export default function AdminBlogPage() {
         {/* Listing */}
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
-            <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>Blog Articles ({filtered.length})</h2>
+            <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>My Articles ({filtered.length})</h2>
             <div style={{ position: "relative" }}>
               <Search size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
               <input
@@ -149,13 +138,13 @@ export default function AdminBlogPage() {
           ) : filtered.length === 0 ? (
             <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "4rem 2rem", textAlign: "center" }}>
               <FileText size={40} style={{ color: "var(--text-muted)", marginBottom: "1rem" }} />
-              <p style={{ color: "var(--text-secondary)" }}>No blog articles found.</p>
+              <p style={{ color: "var(--text-secondary)" }}>No articles authored yet.</p>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {filtered.map((post) => (
                 <div key={post.id} style={{
-                  background: "white", border: editId === post.id ? "2px solid var(--accent-blue)" : "1px solid var(--border-color)",
+                  background: "white", border: editId === post.id ? "2px solid var(--accent-violet)" : "1px solid var(--border-color)",
                   borderRadius: "12px", padding: "1.25rem"
                 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -167,13 +156,8 @@ export default function AdminBlogPage() {
                       <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: "0.15rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{post.excerpt || "No summary provided."}</p>
                       <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.4rem", fontFamily: "monospace" }}>Slug: {post.slug}</p>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0, marginLeft: "1rem" }}>
-                      {post.status === "draft" && (
-                        <button onClick={() => handleApprove(post.id)} style={{ padding: "0.3rem 0.6rem", fontSize: "0.75rem", background: "var(--accent-emerald)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 600 }}>
-                          Approve
-                        </button>
-                      )}
-                      <button onClick={() => handleEdit(post)} style={{ color: "var(--accent-blue)", padding: "0.4rem", background: "transparent", border: "none", cursor: "pointer", borderRadius: "6px" }} title="Edit">
+                    <div style={{ display: "flex", gap: "0.25rem", flexShrink: 0, marginLeft: "1rem" }}>
+                      <button onClick={() => handleEdit(post)} style={{ color: "var(--accent-violet)", padding: "0.4rem", background: "transparent", border: "none", cursor: "pointer", borderRadius: "6px" }} title="Edit">
                         <Edit3 size={16} />
                       </button>
                       <button onClick={() => handleDelete(post.id)} style={{ color: "#ef4444", padding: "0.4rem", background: "transparent", border: "none", cursor: "pointer", borderRadius: "6px" }} title="Delete">
@@ -189,9 +173,15 @@ export default function AdminBlogPage() {
 
         {/* Form */}
         <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "1.75rem", height: "fit-content", position: "sticky", top: "2rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "rgba(139, 92, 246, 0.05)", border: "1px solid rgba(139, 92, 246, 0.15)", borderRadius: "8px", padding: "0.75rem", marginBottom: "1.5rem", fontSize: "0.8rem", color: "var(--accent-violet)" }}>
+            <AlertCircle size={16} />
+            <span>Note: Submitted articles will be reviewed by platform administrators before going public.</span>
+          </div>
+
           <h2 style={{ fontSize: "1.15rem", fontWeight: 700, marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Plus size={18} /> {editId ? "Edit Blog Article" : "Create Blog Article"}
+            <Plus size={18} /> {editId ? "Edit Blog Article" : "Write Blog Article"}
           </h2>
+          
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div>
               <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Title *</label>
@@ -209,16 +199,9 @@ export default function AdminBlogPage() {
               <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Content (Markdown) *</label>
               <textarea required value={blogForm.content} rows={6} onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", fontFamily: "monospace", fontSize: "0.9rem", resize: "vertical" }} />
             </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Status</label>
-              <select value={blogForm.status} onChange={(e) => setBlogForm({ ...blogForm, status: e.target.value })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", background: "white", fontSize: "0.9rem" }}>
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-              </select>
-            </div>
             <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-              <button type="submit" className="btn btn-accent" style={{ flex: 1 }}>
-                {editId ? "Update Article" : "Publish Article"}
+              <button type="submit" className="btn btn-accent" style={{ flex: 1, background: "var(--accent-violet)", borderColor: "var(--accent-violet)" }}>
+                {editId ? "Save Changes" : "Submit Draft"}
               </button>
               {editId && (
                 <button type="button" className="btn btn-outline" onClick={() => { setEditId(null); setBlogForm({ title: "", slug: "", content: "", excerpt: "", status: "draft" }); }}>
