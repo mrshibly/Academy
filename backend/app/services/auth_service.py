@@ -114,6 +114,9 @@ class AuthService:
         # 4. Commit transaction
         await self.db.commit()
 
+        # Reload user with roles loaded
+        user = await self.user_repo.get_by_id(user.id)
+
         # 5. Generate tokens
         roles = [ur.role.name for ur in user.user_roles]
         settings = get_settings()
