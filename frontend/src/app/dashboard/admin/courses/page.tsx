@@ -11,7 +11,7 @@ export default function AdminCoursesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [courseForm, setCourseForm] = useState({
-    title: "", slug: "", description: "", short_description: "", price: 99.0, level: "beginner", duration_hours: 10
+    title: "", slug: "", description: "", short_description: "", price: 99.0, level: "beginner", duration_hours: 10, status: "draft"
   });
   const [editId, setEditId] = useState<string | null>(null);
 
@@ -40,7 +40,7 @@ export default function AdminCoursesPage() {
       const res = await fetch(url, { method, headers, body: JSON.stringify(courseForm) });
       if (res.ok) {
         showMessage(editId ? "Course updated successfully!" : "Course created successfully!");
-        setCourseForm({ title: "", slug: "", description: "", short_description: "", price: 99.0, level: "beginner", duration_hours: 10 });
+        setCourseForm({ title: "", slug: "", description: "", short_description: "", price: 99.0, level: "beginner", duration_hours: 10, status: "draft" });
         setEditId(null);
         fetchCourses();
       } else {
@@ -55,7 +55,8 @@ export default function AdminCoursesPage() {
     setCourseForm({
       title: course.title, slug: course.slug, description: course.description || "",
       short_description: course.short_description || "", price: course.price,
-      level: course.level, duration_hours: course.duration_hours || 10
+      level: course.level, duration_hours: course.duration_hours || 10,
+      status: course.status
     });
   };
 
@@ -127,7 +128,7 @@ export default function AdminCoursesPage() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.4rem" }}>
                         <span style={{ fontSize: "0.7rem", background: "rgba(14, 165, 233, 0.1)", color: "var(--accent-blue)", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: 600 }}>{course.level}</span>
-                        <span style={{ fontSize: "0.7rem", background: course.status === "PUBLISHED" ? "rgba(16, 185, 129, 0.1)" : "rgba(234, 179, 8, 0.1)", color: course.status === "PUBLISHED" ? "var(--accent-emerald)" : "#ca8a04", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: 600 }}>{course.status}</span>
+                        <span style={{ fontSize: "0.7rem", background: course.status === "published" ? "rgba(16, 185, 129, 0.1)" : "rgba(234, 179, 8, 0.1)", color: course.status === "published" ? "var(--accent-emerald)" : "#ca8a04", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: 600 }}>{course.status.toUpperCase()}</span>
                       </div>
                       <h4 style={{ fontWeight: 700, fontSize: "1rem" }}>{course.title}</h4>
                       <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: "0.15rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{course.short_description || "No description"}</p>
@@ -182,20 +183,30 @@ export default function AdminCoursesPage() {
                 <input type="number" required value={courseForm.duration_hours} onChange={(e) => setCourseForm({ ...courseForm, duration_hours: parseFloat(e.target.value) })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", fontSize: "0.9rem" }} />
               </div>
             </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Level</label>
-              <select value={courseForm.level} onChange={(e) => setCourseForm({ ...courseForm, level: e.target.value })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", background: "white", fontSize: "0.9rem" }}>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-              </select>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Level</label>
+                <select value={courseForm.level} onChange={(e) => setCourseForm({ ...courseForm, level: e.target.value })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", background: "white", fontSize: "0.9rem" }}>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Status</label>
+                <select value={courseForm.status} onChange={(e) => setCourseForm({ ...courseForm, status: e.target.value })} style={{ width: "100%", padding: "0.55rem", border: "1px solid var(--border-color)", borderRadius: "6px", background: "white", fontSize: "0.9rem" }}>
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </div>
             </div>
             <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
               <button type="submit" className="btn btn-accent" style={{ flex: 1 }}>
                 {editId ? "Update Course" : "Create Course"}
               </button>
               {editId && (
-                <button type="button" className="btn btn-outline" onClick={() => { setEditId(null); setCourseForm({ title: "", slug: "", description: "", short_description: "", price: 99.0, level: "beginner", duration_hours: 10 }); }}>
+                <button type="button" className="btn btn-outline" onClick={() => { setEditId(null); setCourseForm({ title: "", slug: "", description: "", short_description: "", price: 99.0, level: "beginner", duration_hours: 10, status: "draft" }); }}>
                   Cancel
                 </button>
               )}
