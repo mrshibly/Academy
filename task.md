@@ -31,8 +31,8 @@
 - [x] Add "Sign up with Google" button to register page
 
 ## Phase 2: Data Quality + Auth Robustness
-- [ ] Token auto-refresh in `AuthContext.tsx`
-- [ ] `ProtectedRoute.tsx` component
+- [x] Token auto-refresh in `AuthContext.tsx`
+- [x] `ProtectedRoute.tsx` component
 - [ ] `Toast.tsx` global notification system
 - [ ] `DataTable.tsx` reusable component
 
