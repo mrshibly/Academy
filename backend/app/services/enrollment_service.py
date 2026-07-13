@@ -70,3 +70,25 @@ class EnrollmentService:
     async def delete_enrollment(self, enrollment_id: UUID) -> None:
         await self.enroll_repo.delete(enrollment_id)
         await self.db.commit()
+
+    async def get_enrollment_detail(self, enrollment_id: UUID):
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+        from app.models.enrollment import Enrollment
+        from app.models.course import Course, Module
+
+        stmt = (
+            select(Enrollment)
+            .where(Enrollment.id == enrollment_id)
+            .options(
+                selectinload(Enrollment.course)
+                .selectinload(Course.modules)
+                .selectinload(Module.lessons),
+                selectinload(Enrollment.lesson_progress)
+            )
+        )
+        res = await self.db.execute(stmt)
+        enrollment = res.scalar_one_or_none()
+        if enrollment is None:
+            raise NotFoundError(resource="Enrollment")
+        return enrollment

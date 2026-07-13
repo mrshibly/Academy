@@ -59,3 +59,28 @@ async def cancel_enrollment(enrollment_id: UUID, db: AsyncSession = Depends(get_
     svc = EnrollmentService(db)
     await svc.delete_enrollment(enrollment_id)
     return MessageResponse(message="Enrollment deleted successfully.")
+
+@router.get("/{enrollment_id}", status_code=200)
+async def get_enrollment_detail(
+    enrollment_id: UUID,
+    user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Retrieve detailed progress & syllabus of an enrollment."""
+    from app.core.exceptions import ForbiddenError
+    
+    svc = EnrollmentService(db)
+    enrollment = await svc.get_enrollment_detail(enrollment_id)
+    
+    is_admin_or_instructor = any(ur.role.name in ("admin", "instructor") for ur in user.user_roles)
+    if enrollment.user_id != user.id and not is_admin_or_instructor:
+        raise ForbiddenError(message="You do not have permission to access this enrollment.")
+        
+    from app.schemas.course import CourseRead
+    return {
+        "id": str(enrollment.id),
+        "user_id": str(enrollment.user_id),
+        "status": enrollment.status.value,
+        "course": CourseRead.model_validate(enrollment.course).model_dump(),
+        "completed_lessons": [str(p.lesson_id) for p in enrollment.lesson_progress if p.status.value == "completed"]
+    }

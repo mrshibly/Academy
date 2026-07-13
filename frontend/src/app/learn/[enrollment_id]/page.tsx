@@ -17,27 +17,6 @@ export default function LearnPage() {
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
   const [fetching, setFetching] = useState(true);
 
-  // Mock static course structure for lab flow
-  const mockCourseData = {
-    title: "Ethical Hacking & Penetration Testing",
-    modules: [
-      {
-        title: "Module 1: Introduction to Offensive Security",
-        lessons: [
-          { id: "les-1", title: "Course Overview & Lab Setup", type: "video", content: "Welcome! In this lesson, we will go over the requirements for the sandbox labs. Make sure to download Kali Linux or install it in a local virtual machine." },
-          { id: "les-2", title: "Ethical Disclosure Guidelines", type: "document", content: "Ethical hacking requires strict adherence to legal authorization models. Do not scan targets without written permission (Rules of Engagement)." }
-        ]
-      },
-      {
-        title: "Module 2: Network Reconnaissance",
-        lessons: [
-          { id: "les-3", title: "Active Recon: Port Scanning with Nmap", type: "video", content: "Learn Nmap scan configurations, default script usage (-sC), service version inspection (-sV), and TCP SYN scanning strategies." },
-          { id: "les-4", title: "Puzzling Firewalls & Evasion", type: "document", content: "Firewalls block raw connection checks. Examine fragmentation and decoys techniques to bypass basic filtering." }
-        ]
-      }
-    ]
-  };
-
   useEffect(() => {
     if (loading) return;
     if (!token) {
@@ -47,18 +26,37 @@ export default function LearnPage() {
 
     const loadData = async () => {
       try {
-        // Load initial mock details
-        setCourseTitle(mockCourseData.title);
-        setModules(mockCourseData.modules);
-        setActiveLesson(mockCourseData.modules[0].lessons[0]);
-        setFetching(false);
+        const res = await fetch(`/api/v1/enrollments/${enrollmentId}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCourseTitle(data.course.title);
+          
+          // Sort modules and lessons by order
+          const sortedModules = (data.course.modules || [])
+            .sort((a: any, b: any) => a.order - b.order)
+            .map((mod: any) => ({
+              ...mod,
+              lessons: (mod.lessons || []).sort((a: any, b: any) => a.order - b.order)
+            }));
+          
+          setModules(sortedModules);
+          setCompletedLessonIds(new Set(data.completed_lessons || []));
+          
+          if (sortedModules.length > 0 && sortedModules[0].lessons.length > 0) {
+            setActiveLesson(sortedModules[0].lessons[0]);
+          }
+        }
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load enrollment data:", err);
+      } finally {
+        setFetching(false);
       }
     };
 
     loadData();
-  }, [token, loading, router]);
+  }, [token, loading, router, enrollmentId]);
 
   const handleToggleComplete = async (lessonId: string) => {
     try {
@@ -67,13 +65,15 @@ export default function LearnPage() {
         "Authorization": `Bearer ${token}`
       };
 
-      // Call progress endpoint in backend
+      const isCompleted = completedLessonIds.has(lessonId);
+      const nextStatus = isCompleted ? "not_started" : "completed";
+
       const res = await fetch(`/api/v1/enrollments/${enrollmentId}/progress`, {
         method: "PATCH",
         headers,
         body: JSON.stringify({
           lesson_id: lessonId,
-          status: "completed"
+          status: nextStatus
         })
       });
 
@@ -146,7 +146,7 @@ export default function LearnPage() {
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", width: "85%" }}>
-                        {les.type === "video" ? <PlayCircle size={16} /> : <FileText size={16} />}
+                        {(les.content_type || les.type) === "video" ? <PlayCircle size={16} /> : <FileText size={16} />}
                         <span style={{ fontSize: "0.875rem", fontWeight: isActive ? 600 : 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {les.title}
                         </span>
@@ -176,7 +176,7 @@ export default function LearnPage() {
             </div>
 
             {/* Video Player Placeholder or Document view */}
-            {activeLesson.type === "video" ? (
+            {(activeLesson.content_type || activeLesson.type) === "video" ? (
               <div style={{ width: "100%", height: "24rem", borderRadius: "var(--radius-md)", background: "#0f172a", color: "white", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem", marginBottom: "2.5rem", boxShadow: "var(--shadow-md)" }}>
                 <PlayCircle size={64} style={{ color: "var(--accent-blue)", opacity: 0.9 }} />
                 <span style={{ fontSize: "0.9rem", color: "#94a3b8" }}>Render Secure Video Player</span>
@@ -191,7 +191,7 @@ export default function LearnPage() {
             <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "2rem", boxShadow: "var(--shadow-sm)" }}>
               <h3 style={{ fontWeight: 700, marginBottom: "0.75rem" }}>Lesson Overview</h3>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.975rem", lineHeight: 1.6 }}>
-                {activeLesson.content}
+                {activeLesson.content_body || activeLesson.content || "Welcome to this syllabus lecture. Please proceed with the curriculum outline and resources."}
               </p>
             </div>
 
