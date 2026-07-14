@@ -35,8 +35,8 @@ def build_certificate_html(
           margin: 0;
           padding: 0;
           font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
-          background-color: #030712;
-          color: #f3f4f6;
+          background-color: #f8fafc;
+          color: #0f172a;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -48,7 +48,7 @@ def build_certificate_html(
           position: relative;
           box-sizing: border-box;
           border: 16px solid transparent;
-          background-image: linear-gradient(#030712, #030712), linear-gradient(135deg, #10b981, #8b5cf6, #3b82f6);
+          background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #10b981, #8b5cf6, #3b82f6);
           background-origin: border-box;
           background-clip: content-box, border-box;
           padding: 50px 70px;
@@ -58,14 +58,14 @@ def build_certificate_html(
           justify-content: space-between;
           overflow: hidden;
         }}
-        /* Digital futuristic grid background */
+        /* Digital futuristic grid background in light-mode */
         .cert-container::before {{
           content: "";
           position: absolute;
           top: 0; left: 0; right: 0; bottom: 0;
           background-image: 
-            linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+            linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
           background-size: 20px 20px;
           pointer-events: none;
           z-index: 1;
@@ -90,11 +90,10 @@ def build_certificate_html(
           text-transform: uppercase;
           letter-spacing: 0.25em;
           color: #10b981;
-          text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
         }}
         .brand-url {{
           font-size: 10px;
-          color: #6b7280;
+          color: #94a3b8;
           margin-top: 3px;
           letter-spacing: 0.1em;
         }}
@@ -104,9 +103,7 @@ def build_certificate_html(
         .main-title {{
           font-size: 44px;
           font-weight: 900;
-          background: linear-gradient(to right, #ffffff, #e5e7eb, #9ca3af);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: #0f172a;
           margin: 0;
           letter-spacing: 0.08em;
           text-transform: uppercase;
@@ -118,7 +115,6 @@ def build_certificate_html(
           color: #8b5cf6;
           font-weight: 800;
           margin-top: 4px;
-          text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
         }}
         .divider {{
           width: 320px;
@@ -128,7 +124,7 @@ def build_certificate_html(
         }}
         .presentation-text {{
           font-size: 10px;
-          color: #9ca3af;
+          color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.15em;
           font-weight: 600;
@@ -137,15 +133,14 @@ def build_certificate_html(
         .student-name {{
           font-size: 40px;
           font-weight: 800;
-          color: #ffffff;
+          color: #0f172a;
           margin: 10px 0;
           text-align: center;
           letter-spacing: 0.02em;
-          text-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
         }}
         .course-info {{
           font-size: 15px;
-          color: #9ca3af;
+          color: #475569;
           text-align: center;
           max-width: 700px;
           line-height: 1.6;
@@ -171,8 +166,8 @@ def build_certificate_html(
           position: relative;
         }}
         .signature-box {{
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(15, 23, 42, 0.06);
+          background: rgba(15, 23, 42, 0.015);
           border-radius: 8px;
           height: 55px;
           margin-bottom: 8px;
@@ -186,7 +181,7 @@ def build_certificate_html(
           bottom: 12px;
           left: 20px;
           right: 20px;
-          border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+          border-bottom: 1px dashed rgba(15, 23, 42, 0.1);
           height: 1px;
           z-index: 1;
         }}
@@ -200,13 +195,13 @@ def build_certificate_html(
         .col-label {{
           font-size: 11px;
           font-weight: 800;
-          color: #ffffff;
+          color: #0f172a;
           text-transform: uppercase;
           letter-spacing: 0.08em;
         }}
         .col-sublabel {{
           font-size: 9px;
-          color: #6b7280;
+          color: #64748b;
           text-transform: uppercase;
           margin-top: 3px;
           font-weight: 600;
@@ -221,7 +216,7 @@ def build_certificate_html(
         .meta-text {{
           font-size: 9px;
           font-family: monospace;
-          color: #9ca3af;
+          color: #475569;
           margin-bottom: 3px;
           letter-spacing: 0.05em;
         }}
