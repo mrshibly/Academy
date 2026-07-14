@@ -35,8 +35,7 @@ def build_certificate_html(
           margin: 0;
           padding: 0;
           font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
-          background-color: #f8fafc;
-          color: #0f172a;
+          background-color: #cbd5e1;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -47,220 +46,426 @@ def build_certificate_html(
           height: 210mm;
           position: relative;
           box-sizing: border-box;
-          border: 16px solid transparent;
-          background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #10b981, #8b5cf6, #3b82f6);
-          background-origin: border-box;
-          background-clip: content-box, border-box;
-          padding: 50px 70px;
+          background-color: #ffffff;
           display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: space-between;
           overflow: hidden;
         }}
-        /* Digital futuristic grid background in light-mode */
-        .cert-container::before {{
-          content: "";
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background-image: 
-            linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
-          background-size: 20px 20px;
-          pointer-events: none;
-          z-index: 1;
-        }}
-        .content-wrap {{
+        
+        /* Left solid blue panel */
+        .left-panel {{
+          width: 42%;
+          height: 100%;
+          background-color: #1e6fd9;
           position: relative;
-          z-index: 2;
+          z-index: 10;
+          clip-path: polygon(0 0, 100% 0, 100% 76%, 72% 100%, 0 100%);
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: space-between;
-          height: 100%;
-          width: 100%;
-        }}
-        .header {{
-          text-align: center;
-          margin-top: 5px;
-        }}
-        .brand-title {{
-          font-size: 13px;
-          font-weight: 900;
-          text-transform: uppercase;
-          letter-spacing: 0.25em;
-          color: #10b981;
-        }}
-        .brand-url {{
-          font-size: 10px;
-          color: #94a3b8;
-          margin-top: 3px;
-          letter-spacing: 0.1em;
-        }}
-        .title-section {{
-          text-align: center;
-        }}
-        .main-title {{
-          font-size: 44px;
-          font-weight: 900;
-          color: #0f172a;
-          margin: 0;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }}
-        .sub-title {{
-          font-size: 13px;
-          text-transform: uppercase;
-          letter-spacing: 0.3em;
-          color: #8b5cf6;
-          font-weight: 800;
-          margin-top: 4px;
-        }}
-        .divider {{
-          width: 320px;
-          height: 2px;
-          background: linear-gradient(to right, transparent, #8b5cf6, #10b981, transparent);
-          margin: 12px auto;
-        }}
-        .presentation-text {{
-          font-size: 10px;
-          color: #64748b;
-          text-transform: uppercase;
-          letter-spacing: 0.15em;
-          font-weight: 600;
-          margin: 5px 0;
-        }}
-        .student-name {{
-          font-size: 40px;
-          font-weight: 800;
-          color: #0f172a;
-          margin: 10px 0;
-          text-align: center;
-          letter-spacing: 0.02em;
-        }}
-        .course-info {{
-          font-size: 15px;
-          color: #475569;
-          text-align: center;
-          max-width: 700px;
-          line-height: 1.6;
-        }}
-        .course-title {{
-          font-weight: 900;
-          color: #10b981;
-          font-size: 18px;
-          letter-spacing: 0.02em;
-        }}
-        .footer-section {{
-          width: 100%;
-          display: flex;
-          justify-content: space-between;
-          padding: 0 20px;
-          margin-top: 15px;
+          padding: 50px 30px;
           box-sizing: border-box;
         }}
-        .footer-col {{
+        
+        /* Logo sunburst */
+        .logo-container {{
           display: flex;
           flex-direction: column;
-          width: 250px;
-          position: relative;
+          align-items: center;
+          margin-top: 10px;
         }}
-        .signature-box {{
-          border: 1px solid rgba(15, 23, 42, 0.06);
-          background: rgba(15, 23, 42, 0.015);
-          border-radius: 8px;
-          height: 55px;
-          margin-bottom: 8px;
+        .logo-svg {{
+          width: 44px;
+          height: 44px;
+        }}
+        .logo-title {{
+          font-size: 15px;
+          font-weight: 800;
+          color: #ffffff;
+          margin-top: 8px;
+          letter-spacing: 0.05em;
+        }}
+        .logo-url {{
+          font-size: 9px;
+          color: rgba(255, 255, 255, 0.7);
+          margin-top: 3px;
+          letter-spacing: 0.05em;
+        }}
+        
+        /* Left Title Block */
+        .left-main-title {{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 80px;
+        }}
+        .title-line {{
+          width: 240px;
+          height: 2px;
+          background-color: #ffffff;
           position: relative;
+          margin: 15px 0;
+        }}
+        .title-line::before, .title-line::after {{
+          content: "";
+          position: absolute;
+          top: -3px;
+          width: 8px;
+          height: 8px;
+          background-color: #ffffff;
+          border-radius: 50%;
+        }}
+        .title-line::before {{ left: 0; }}
+        .title-line::after {{ right: 0; }}
+        
+        .title-text-main {{
+          font-size: 34px;
+          font-weight: 800;
+          color: #ffffff;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }}
+        .title-text-sub {{
+          font-size: 20px;
+          color: #ffffff;
+          font-weight: 300;
+          margin-top: 2px;
+        }}
+        
+        /* Horizontal dots in blue panel */
+        .left-dots {{
+          display: flex;
+          gap: 10px;
+          position: absolute;
+          bottom: 40px;
+          left: 30px;
+        }}
+        .dot {{
+          width: 6px;
+          height: 6px;
+          background-color: #ffffff;
+          border-radius: 50%;
+        }}
+
+        /* Right panel container */
+        .right-panel {{
+          flex: 1;
+          height: 100%;
+          position: relative;
+          z-index: 5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 50px 40px 50px 20px;
+          box-sizing: border-box;
+        }}
+        
+        .cert-subtitle {{
+          font-size: 11px;
+          font-weight: 600;
+          color: #64748b;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+        }}
+        .cert-presented {{
+          font-size: 11px;
+          font-weight: 600;
+          color: #64748b;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          margin-top: 4px;
+        }}
+        .student-name {{
+          font-size: 38px;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 22px 0 10px 0;
+          text-align: center;
+          letter-spacing: 0.02em;
+        }}
+        .horizontal-line {{
+          width: 420px;
+          height: 1px;
+          background-color: #e2e8f0;
+          margin: 12px 0;
+        }}
+        .course-info {{
+          font-size: 13px;
+          color: #475569;
+          text-align: center;
+          max-width: 480px;
+          line-height: 1.5;
+        }}
+        .course-title {{
+          font-weight: 700;
+          color: #0f172a;
+        }}
+        
+        /* Speaker details signature section */
+        .speaker-section {{
+          margin-top: 25px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }}
+        .signature-container {{
+          height: 48px;
           display: flex;
           align-items: center;
           justify-content: center;
         }}
-        .signature-line-placeholder {{
-          position: absolute;
-          bottom: 12px;
-          left: 20px;
-          right: 20px;
-          border-bottom: 1px dashed rgba(15, 23, 42, 0.1);
-          height: 1px;
-          z-index: 1;
-        }}
         .signature-image {{
-          position: relative;
-          z-index: 2;
-          max-height: 48px;
-          max-width: 210px;
+          max-height: 44px;
+          max-width: 180px;
           object-fit: contain;
         }}
-        .col-label {{
-          font-size: 11px;
-          font-weight: 800;
+        .speaker-name {{
+          font-size: 15px;
+          font-weight: 700;
           color: #0f172a;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
+          margin-top: 5px;
         }}
-        .col-sublabel {{
-          font-size: 9px;
+        .speaker-title {{
+          font-size: 11px;
           color: #64748b;
-          text-transform: uppercase;
           margin-top: 3px;
           font-weight: 600;
-          letter-spacing: 0.05em;
         }}
-        .metadata-box {{
-          text-align: right;
+        
+        /* Metadata bottom row details */
+        .metadata-row {{
+          display: flex;
+          justify-content: space-between;
+          width: 400px;
+          margin-top: 35px;
+        }}
+        .metadata-col {{
           display: flex;
           flex-direction: column;
-          justify-content: center;
+          align-items: center;
+          width: 160px;
         }}
-        .meta-text {{
-          font-size: 9px;
-          font-family: monospace;
-          color: #475569;
-          margin-bottom: 3px;
-          letter-spacing: 0.05em;
+        .metadata-label {{
+          font-size: 11px;
+          color: #64748b;
+          font-weight: 600;
+          margin-bottom: 4px;
+        }}
+        .metadata-val-line {{
+          width: 100%;
+          height: 1px;
+          background-color: #cbd5e1;
+          margin-bottom: 6px;
+        }}
+        .metadata-val {{
+          font-size: 11px;
+          font-weight: 700;
+          color: #0f172a;
+        }}
+
+        /* GEOMETRICAL ACCENT SHAPES */
+        
+        /* Top right red block */
+        .accent-red-block {{
+          position: absolute;
+          top: 0;
+          right: 8%;
+          width: 150px;
+          height: 12px;
+          background-color: #f87171;
+          z-index: 1;
+        }}
+        
+        /* Orange diagonal strip at top center */
+        .accent-orange-strip {{
+          position: absolute;
+          top: -40px;
+          left: 58%;
+          width: 35px;
+          height: 180px;
+          background-color: #f59e0b;
+          transform: rotate(45deg);
+          z-index: 1;
+        }}
+        
+        /* Right blue chevron */
+        .accent-blue-chevron {{
+          position: absolute;
+          right: 0;
+          top: 35%;
+          width: 35px;
+          height: 70px;
+          background-color: #1e6fd9;
+          clip-path: polygon(100% 0, 0 50%, 100% 100%, 40% 50%);
+          z-index: 1;
+        }}
+        
+        /* Yellow bar peeking out behind left blue panel */
+        .accent-yellow-bar {{
+          position: absolute;
+          left: 0;
+          bottom: 16%;
+          width: 290px;
+          height: 48px;
+          background-color: #f59e0b;
+          z-index: 2;
+        }}
+        
+        /* Bottom center blue triangle */
+        .accent-blue-triangle {{
+          position: absolute;
+          bottom: 0;
+          left: 15%;
+          width: 140px;
+          height: 70px;
+          background-color: #1e6fd9;
+          clip-path: polygon(50% 0, 100% 100%, 75% 100%, 50% 35%, 25% 100%, 0 100%);
+          z-index: 5;
+        }}
+        
+        /* Bottom center red block triangle */
+        .accent-bottom-red-block {{
+          position: absolute;
+          bottom: 0;
+          left: 32%;
+          width: 110px;
+          height: 40px;
+          background-color: #f87171;
+          clip-path: polygon(0 100%, 100% 100%, 100% 0);
+          z-index: 4;
+        }}
+        
+        /* Top-left hatch lines */
+        .accent-hatch-topleft {{
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 150px;
+          height: 150px;
+          background: repeating-linear-gradient(45deg, rgba(30, 111, 217, 0.2), rgba(30, 111, 217, 0.2) 1px, transparent 1px, transparent 8px);
+          z-index: 1;
+        }}
+        
+        /* Bottom-right hatch lines */
+        .accent-hatch-bottomright {{
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          width: 180px;
+          height: 180px;
+          background: repeating-linear-gradient(45deg, rgba(30, 111, 217, 0.2), rgba(30, 111, 217, 0.2) 1px, transparent 1px, transparent 8px);
+          z-index: 1;
+        }}
+        
+        /* Decorative yellow dots in top-right */
+        .accent-dots-topright {{
+          position: absolute;
+          top: 30px;
+          right: 30px;
+          width: 80px;
+          height: 40px;
+          background-image: radial-gradient(#f59e0b 2px, transparent 2.5px);
+          background-size: 15px 15px;
+          z-index: 1;
+        }}
+        
+        /* Decorative yellow dots in bottom-left */
+        .accent-dots-bottomleft {{
+          position: absolute;
+          bottom: 30px;
+          left: 30px;
+          width: 120px;
+          height: 25px;
+          background-image: radial-gradient(#f59e0b 2.5px, transparent 3px);
+          background-size: 18px 18px;
+          z-index: 12;
         }}
       </style>
     </head>
     <body>
       <div class="cert-container">
-        <div class="content-wrap">
-          <div class="header">
-            <div class="brand-title">ACADEMY PLATFORM</div>
-            <div class="brand-url">www.academy.dev</div>
+        <!-- Geometrical background accents -->
+        <div class="accent-hatch-topleft"></div>
+        <div class="accent-hatch-bottomright"></div>
+        <div class="accent-orange-strip"></div>
+        <div class="accent-red-block"></div>
+        <div class="accent-dots-topright"></div>
+        <div class="accent-blue-chevron"></div>
+        
+        <!-- peeking yellow block -->
+        <div class="accent-yellow-bar"></div>
+        <div class="accent-dots-bottomleft"></div>
+        
+        <!-- Bottom shapes -->
+        <div class="accent-blue-triangle"></div>
+        <div class="accent-bottom-red-block"></div>
+
+        <!-- Left blue panel -->
+        <div class="left-panel">
+          <div class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="10" fill="none" stroke="white" stroke-width="4" stroke-dasharray="6,6" />
+              <line x1="50" y1="18" x2="50" y2="32" stroke="white" stroke-width="5" stroke-linecap="round" />
+              <line x1="50" y1="68" x2="50" y2="82" stroke="white" stroke-width="5" stroke-linecap="round" />
+              <line x1="18" y1="50" x2="32" y2="50" stroke="white" stroke-width="5" stroke-linecap="round" />
+              <line x1="68" y1="50" x2="82" y2="50" stroke="white" stroke-width="5" stroke-linecap="round" />
+              <line x1="27" y1="27" x2="37" y2="37" stroke="white" stroke-width="5" stroke-linecap="round" />
+              <line x1="63" y1="63" x2="73" y2="73" stroke="white" stroke-width="5" stroke-linecap="round" />
+              <line x1="73" y1="27" x2="63" y2="37" stroke="white" stroke-width="5" stroke-linecap="round" />
+              <line x1="37" y1="63" x2="27" y2="73" stroke="white" stroke-width="5" stroke-linecap="round" />
+            </svg>
+            <div class="logo-title">ACADEMY PLATFORM</div>
+            <div class="logo-url">www.academy.dev</div>
           </div>
 
-          <div class="title-section">
-            <h1 class="main-title">Certificate of Completion</h1>
-            <div class="sub-title">Graduation Credential</div>
-            <div class="divider"></div>
-            <p class="presentation-text">This is proudly awarded to</p>
+          <div class="left-main-title">
+            <div class="title-line"></div>
+            <div class="title-text-main">CERTIFICATE</div>
+            <div class="title-text-sub">of Completion</div>
+            <div class="title-line"></div>
           </div>
 
+          <div class="left-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        </div>
+
+        <!-- Right content panel -->
+        <div class="right-panel">
+          <div class="cert-subtitle">Certificate of Completion</div>
+          <div class="cert-presented">is proudly presented to</div>
+          
           <div class="student-name">{user_name}</div>
-
+          
+          <div class="horizontal-line"></div>
+          
           <div class="course-info">
-            for successfully completing the specialized learning curriculum of<br>
-            <span class="course-title">{course_title}</span>
+            for successfully completing the specialized learning<br>
+            curriculum of <span class="course-title">{course_title}</span> course
           </div>
 
-          <div class="footer-section">
-            <div class="footer-col" style="text-align: left;">
-              <div class="signature-box">
-                <div class="signature-line-placeholder"></div>
-                {signature_img_html}
-              </div>
-              <div class="col-label">{instructor_name}</div>
-              <div class="col-sublabel">Course Instructor</div>
+          <div class="speaker-section">
+            <div class="signature-container">
+              {signature_img_html}
+            </div>
+            <div class="speaker-name">{instructor_name}</div>
+            <div class="speaker-title">Course Speaker</div>
+          </div>
+
+          <div class="metadata-row">
+            <div class="metadata-col">
+              <div class="metadata-label">Certified on:</div>
+              <div class="metadata-val-line"></div>
+              <div class="metadata-val">{issued_at_str}</div>
             </div>
             
-            <div class="footer-col metadata-box" style="text-align: right;">
-              <div style="margin-bottom: 8px;">
-                <div class="meta-text">ISSUED ON: {issued_at_str}</div>
-                <div class="meta-text">CREDENTIAL ID: {verification_id}</div>
-              </div>
-              <div class="col-label">VERIFIED SECURE CREDENTIAL</div>
-              <div class="col-sublabel">verify.academy.dev</div>
+            <div class="metadata-col">
+              <div class="metadata-label">Certificate ID</div>
+              <div class="metadata-val-line"></div>
+              <div class="metadata-val">{verification_id}</div>
             </div>
           </div>
         </div>
