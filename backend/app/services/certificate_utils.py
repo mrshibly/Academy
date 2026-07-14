@@ -35,7 +35,7 @@ def build_certificate_html(
           margin: 0;
           padding: 0;
           font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
-          background-color: #cbd5e1;
+          background-color: #f8fafc;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -51,11 +51,11 @@ def build_certificate_html(
           overflow: hidden;
         }}
         
-        /* Left solid blue panel */
+        /* Left solid emerald/teal panel */
         .left-panel {{
           width: 42%;
           height: 100%;
-          background-color: #1e6fd9;
+          background-image: linear-gradient(135deg, #10b981, #0f766e);
           position: relative;
           z-index: 10;
           clip-path: polygon(0 0, 100% 0, 100% 76%, 72% 100%, 0 100%);
@@ -199,7 +199,7 @@ def build_certificate_html(
         }}
         .course-title {{
           font-weight: 700;
-          color: #0f172a;
+          color: #0f766e;
         }}
         
         /* Speaker details signature section */
@@ -264,120 +264,120 @@ def build_certificate_html(
           color: #0f172a;
         }}
 
-        /* GEOMETRICAL ACCENT SHAPES */
+        /* GEOMETRICAL ACCENT SHAPES - THEME COLORS */
         
-        /* Top right red block */
+        /* Top right violet block */
         .accent-red-block {{
           position: absolute;
           top: 0;
           right: 8%;
           width: 150px;
           height: 12px;
-          background-color: #f87171;
+          background-color: #8b5cf6;
           z-index: 1;
         }}
         
-        /* Orange diagonal strip at top center */
+        /* Violet diagonal strip at top center */
         .accent-orange-strip {{
           position: absolute;
           top: -40px;
           left: 58%;
           width: 35px;
           height: 180px;
-          background-color: #f59e0b;
+          background-color: #8b5cf6;
           transform: rotate(45deg);
           z-index: 1;
         }}
         
-        /* Right blue chevron */
+        /* Right emerald chevron */
         .accent-blue-chevron {{
           position: absolute;
           right: 0;
           top: 35%;
           width: 35px;
           height: 70px;
-          background-color: #1e6fd9;
+          background-color: #10b981;
           clip-path: polygon(100% 0, 0 50%, 100% 100%, 40% 50%);
           z-index: 1;
         }}
         
-        /* Yellow bar peeking out behind left blue panel */
+        /* Violet bar peeking out behind left emerald panel */
         .accent-yellow-bar {{
           position: absolute;
           left: 0;
           bottom: 16%;
           width: 290px;
           height: 48px;
-          background-color: #f59e0b;
+          background-color: #8b5cf6;
           z-index: 2;
         }}
         
-        /* Bottom center blue triangle */
+        /* Bottom center emerald triangle */
         .accent-blue-triangle {{
           position: absolute;
           bottom: 0;
           left: 15%;
           width: 140px;
           height: 70px;
-          background-color: #1e6fd9;
+          background-color: #10b981;
           clip-path: polygon(50% 0, 100% 100%, 75% 100%, 50% 35%, 25% 100%, 0 100%);
           z-index: 5;
         }}
         
-        /* Bottom center red block triangle */
+        /* Bottom center violet block triangle */
         .accent-bottom-red-block {{
           position: absolute;
           bottom: 0;
           left: 32%;
           width: 110px;
           height: 40px;
-          background-color: #f87171;
+          background-color: #8b5cf6;
           clip-path: polygon(0 100%, 100% 100%, 100% 0);
           z-index: 4;
         }}
         
-        /* Top-left hatch lines */
+        /* Top-left emerald hatch lines */
         .accent-hatch-topleft {{
           position: absolute;
           top: 0;
           left: 0;
           width: 150px;
           height: 150px;
-          background: repeating-linear-gradient(45deg, rgba(30, 111, 217, 0.2), rgba(30, 111, 217, 0.2) 1px, transparent 1px, transparent 8px);
+          background: repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15) 1px, transparent 1px, transparent 8px);
           z-index: 1;
         }}
         
-        /* Bottom-right hatch lines */
+        /* Bottom-right emerald hatch lines */
         .accent-hatch-bottomright {{
           position: absolute;
           bottom: 0;
           right: 0;
           width: 180px;
           height: 180px;
-          background: repeating-linear-gradient(45deg, rgba(30, 111, 217, 0.2), rgba(30, 111, 217, 0.2) 1px, transparent 1px, transparent 8px);
+          background: repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15) 1px, transparent 1px, transparent 8px);
           z-index: 1;
         }}
         
-        /* Decorative yellow dots in top-right */
+        /* Decorative emerald dots in top-right */
         .accent-dots-topright {{
           position: absolute;
           top: 30px;
           right: 30px;
           width: 80px;
           height: 40px;
-          background-image: radial-gradient(#f59e0b 2px, transparent 2.5px);
+          background-image: radial-gradient(#10b981 2px, transparent 2.5px);
           background-size: 15px 15px;
           z-index: 1;
         }}
         
-        /* Decorative yellow dots in bottom-left */
+        /* Decorative emerald dots in bottom-left */
         .accent-dots-bottomleft {{
           position: absolute;
           bottom: 30px;
           left: 30px;
           width: 120px;
           height: 25px;
-          background-image: radial-gradient(#f59e0b 2.5px, transparent 3px);
+          background-image: radial-gradient(#10b981 2.5px, transparent 3px);
           background-size: 18px 18px;
           z-index: 12;
         }}
