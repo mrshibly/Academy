@@ -34,8 +34,9 @@ def build_certificate_html(
         body {{
           margin: 0;
           padding: 0;
-          font-family: 'Helvetica Neue', Arial, sans-serif;
-          background: #ffffff;
+          font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+          background-color: #030712;
+          color: #f3f4f6;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -46,151 +47,226 @@ def build_certificate_html(
           height: 210mm;
           position: relative;
           box-sizing: border-box;
-          border: 20px solid transparent;
-          background-image: linear-gradient(white, white), linear-gradient(135deg, #0ea5e9, #4f46e5);
+          border: 16px solid transparent;
+          background-image: linear-gradient(#030712, #030712), linear-gradient(135deg, #10b981, #8b5cf6, #3b82f6);
           background-origin: border-box;
           background-clip: content-box, border-box;
-          padding: 60px;
+          padding: 50px 70px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: space-between;
+          overflow: hidden;
+        }}
+        /* Digital futuristic grid background */
+        .cert-container::before {{
+          content: "";
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background-image: 
+            linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+          background-size: 20px 20px;
+          pointer-events: none;
+          z-index: 1;
+        }}
+        .content-wrap {{
+          position: relative;
+          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          height: 100%;
+          width: 100%;
         }}
         .header {{
           text-align: center;
-          margin-top: 10px;
+          margin-top: 5px;
         }}
         .brand-title {{
-          font-size: 14px;
+          font-size: 13px;
+          font-weight: 900;
           text-transform: uppercase;
-          letter-spacing: 0.15em;
-          color: #64748b;
-          font-weight: 800;
+          letter-spacing: 0.25em;
+          color: #10b981;
+          text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
         }}
         .brand-url {{
-          font-size: 11px;
-          color: #94a3b8;
-          margin-top: 2px;
+          font-size: 10px;
+          color: #6b7280;
+          margin-top: 3px;
+          letter-spacing: 0.1em;
         }}
         .title-section {{
           text-align: center;
         }}
         .main-title {{
-          font-size: 48px;
-          font-weight: 700;
-          color: #1e3a8a;
+          font-size: 44px;
+          font-weight: 900;
+          background: linear-gradient(to right, #ffffff, #e5e7eb, #9ca3af);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           margin: 0;
-          letter-spacing: 0.05em;
-        }}
-        .divider {{
-          width: 250px;
-          height: 2px;
-          background: linear-gradient(to right, transparent, #1e3a8a, transparent);
-          margin: 8px auto;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
         }}
         .sub-title {{
-          font-size: 11px;
+          font-size: 13px;
+          text-transform: uppercase;
+          letter-spacing: 0.3em;
+          color: #8b5cf6;
+          font-weight: 800;
+          margin-top: 4px;
+          text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+        }}
+        .divider {{
+          width: 320px;
+          height: 2px;
+          background: linear-gradient(to right, transparent, #8b5cf6, #10b981, transparent);
+          margin: 12px auto;
+        }}
+        .presentation-text {{
+          font-size: 10px;
+          color: #9ca3af;
           text-transform: uppercase;
           letter-spacing: 0.15em;
-          color: #475569;
-          font-weight: 700;
-          margin-top: 5px;
+          font-weight: 600;
+          margin: 5px 0;
         }}
         .student-name {{
-          font-family: Georgia, serif;
-          font-size: 44px;
-          font-style: italic;
-          color: #1d4ed8;
-          margin: 15px 0;
+          font-size: 40px;
+          font-weight: 800;
+          color: #ffffff;
+          margin: 10px 0;
           text-align: center;
-          font-weight: 600;
+          letter-spacing: 0.02em;
+          text-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
         }}
         .course-info {{
-          font-size: 16px;
-          color: #475569;
+          font-size: 15px;
+          color: #9ca3af;
           text-align: center;
-          max-width: 650px;
-          line-height: 1.5;
+          max-width: 700px;
+          line-height: 1.6;
         }}
         .course-title {{
-          font-weight: 800;
-          color: #0f172a;
+          font-weight: 900;
+          color: #10b981;
+          font-size: 18px;
+          letter-spacing: 0.02em;
         }}
         .footer-section {{
           width: 100%;
           display: flex;
           justify-content: space-between;
-          padding: 0 40px;
-          margin-bottom: 10px;
+          padding: 0 20px;
+          margin-top: 15px;
           box-sizing: border-box;
         }}
         .footer-col {{
           display: flex;
           flex-direction: column;
-          width: 240px;
+          width: 250px;
           position: relative;
         }}
-        .signature-line {{
-          border-bottom: 2px solid #cbd5e1;
-          height: 45px;
-          margin-bottom: 10px;
+        .signature-box {{
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 8px;
+          height: 55px;
+          margin-bottom: 8px;
           position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }}
+        .signature-line-placeholder {{
+          position: absolute;
+          bottom: 12px;
+          left: 20px;
+          right: 20px;
+          border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+          height: 1px;
+          z-index: 1;
+        }}
+        .signature-image {{
+          position: relative;
+          z-index: 2;
+          max-height: 48px;
+          max-width: 210px;
+          object-fit: contain;
         }}
         .col-label {{
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 800;
-          color: #0f172a;
+          color: #ffffff;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.08em;
         }}
         .col-sublabel {{
-          font-size: 10px;
-          color: #64748b;
+          font-size: 9px;
+          color: #6b7280;
           text-transform: uppercase;
-          margin-top: 2px;
+          margin-top: 3px;
           font-weight: 600;
+          letter-spacing: 0.05em;
+        }}
+        .metadata-box {{
+          text-align: right;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }}
+        .meta-text {{
+          font-size: 9px;
+          font-family: monospace;
+          color: #9ca3af;
+          margin-bottom: 3px;
+          letter-spacing: 0.05em;
         }}
       </style>
     </head>
     <body>
       <div class="cert-container">
-        <div class="header">
-          <div class="brand-title">ACADEMY PLATFORM</div>
-          <div class="brand-url">www.academy.dev</div>
-        </div>
-
-        <div class="title-section">
-          <h1 class="main-title">CERTIFICATE</h1>
-          <div class="sub-title">OF COMPLETION</div>
-          <div class="divider"></div>
-          <p style="font-size: 11px; color: #64748b; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 0;">
-            We proudly present this certificate to
-          </p>
-        </div>
-
-        <div class="student-name">{user_name}</div>
-
-        <div class="course-info">
-          for successfully completing the specialized learning curriculum of<br>
-          <span class="course-title">{course_title}</span>
-        </div>
-
-        <div class="footer-section">
-          <div class="footer-col" style="text-align: left;">
-            <div class="signature-line">
-              {signature_img_html}
-            </div>
-            <div class="col-label">{instructor_name}</div>
-            <div class="col-sublabel">Course Instructor</div>
+        <div class="content-wrap">
+          <div class="header">
+            <div class="brand-title">ACADEMY PLATFORM</div>
+            <div class="brand-url">www.academy.dev</div>
           </div>
-          
-          <div class="footer-col" style="text-align: right;">
-            <div style="height: 45px; display: flex; flex-direction: column; justify-content: flex-end; margin-bottom: 10px;">
-              <div style="font-size: 10px; font-weight: 600; color: #475569; margin-bottom: 2px;">ISSUING DATE: {issued_at_str}</div>
-              <div style="font-size: 10px; font-weight: 600; color: #475569;">CREDENTIAL ID: {verification_id}</div>
+
+          <div class="title-section">
+            <h1 class="main-title">Certificate of Completion</h1>
+            <div class="sub-title">Graduation Credential</div>
+            <div class="divider"></div>
+            <p class="presentation-text">This is proudly awarded to</p>
+          </div>
+
+          <div class="student-name">{user_name}</div>
+
+          <div class="course-info">
+            for successfully completing the specialized learning curriculum of<br>
+            <span class="course-title">{course_title}</span>
+          </div>
+
+          <div class="footer-section">
+            <div class="footer-col" style="text-align: left;">
+              <div class="signature-box">
+                <div class="signature-line-placeholder"></div>
+                {signature_img_html}
+              </div>
+              <div class="col-label">{instructor_name}</div>
+              <div class="col-sublabel">Course Instructor</div>
             </div>
-            <div class="col-label">VERIFIED CREDENTIAL</div>
-            <div class="col-sublabel">verification.academy.dev</div>
+            
+            <div class="footer-col metadata-box" style="text-align: right;">
+              <div style="margin-bottom: 8px;">
+                <div class="meta-text">ISSUED ON: {issued_at_str}</div>
+                <div class="meta-text">CREDENTIAL ID: {verification_id}</div>
+              </div>
+              <div class="col-label">VERIFIED SECURE CREDENTIAL</div>
+              <div class="col-sublabel">verify.academy.dev</div>
+            </div>
           </div>
         </div>
       </div>
