@@ -32,7 +32,8 @@ async def google_login(
             id_token.verify_oauth2_token,
             data.id_token,
             google_requests.Request(),
-            client_id
+            client_id,
+            clock_skew=20
         )
 
         # ID token is valid, extract user info
