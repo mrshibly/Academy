@@ -20,13 +20,18 @@ def build_certificate_html(
     instructor_name: str,
     signature_img_html: str
 ) -> str:
-    """Build the high-fidelity HTML structure for a completion certificate."""
+    """Build a high-fidelity, premium HTML layout for completion certificates."""
+    # Fallback/placeholder signature if instructor has none
+    sig_html = signature_img_html if signature_img_html else f'<span style="font-family: \'Dancing Script\', cursive, Georgia, serif; font-size: 24px; color: #1e293b; font-style: italic; opacity: 0.85;">{instructor_name}</span>'
+    
     return f"""
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
       <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;600;700;800&display=swap');
+        
         @page {{
           size: A4 landscape;
           margin: 0;
@@ -34,7 +39,7 @@ def build_certificate_html(
         body {{
           margin: 0;
           padding: 0;
-          font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+          font-family: 'Inter', -apple-system, sans-serif;
           background-color: #f8fafc;
           display: flex;
           align-items: center;
@@ -46,428 +51,287 @@ def build_certificate_html(
           height: 210mm;
           position: relative;
           box-sizing: border-box;
-          background-color: #ffffff;
-          display: flex;
-          overflow: hidden;
-        }}
-        
-        /* Left solid emerald/teal panel */
-        .left-panel {{
-          width: 42%;
-          height: 100%;
-          background-image: linear-gradient(135deg, #10b981, #0f766e);
-          position: relative;
-          z-index: 10;
-          clip-path: polygon(0 0, 100% 0, 100% 76%, 72% 100%, 0 100%);
+          background-color: #fcfbf7; /* Ivory background */
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: space-between;
-          padding: 50px 30px;
-          box-sizing: border-box;
+          padding: 40px;
+          overflow: hidden;
+          
+          /* Dual navy & gold border */
+          border: 16px solid #0f172a;
+          outline: 4px solid #d4af37;
+          outline-offset: -12px;
         }}
         
-        /* Logo sunburst */
-        .logo-container {{
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-top: 10px;
-        }}
-        .logo-svg {{
-          width: 44px;
-          height: 44px;
-        }}
-        .logo-title {{
-          font-size: 15px;
-          font-weight: 800;
-          color: #ffffff;
-          margin-top: 8px;
-          letter-spacing: 0.05em;
-        }}
-        .logo-url {{
-          font-size: 9px;
-          color: rgba(255, 255, 255, 0.7);
-          margin-top: 3px;
-          letter-spacing: 0.05em;
-        }}
-        
-        /* Left Title Block */
-        .left-main-title {{
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-bottom: 80px;
-        }}
-        .title-line {{
-          width: 240px;
-          height: 2px;
-          background-color: #ffffff;
-          position: relative;
-          margin: 15px 0;
-        }}
-        .title-line::before, .title-line::after {{
-          content: "";
+        /* Subtle corner decorations */
+        .corner-dec {{
           position: absolute;
-          top: -3px;
-          width: 8px;
-          height: 8px;
-          background-color: #ffffff;
-          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          border: 2px solid #d4af37;
+          z-index: 10;
         }}
-        .title-line::before {{ left: 0; }}
-        .title-line::after {{ right: 0; }}
-        
-        .title-text-main {{
-          font-size: 34px;
-          font-weight: 800;
-          color: #ffffff;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }}
-        .title-text-sub {{
-          font-size: 20px;
-          color: #ffffff;
-          font-weight: 300;
-          margin-top: 2px;
-        }}
-        
-        /* Horizontal dots in blue panel */
-        .left-dots {{
-          display: flex;
-          gap: 10px;
+        .corner-top-left {{ top: 20px; left: 20px; border-right: none; border-bottom: none; }}
+        .corner-top-right {{ top: 20px; right: 20px; border-left: none; border-bottom: none; }}
+        .corner-bottom-left {{ bottom: 20px; left: 20px; border-right: none; border-top: none; }}
+        .corner-bottom-right {{ bottom: 20px; right: 20px; border-left: none; border-top: none; }}
+
+        /* Watermark Background */
+        .watermark-bg {{
           position: absolute;
-          bottom: 40px;
-          left: 30px;
-        }}
-        .dot {{
-          width: 6px;
-          height: 6px;
-          background-color: #ffffff;
-          border-radius: 50%;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 500px;
+          height: 500px;
+          opacity: 0.015;
+          pointer-events: none;
+          z-index: 1;
         }}
 
-        /* Right panel container */
-        .right-panel {{
-          flex: 1;
-          height: 100%;
-          position: relative;
-          z-index: 5;
+        .cert-header {{
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
-          padding: 50px 40px 50px 20px;
-          box-sizing: border-box;
+          margin-top: 15px;
+          z-index: 5;
         }}
         
+        .brand-section {{
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 20px;
+        }}
+        .brand-logo {{
+          width: 20px;
+          height: 20px;
+          color: #d4af37;
+        }}
+        .brand-name {{
+          font-size: 11px;
+          font-weight: 800;
+          color: #0f172a;
+          letter-spacing: 0.15em;
+        }}
+
+        .cert-title {{
+          font-family: 'Cinzel', Georgia, serif;
+          font-size: 32px;
+          font-weight: 800;
+          color: #0f172a;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          margin: 0;
+        }}
         .cert-subtitle {{
           font-size: 11px;
           font-weight: 600;
           color: #64748b;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
+          margin-top: 5px;
         }}
-        .cert-presented {{
-          font-size: 11px;
-          font-weight: 600;
-          color: #64748b;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          margin-top: 4px;
-        }}
-        .student-name {{
-          font-size: 38px;
-          font-weight: 800;
-          color: #0f172a;
-          margin: 22px 0 10px 0;
-          text-align: center;
-          letter-spacing: 0.02em;
-        }}
-        .horizontal-line {{
-          width: 420px;
-          height: 1px;
-          background-color: #e2e8f0;
-          margin: 12px 0;
-        }}
-        .course-info {{
-          font-size: 13px;
-          color: #475569;
-          text-align: center;
-          max-width: 480px;
-          line-height: 1.5;
-        }}
-        .course-title {{
-          font-weight: 700;
-          color: #0f766e;
-        }}
-        
-        /* Speaker details signature section */
-        .speaker-section {{
-          margin-top: 25px;
+
+        .cert-body {{
           display: flex;
           flex-direction: column;
           align-items: center;
+          text-align: center;
+          margin: 20px 0;
+          z-index: 5;
+          width: 80%;
         }}
-        .signature-container {{
-          height: 48px;
+        
+        .presented-to {{
+          font-size: 11px;
+          font-weight: 600;
+          color: #64748b;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }}
+        
+        .student-name {{
+          font-family: 'Cinzel', Georgia, serif;
+          font-size: 36px;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 15px 0 10px 0;
+          border-bottom: 1px solid #e2e8f0;
+          padding-bottom: 8px;
+          width: 80%;
+          text-align: center;
+        }}
+        
+        .course-info {{
+          font-size: 13px;
+          line-height: 1.6;
+          color: #475569;
+          max-width: 600px;
+          margin-top: 10px;
+        }}
+        .course-name {{
+          font-weight: 800;
+          color: #0ea5e9;
+        }}
+
+        .cert-footer {{
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          width: 85%;
+          margin-bottom: 10px;
+          z-index: 5;
+        }}
+
+        .signature-block {{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 200px;
+          position: relative;
+        }}
+        
+        .sig-line {{
+          width: 100%;
+          height: 1px;
+          background-color: #cbd5e1;
+          margin-top: 45px;
+          margin-bottom: 8px;
+        }}
+        
+        .sig-title {{
+          font-size: 10px;
+          font-weight: 700;
+          color: #64748b;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }}
+        
+        .sig-name {{
+          font-size: 11px;
+          font-weight: 600;
+          color: #0f172a;
+        }}
+
+        /* Central seal */
+        .seal-container {{
+          width: 90px;
+          height: 90px;
+          position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
         }}
-        .signature-image {{
-          max-height: 44px;
-          max-width: 180px;
-          object-fit: contain;
-        }}
-        .speaker-name {{
-          font-size: 15px;
-          font-weight: 700;
-          color: #0f172a;
-          margin-top: 5px;
-        }}
-        .speaker-title {{
-          font-size: 11px;
-          color: #64748b;
-          margin-top: 3px;
-          font-weight: 600;
+        
+        .seal-bg {{
+          width: 100%;
+          height: 100%;
+          background-color: #fef08a;
+          border: 4px double #d4af37;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 10px rgba(212, 175, 55, 0.15);
         }}
         
-        /* Metadata bottom row details */
-        .metadata-row {{
-          display: flex;
-          justify-content: space-between;
-          width: 400px;
-          margin-top: 35px;
-        }}
-        .metadata-col {{
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          width: 160px;
-        }}
-        .metadata-label {{
-          font-size: 11px;
-          color: #64748b;
-          font-weight: 600;
-          margin-bottom: 4px;
-        }}
-        .metadata-val-line {{
-          width: 100%;
-          height: 1px;
-          background-color: #cbd5e1;
-          margin-bottom: 6px;
-        }}
-        .metadata-val {{
-          font-size: 11px;
-          font-weight: 700;
-          color: #0f172a;
+        .seal-text {{
+          font-size: 8px;
+          font-weight: 800;
+          color: #d4af37;
+          text-transform: uppercase;
         }}
 
-        /* GEOMETRICAL ACCENT SHAPES - THEME COLORS */
-        
-        /* Top right violet block */
-        .accent-red-block {{
-          position: absolute;
-          top: 0;
-          right: 8%;
-          width: 150px;
-          height: 12px;
-          background-color: #8b5cf6;
-          z-index: 1;
-        }}
-        
-        /* Violet diagonal strip at top center */
-        .accent-orange-strip {{
-          position: absolute;
-          top: -40px;
-          left: 58%;
-          width: 35px;
-          height: 180px;
-          background-color: #8b5cf6;
-          transform: rotate(45deg);
-          z-index: 1;
-        }}
-        
-        /* Right emerald chevron */
-        .accent-blue-chevron {{
-          position: absolute;
-          right: 0;
-          top: 35%;
-          width: 35px;
-          height: 70px;
-          background-color: #10b981;
-          clip-path: polygon(100% 0, 0 50%, 100% 100%, 40% 50%);
-          z-index: 1;
-        }}
-        
-        /* Violet bar peeking out behind left emerald panel */
-        .accent-yellow-bar {{
-          position: absolute;
-          left: 0;
-          bottom: 16%;
-          width: 290px;
-          height: 48px;
-          background-color: #8b5cf6;
-          z-index: 2;
-        }}
-        
-        /* Bottom center emerald triangle */
-        .accent-blue-triangle {{
-          position: absolute;
-          bottom: 0;
-          left: 15%;
-          width: 140px;
-          height: 70px;
-          background-color: #10b981;
-          clip-path: polygon(50% 0, 100% 100%, 75% 100%, 50% 35%, 25% 100%, 0 100%);
+        /* Mono security info */
+        .security-info {{
+          font-family: monospace;
+          font-size: 8px;
+          color: #94a3b8;
+          width: 100%;
+          text-align: center;
+          margin-top: 5px;
           z-index: 5;
-        }}
-        
-        /* Bottom center violet block triangle */
-        .accent-bottom-red-block {{
-          position: absolute;
-          bottom: 0;
-          left: 32%;
-          width: 110px;
-          height: 40px;
-          background-color: #8b5cf6;
-          clip-path: polygon(0 100%, 100% 100%, 100% 0);
-          z-index: 4;
-        }}
-        
-        /* Top-left emerald hatch lines */
-        .accent-hatch-topleft {{
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 150px;
-          height: 150px;
-          background: repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15) 1px, transparent 1px, transparent 8px);
-          z-index: 1;
-        }}
-        
-        /* Bottom-right emerald hatch lines */
-        .accent-hatch-bottomright {{
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          width: 180px;
-          height: 180px;
-          background: repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15) 1px, transparent 1px, transparent 8px);
-          z-index: 1;
-        }}
-        
-        /* Decorative emerald dots in top-right */
-        .accent-dots-topright {{
-          position: absolute;
-          top: 30px;
-          right: 30px;
-          width: 80px;
-          height: 40px;
-          background-image: radial-gradient(#10b981 2px, transparent 2.5px);
-          background-size: 15px 15px;
-          z-index: 1;
-        }}
-        
-        /* Decorative emerald dots in bottom-left */
-        .accent-dots-bottomleft {{
-          position: absolute;
-          bottom: 30px;
-          left: 30px;
-          width: 120px;
-          height: 25px;
-          background-image: radial-gradient(#10b981 2.5px, transparent 3px);
-          background-size: 18px 18px;
-          z-index: 12;
         }}
       </style>
     </head>
     <body>
       <div class="cert-container">
-        <!-- Geometrical background accents -->
-        <div class="accent-hatch-topleft"></div>
-        <div class="accent-hatch-bottomright"></div>
-        <div class="accent-orange-strip"></div>
-        <div class="accent-red-block"></div>
-        <div class="accent-dots-topright"></div>
-        <div class="accent-blue-chevron"></div>
-        
-        <!-- peeking yellow block -->
-        <div class="accent-yellow-bar"></div>
-        <div class="accent-dots-bottomleft"></div>
-        
-        <!-- Bottom shapes -->
-        <div class="accent-blue-triangle"></div>
-        <div class="accent-bottom-red-block"></div>
+        <!-- Corner Borders -->
+        <div class="corner-dec corner-top-left"></div>
+        <div class="corner-dec corner-top-right"></div>
+        <div class="corner-dec corner-bottom-left"></div>
+        <div class="corner-dec corner-bottom-right"></div>
 
-        <!-- Left blue panel -->
-        <div class="left-panel">
-          <div class="logo-container">
-            <svg class="logo-svg" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="10" fill="none" stroke="white" stroke-width="4" stroke-dasharray="6,6" />
-              <line x1="50" y1="18" x2="50" y2="32" stroke="white" stroke-width="5" stroke-linecap="round" />
-              <line x1="50" y1="68" x2="50" y2="82" stroke="white" stroke-width="5" stroke-linecap="round" />
-              <line x1="18" y1="50" x2="32" y2="50" stroke="white" stroke-width="5" stroke-linecap="round" />
-              <line x1="68" y1="50" x2="82" y2="50" stroke="white" stroke-width="5" stroke-linecap="round" />
-              <line x1="27" y1="27" x2="37" y2="37" stroke="white" stroke-width="5" stroke-linecap="round" />
-              <line x1="63" y1="63" x2="73" y2="73" stroke="white" stroke-width="5" stroke-linecap="round" />
-              <line x1="73" y1="27" x2="63" y2="37" stroke="white" stroke-width="5" stroke-linecap="round" />
-              <line x1="37" y1="63" x2="27" y2="73" stroke="white" stroke-width="5" stroke-linecap="round" />
+        <!-- Watermark -->
+        <svg class="watermark-bg" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#000" stroke-width="0.5" />
+          <polygon points="50,5 95,50 50,95 5,50" fill="none" stroke="#000" stroke-width="0.5" />
+        </svg>
+
+        <!-- Header -->
+        <div class="cert-header">
+          <div class="brand-section">
+            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
-            <div class="logo-title">ACADEMY PLATFORM</div>
-            <div class="logo-url">www.academy.dev</div>
+            <span class="brand-name">ACADEMY VERIFIED CREDENTIAL</span>
+          </div>
+          <h1 class="cert-title">Certificate of Completion</h1>
+          <div class="cert-subtitle">Recognizing Academic Excellence</div>
+        </div>
+
+        <!-- Body -->
+        <div class="cert-body">
+          <span class="presented-to">This certificate is proudly awarded to</span>
+          <h2 class="student-name">{user_name}</h2>
+          <p class="course-info">
+            for successfully passing all required module tests, assignments, and practical laboratory criteria designated under the curriculum guidelines of:
+            <br>
+            <span class="course-name">{course_title}</span>
+          </p>
+        </div>
+
+        <!-- Footer signatures & seal -->
+        <div class="cert-footer">
+          <!-- Left signature -->
+          <div class="signature-block">
+            <div style="position: absolute; bottom: 35px; width: 100%; text-align: center;">
+              {sig_html}
+            </div>
+            <div class="sig-line"></div>
+            <span class="sig-name">{instructor_name}</span>
+            <span class="sig-title">Lead Instructor</span>
           </div>
 
-          <div class="left-main-title">
-            <div class="title-line"></div>
-            <div class="title-text-main">CERTIFICATE</div>
-            <div class="title-text-sub">of Completion</div>
-            <div class="title-line"></div>
+          <!-- Central gold seal -->
+          <div class="seal-container">
+            <div class="seal-bg">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                <svg style="width: 18px; height: 18px; color: #d4af37;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span class="seal-text">VERIFIED</span>
+              </div>
+            </div>
           </div>
 
-          <div class="left-dots">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
+          <!-- Right signature -->
+          <div class="signature-block">
+            <div style="position: absolute; bottom: 35px; width: 100%; text-align: center; font-family: 'Cinzel', Georgia, serif; font-size: 13px; font-weight: bold; color: #0f172a; opacity: 0.85;">
+              Academy Council
+            </div>
+            <div class="sig-line"></div>
+            <span class="sig-name">Academic Board</span>
+            <span class="sig-title">Verification Council</span>
           </div>
         </div>
 
-        <!-- Right content panel -->
-        <div class="right-panel">
-          <div class="cert-subtitle">Certificate of Completion</div>
-          <div class="cert-presented">is proudly presented to</div>
-          
-          <div class="student-name">{user_name}</div>
-          
-          <div class="horizontal-line"></div>
-          
-          <div class="course-info">
-            for successfully completing the specialized learning<br>
-            curriculum of <span class="course-title">{course_title}</span> course
-          </div>
-
-          <div class="speaker-section">
-            <div class="signature-container">
-              {signature_img_html}
-            </div>
-            <div class="speaker-name">{instructor_name}</div>
-            <div class="speaker-title">Course Speaker</div>
-          </div>
-
-          <div class="metadata-row">
-            <div class="metadata-col">
-              <div class="metadata-label">Certified on:</div>
-              <div class="metadata-val-line"></div>
-              <div class="metadata-val">{issued_at_str}</div>
-            </div>
-            
-            <div class="metadata-col">
-              <div class="metadata-label">Certificate ID</div>
-              <div class="metadata-val-line"></div>
-              <div class="metadata-val">{verification_id}</div>
-            </div>
-          </div>
+        <!-- Security monospace identifier link -->
+        <div class="security-info">
+          VERIFICATION CODE: {verification_id} &bull; SECURELY REGISTERED &bull; VERIFY AT: www.academy.dev/verify/{verification_id}
         </div>
       </div>
     </body>
