@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
+import { Menu, Shield } from "lucide-react";
 import DashboardSidebar from "./Sidebar";
 
 export default function DashboardLayout({
@@ -14,6 +15,9 @@ export default function DashboardLayout({
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -36,6 +40,11 @@ export default function DashboardLayout({
     }
   }, [user, loading, router, pathname]);
 
+  useEffect(() => {
+    // Automatically close mobile menu drawer on route transition
+    setMobileOpen(false);
+  }, [pathname]);
+
   if (loading) {
     return (
       <div
@@ -44,7 +53,7 @@ export default function DashboardLayout({
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
-          background: "#f8fafc",
+          background: "var(--bg-secondary)",
         }}
       >
         <div style={{ textAlign: "center" }}>
@@ -69,20 +78,34 @@ export default function DashboardLayout({
   if (!user) return null;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
-      <DashboardSidebar />
-      <div
-        className="dashboard-content"
-        style={{
-          flex: 1,
-          marginLeft: "16.5rem",
-          transition: "margin-left 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <main style={{ flex: 1, padding: "2rem 2.5rem" }}>{children}</main>
+    <div className="dashboard-container">
+      {/* Mobile Top Header */}
+      <div className="mobile-dashboard-header">
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 800, fontSize: "1.2rem", color: "var(--text-primary)" }}>
+          <Shield style={{ color: "var(--accent-blue)" }} size={24} />
+          <span>Academy<span style={{ color: "var(--accent-blue)" }}>.</span></span>
+        </div>
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-primary)" }}
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* Sidebar Component */}
+      <DashboardSidebar
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
+
+      {/* Main Content Wrapper */}
+      <div className={`dashboard-content-wrapper ${collapsed ? "collapsed" : ""}`}>
+        <main style={{ flex: 1, padding: "2rem 2.5rem" }}>
+          {children}
+        </main>
       </div>
     </div>
   );

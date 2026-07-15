@@ -190,7 +190,7 @@ export default function ProfileSettingsPage() {
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing}
-                style={{ border: "2px dashed var(--border-color)", borderRadius: "8px", background: "#f8fafc", cursor: "crosshair" }}
+                style={{ border: "2px dashed var(--border-color)", borderRadius: "8px", background: "var(--bg-secondary)", cursor: "crosshair" }}
               />
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button
@@ -229,7 +229,7 @@ export default function ProfileSettingsPage() {
 
               <div style={{ marginTop: "0.5rem" }}>
                 <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-muted)", marginBottom: "0.35rem" }}>Active Signature Preview:</div>
-                <div style={{ width: "100%", height: "5.5rem", border: "1px solid var(--border-color)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", overflow: "hidden" }}>
+                <div style={{ width: "100%", height: "5.5rem", border: "1px solid var(--border-color)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-secondary)", overflow: "hidden" }}>
                   {signatureUrl ? (
                     <img src={signatureUrl} alt="Signature Preview" style={{ maxHeight: "4.5rem", maxWidth: "90%", objectFit: "contain" }} />
                   ) : (

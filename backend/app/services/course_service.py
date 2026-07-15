@@ -61,3 +61,33 @@ class CourseService:
         lesson = await self.repo.create_lesson(module_id=module_id, **kwargs)
         await self.db.commit()
         return lesson
+
+    async def update_module(self, module_id: UUID, **kwargs):
+        module = await self.repo.get_module_by_id(module_id)
+        if module is None:
+            raise NotFoundError(resource="Module")
+        module = await self.repo.update_module(module, **kwargs)
+        await self.db.commit()
+        return module
+
+    async def delete_module(self, module_id: UUID):
+        module = await self.repo.get_module_by_id(module_id)
+        if module is None:
+            raise NotFoundError(resource="Module")
+        await self.repo.delete_module(module)
+        await self.db.commit()
+
+    async def update_lesson(self, lesson_id: UUID, **kwargs):
+        lesson = await self.repo.get_lesson_by_id(lesson_id)
+        if lesson is None:
+            raise NotFoundError(resource="Lesson")
+        lesson = await self.repo.update_lesson(lesson, **kwargs)
+        await self.db.commit()
+        return lesson
+
+    async def delete_lesson(self, lesson_id: UUID):
+        lesson = await self.repo.get_lesson_by_id(lesson_id)
+        if lesson is None:
+            raise NotFoundError(resource="Lesson")
+        await self.repo.delete_lesson(lesson)
+        await self.db.commit()

@@ -55,7 +55,7 @@ export default function AdminContactsPage() {
         <p style={{ color: "var(--text-secondary)", marginTop: "0.25rem" }}>Review general contact queries and specialized B2B project quote requests</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem" }} className="responsive-grid-split">
         {/* Contact submissions */}
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>

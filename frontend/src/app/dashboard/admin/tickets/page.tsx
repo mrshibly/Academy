@@ -120,7 +120,7 @@ export default function AdminTicketsPage() {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "2.5rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "2.5rem" }} className="responsive-grid-split">
         {/* Ticket List */}
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
@@ -201,7 +201,7 @@ export default function AdminTicketsPage() {
                   <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", textAlign: "center" }}>No replies in this thread yet.</p>
                 ) : (
                   selectedTicket.replies.map((reply: any) => (
-                    <div key={reply.id} style={{ alignSelf: reply.is_staff_reply ? "flex-end" : "flex-start", background: reply.is_staff_reply ? "rgba(14, 165, 233, 0.08)" : "#f8fafc", padding: "0.65rem 0.85rem", borderRadius: "8px", maxWidth: "80%" }}>
+                    <div key={reply.id} style={{ alignSelf: reply.is_staff_reply ? "flex-end" : "flex-start", background: reply.is_staff_reply ? "rgba(14, 165, 233, 0.08)" : "var(--bg-secondary)", padding: "0.65rem 0.85rem", borderRadius: "8px", maxWidth: "80%" }}>
                       <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginBottom: "0.2rem" }}>
                         {reply.is_staff_reply ? "Staff Agent Override" : "User Client"} &bull; {new Date(reply.created_at).toLocaleTimeString()}
                       </div>

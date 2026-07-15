@@ -7,7 +7,7 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import Boolean, String
+from sqlalchemy import Boolean, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
@@ -29,7 +29,7 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin):
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     oauth_provider: Mapped[str | None] = mapped_column(String(50), nullable=True)
     oauth_provider_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    signature_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    signature_url: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Relationships
     user_roles: Mapped[List["UserRole"]] = relationship("UserRole", back_populates="user", lazy="selectin")

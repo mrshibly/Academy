@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.core.dependencies import get_current_active_user, require_role
 from app.models.user import User
-from app.schemas.course import CourseCreate, CourseUpdate, CourseRead, ModuleCreate, LessonCreate
+from app.schemas.course import CourseCreate, CourseUpdate, CourseRead, ModuleCreate, LessonCreate, ModuleUpdate, LessonUpdate
 from app.schemas.common import PaginatedResponse
 from app.schemas.auth import MessageResponse
 from app.services.course_service import CourseService
@@ -82,5 +82,37 @@ async def create_module(course_id: UUID, data: ModuleCreate, db: AsyncSession = 
 async def create_lesson(module_id: UUID, data: LessonCreate, db: AsyncSession = Depends(get_db)):
     """Add a lesson to a module."""
     svc = CourseService(db)
-    lesson = await svc.create_lesson(module_id, **data.model_dump())
+    lesson = await svc.create_lesson(module_id=module_id, **data.model_dump())
     return {"id": str(lesson.id), "title": lesson.title, "order": lesson.order}
+
+
+@router.patch("/modules/{module_id}", status_code=200, dependencies=[Depends(require_role("instructor", "admin"))])
+async def update_module(module_id: UUID, data: ModuleUpdate, db: AsyncSession = Depends(get_db)):
+    """Update a module's details."""
+    svc = CourseService(db)
+    module = await svc.update_module(module_id=module_id, **data.model_dump(exclude_unset=True))
+    return {"id": str(module.id), "title": module.title, "order": module.order}
+
+
+@router.delete("/modules/{module_id}", response_model=MessageResponse, status_code=200, dependencies=[Depends(require_role("instructor", "admin"))])
+async def delete_module(module_id: UUID, db: AsyncSession = Depends(get_db)):
+    """Delete a module."""
+    svc = CourseService(db)
+    await svc.delete_module(module_id)
+    return MessageResponse(message="Module deleted.")
+
+
+@router.patch("/lessons/{lesson_id}", status_code=200, dependencies=[Depends(require_role("instructor", "admin"))])
+async def update_lesson(lesson_id: UUID, data: LessonUpdate, db: AsyncSession = Depends(get_db)):
+    """Update a lesson's details."""
+    svc = CourseService(db)
+    lesson = await svc.update_lesson(lesson_id=lesson_id, **data.model_dump(exclude_unset=True))
+    return {"id": str(lesson.id), "title": lesson.title, "order": lesson.order}
+
+
+@router.delete("/lessons/{lesson_id}", response_model=MessageResponse, status_code=200, dependencies=[Depends(require_role("instructor", "admin"))])
+async def delete_lesson(lesson_id: UUID, db: AsyncSession = Depends(get_db)):
+    """Delete a lesson."""
+    svc = CourseService(db)
+    await svc.delete_lesson(lesson_id)
+    return MessageResponse(message="Lesson deleted.")

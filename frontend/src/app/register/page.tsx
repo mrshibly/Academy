@@ -114,15 +114,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={{ padding: "6rem 0", display: "flex", justifyContent: "center" }}>
-      <div className="container" style={{ maxWidth: "26rem" }}>
-        
-        <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "2.5rem", boxShadow: "var(--shadow-md)" }}>
+    <div style={{ minHeight: "92vh", display: "flex", width: "100%", background: "var(--bg-primary)" }}>
+      {/* Left Column - Form */}
+      <div style={{ flex: "1 1 45%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "3rem 2rem", zIndex: 10 }}>
+        <div className="glass-panel" style={{ width: "100%", maxWidth: "26rem", padding: "2.5rem", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", background: "var(--card-bg)" }}>
           
           {success ? (
             <div style={{ textAlign: "center", padding: "1.5rem 0" }}>
               <CheckCircle2 size={64} style={{ color: "var(--accent-emerald)", margin: "0 auto 1.5rem auto" }} />
-              <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem" }}>Registration Successful</h2>
+              <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem", color: "var(--text-primary)" }}>Registration Successful</h2>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem", lineHeight: 1.5 }}>
                 An email verification link has been sent to <strong>{email}</strong>. Please check your inbox to activate your account.
               </p>
@@ -133,7 +133,7 @@ export default function RegisterPage() {
           ) : (
             <>
               <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-                <h1 style={{ fontSize: "1.75rem", fontWeight: 800 }}>Create Account</h1>
+                <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text-primary)" }}>Create Account</h1>
                 <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginTop: "0.25rem" }}>
                   Join our training tracks and acquire expert credentials
                 </p>
@@ -161,7 +161,7 @@ export default function RegisterPage() {
                   <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)" }}>Full Name</label>
                   <div style={{ position: "relative" }}>
                     <User size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-                    <input required type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} style={{ width: "100%", padding: "0.65rem 0.65rem 0.65rem 2.25rem", borderRadius: "6px", border: "1px solid var(--border-color)", marginTop: "0.25rem", outline: "none" }} />
+                    <input required type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="input-field" style={{ paddingLeft: "2.25rem", marginTop: "0.25rem" }} />
                   </div>
                 </div>
 
@@ -169,7 +169,7 @@ export default function RegisterPage() {
                   <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)" }}>Email Address</label>
                   <div style={{ position: "relative" }}>
                     <Mail size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-                    <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%", padding: "0.65rem 0.65rem 0.65rem 2.25rem", borderRadius: "6px", border: "1px solid var(--border-color)", marginTop: "0.25rem", outline: "none" }} />
+                    <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" style={{ paddingLeft: "2.25rem", marginTop: "0.25rem" }} />
                   </div>
                 </div>
 
@@ -177,7 +177,7 @@ export default function RegisterPage() {
                   <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)" }}>Password</label>
                   <div style={{ position: "relative" }}>
                     <Lock size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-                    <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: "100%", padding: "0.65rem 0.65rem 0.65rem 2.25rem", borderRadius: "6px", border: "1px solid var(--border-color)", marginTop: "0.25rem", outline: "none" }} />
+                    <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input-field" style={{ paddingLeft: "2.25rem", marginTop: "0.25rem" }} />
                   </div>
                 </div>
 
@@ -194,7 +194,34 @@ export default function RegisterPage() {
           )}
 
         </div>
+      </div>
 
+      {/* Right Column - Visual Graphic (Hidden on mobile via css media query) */}
+      <div className="login-graphic" style={{ flex: "1 1 55%", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "5rem", borderLeft: "1px solid var(--border-color)" }}>
+        <img
+          src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&q=80&auto=format&fit=crop"
+          alt="Cybersecurity code hacker terminal graphic"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
+        />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(11, 15, 25, 0.95) 0%, rgba(11, 15, 25, 0.5) 50%, rgba(11, 15, 25, 0.1) 100%)", zIndex: 1 }} />
+        <div style={{ position: "relative", zIndex: 2, color: "#ffffff", maxWidth: "34rem" }}>
+          <span style={{ background: "rgba(16, 185, 129, 0.2)", border: "1px solid rgba(16, 185, 129, 0.4)", color: "#a7f3d0", padding: "0.4rem 0.8rem", borderRadius: "9999px", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", display: "inline-block", marginBottom: "1.5rem" }}>
+            Certified Professional Education
+          </span>
+          <h2 style={{ fontSize: "2.25rem", fontWeight: 800, lineHeight: 1.2, marginBottom: "1.25rem" }}>
+            Become a Certified Ethical Hacker & AI Engineer
+          </h2>
+          <p style={{ color: "#cbd5e1", fontSize: "1rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+            "The curriculum covers advanced AI security vulnerability assessments and machine learning operations. It prepared me perfectly for my role as a security consultant."
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#10b981", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.8rem", color: "#ffffff" }}>AS</div>
+            <div>
+              <div style={{ fontSize: "0.875rem", fontWeight: 700 }}>Amina Sultana</div>
+              <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>DevSecOps Specialist</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

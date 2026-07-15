@@ -77,7 +77,7 @@ export default function StudentDashboard() {
   };
 
   return (
-    <div style={{ padding: "2.5rem 0", minHeight: "90vh", backgroundColor: "var(--bg-secondary)" }}>
+    <div style={{ padding: "2.5rem 0", minHeight: "90vh", backgroundColor: "var(--bg-primary)" }}>
       {/* Dynamic Keyframes & Hover CSS Presets */}
       <style>{`
         .glass-hero {
@@ -110,7 +110,7 @@ export default function StudentDashboard() {
           margin-bottom: 3rem;
         }
         .stat-card {
-          background: white;
+          background: var(--card-bg);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-md);
           padding: 1.5rem;
@@ -123,7 +123,7 @@ export default function StudentDashboard() {
         .stat-card:hover {
           transform: translateY(-4px);
           box-shadow: var(--shadow-md), 0 12px 20px rgba(0, 0, 0, 0.03);
-          border-color: #cbd5e1;
+          border-color: var(--accent-blue);
         }
         .course-grid {
           display: grid;
@@ -131,7 +131,7 @@ export default function StudentDashboard() {
           gap: 1.75rem;
         }
         .course-card {
-          background: white;
+          background: var(--card-bg);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-md);
           overflow: hidden;
@@ -187,7 +187,7 @@ export default function StudentDashboard() {
           box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
         }
         .certificate-card {
-          background: white;
+          background: var(--card-bg);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-md);
           padding: 1.25rem 1.5rem;
@@ -262,7 +262,7 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "2.5rem" }} className="responsive-dashboard-columns">
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "2.5rem" }} className="responsive-grid-split">
           
           {/* Enrolled Training Tracks List */}
           <div>
@@ -276,7 +276,7 @@ export default function StudentDashboard() {
             </div>
 
             {activeCourses.length === 0 ? (
-              <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "4rem 2rem", textAlign: "center" }}>
+              <div style={{ background: "var(--card-bg)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "4rem 2rem", textAlign: "center" }}>
                 <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>You are not enrolled in any training tracks yet.</p>
                 <Link href="/academy" className="btn btn-primary">
                   Browse Catalog
@@ -341,7 +341,7 @@ export default function StudentDashboard() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               {certificates.length === 0 ? (
-                <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "3rem 1.5rem", textAlign: "center" }}>
+                <div style={{ background: "var(--card-bg)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "3rem 1.5rem", textAlign: "center" }}>
                   <Award size={36} style={{ color: "var(--text-muted)", opacity: 0.4, marginBottom: "0.75rem" }} />
                   <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", lineHeight: 1.5 }}>
                     Your cryptographically signed certificates will render here automatically upon finishing a syllabus.

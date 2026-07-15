@@ -37,11 +37,11 @@ export default function Home() {
           }} />
         </div>
 
-        <div className="container" style={{
+        <div className="container responsive-grid-split" style={{
           position: "relative",
           zIndex: 1,
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "1.2fr 1fr",
           gap: "4rem",
           alignItems: "center",
           padding: "4rem 1.5rem"
@@ -210,7 +210,7 @@ export default function Home() {
       </section>
 
       {/* Trust & Verification Badges */}
-      <section style={{ background: "#ffffff", borderBottom: "1px solid var(--border-color)", padding: "2.5rem 0" }}>
+      <section style={{ background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", padding: "2.5rem 0" }}>
         <div className="container" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-around", alignItems: "center", gap: "2rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--text-secondary)" }}>
             <Award size={24} style={{ color: "var(--accent-teal)" }} />
@@ -251,10 +251,10 @@ export default function Home() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2rem" }}>
+          <div className="responsive-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
             {/* Card 1: AI Engineering */}
             <div className="hover-lift" style={{
-              background: "white",
+              background: "var(--card-bg)",
               borderRadius: "var(--radius-md)",
               border: "1px solid var(--border-color)",
               overflow: "hidden",
@@ -294,7 +294,7 @@ export default function Home() {
 
             {/* Card 2: Cybersecurity */}
             <div className="hover-lift" style={{
-              background: "white",
+              background: "var(--card-bg)",
               borderRadius: "var(--radius-md)",
               border: "1px solid var(--border-color)",
               overflow: "hidden",
@@ -334,7 +334,7 @@ export default function Home() {
 
             {/* Card 3: Academy */}
             <div className="hover-lift" style={{
-              background: "white",
+              background: "var(--card-bg)",
               borderRadius: "var(--radius-md)",
               border: "1px solid var(--border-color)",
               overflow: "hidden",
@@ -378,12 +378,12 @@ export default function Home() {
       {/* Why Choose Us — Visual showcase */}
       <section style={{
         padding: "6rem 0",
-        background: "#ffffff",
+        background: "var(--bg-primary)",
         borderTop: "1px solid var(--border-color)",
         borderBottom: "1px solid var(--border-color)"
       }}>
         <div className="container">
-          <div style={{
+          <div className="responsive-grid-split" style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "5rem",
@@ -407,7 +407,7 @@ export default function Home() {
                 position: "absolute",
                 bottom: "-30px",
                 right: "-20px",
-                background: "white",
+                background: "var(--card-bg)",
                 borderRadius: "12px",
                 padding: "1.25rem 1.5rem",
                 boxShadow: "0 15px 40px rgba(0,0,0,0.12)",
@@ -509,7 +509,7 @@ export default function Home() {
           position: "relative",
           zIndex: 1,
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
           gap: "3rem",
           textAlign: "center"
         }}>

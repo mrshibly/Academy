@@ -29,7 +29,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="header" style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255, 255, 255, 0.9)", backdropFilter: "blur(8px)" }}>
+    <header className="header">
       <div className="container nav" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", height: "4.5rem", position: "relative" }}>
         
         {/* Brand Logo */}
@@ -96,7 +96,7 @@ export default function Navbar() {
                     position: "absolute",
                     right: 0,
                     top: "3rem",
-                    background: "white",
+                    background: "var(--card-bg)",
                     border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     boxShadow: "0 10px 25px rgba(0,0,0,0.08)",

@@ -133,12 +133,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: "6rem 0", display: "flex", justifyContent: "center" }}>
-      <div className="container" style={{ maxWidth: "26rem" }}>
-        
-        <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "2.5rem", boxShadow: "var(--shadow-md)" }}>
+    <div style={{ minHeight: "92vh", display: "flex", width: "100%", background: "var(--bg-primary)" }}>
+      {/* Left Column - Form */}
+      <div style={{ flex: "1 1 45%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "3rem 2rem", zIndex: 10 }}>
+        <div className="glass-panel" style={{ width: "100%", maxWidth: "26rem", padding: "2.5rem", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", background: "var(--card-bg)" }}>
           <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-            <h1 style={{ fontSize: "1.75rem", fontWeight: 800 }}>Welcome Back</h1>
+            <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text-primary)" }}>Welcome Back</h1>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginTop: "0.25rem" }}>
               Log in to resume your training tracks
             </p>
@@ -166,7 +166,7 @@ export default function LoginPage() {
               <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)" }}>Email Address</label>
               <div style={{ position: "relative" }}>
                 <Mail size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-                <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%", padding: "0.65rem 0.65rem 0.65rem 2.25rem", borderRadius: "6px", border: "1px solid var(--border-color)", marginTop: "0.25rem", outline: "none" }} />
+                <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" style={{ paddingLeft: "2.25rem", marginTop: "0.25rem" }} />
               </div>
             </div>
 
@@ -177,7 +177,7 @@ export default function LoginPage() {
               </div>
               <div style={{ position: "relative" }}>
                 <Lock size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-                <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: "100%", padding: "0.65rem 0.65rem 0.65rem 2.25rem", borderRadius: "6px", border: "1px solid var(--border-color)", marginTop: "0.25rem", outline: "none" }} />
+                <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input-field" style={{ paddingLeft: "2.25rem", marginTop: "0.25rem" }} />
               </div>
             </div>
 
@@ -190,9 +190,35 @@ export default function LoginPage() {
           <p style={{ textAlign: "center", marginTop: "1.5rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
             Don't have an account? <Link href="/register" style={{ color: "var(--accent-blue)", fontWeight: 600 }}>Sign up</Link>
           </p>
-
         </div>
+      </div>
 
+      {/* Right Column - Visual Graphic (Hidden on mobile via css media query) */}
+      <div className="login-graphic" style={{ flex: "1 1 55%", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "5rem", borderLeft: "1px solid var(--border-color)" }}>
+        <img
+          src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&q=80&auto=format&fit=crop"
+          alt="Cybersecurity defense operation center network graphic"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
+        />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(11, 15, 25, 0.95) 0%, rgba(11, 15, 25, 0.5) 50%, rgba(11, 15, 25, 0.1) 100%)", zIndex: 1 }} />
+        <div style={{ position: "relative", zIndex: 2, color: "#ffffff", maxWidth: "34rem" }}>
+          <span style={{ background: "rgba(14, 165, 233, 0.2)", border: "1px solid rgba(14, 165, 233, 0.4)", color: "#7dd3fc", padding: "0.4rem 0.8rem", borderRadius: "9999px", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", display: "inline-block", marginBottom: "1.5rem" }}>
+            Offensive Security & AI
+          </span>
+          <h2 style={{ fontSize: "2.25rem", fontWeight: 800, lineHeight: 1.2, marginBottom: "1.25rem" }}>
+            Master the Advanced Skills Demanded by the Industry
+          </h2>
+          <p style={{ color: "#cbd5e1", fontSize: "1rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+            "The training curriculum is exceptionally hands-on. The labs provided me with real-world scenarios that allowed me to secure our enterprise pipelines within weeks."
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#0ea5e9", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.8rem", color: "#ffffff" }}>JD</div>
+            <div>
+              <div style={{ fontSize: "0.875rem", fontWeight: 700 }}>John Doe</div>
+              <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Lead Security Engineer, SecureOps</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

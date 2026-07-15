@@ -76,3 +76,19 @@ class CourseRead(BaseModel):
     created_at: datetime
     modules: list[ModuleRead] = []
     model_config = {"from_attributes": True}
+
+
+class ModuleUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    order: int | None = None
+
+
+class LessonUpdate(BaseModel):
+    title: str | None = None
+    order: int | None = None
+    content_type: str | None = None
+    content_url: str | None = None
+    content_body: str | None = None
+    duration_minutes: int | None = None
+    is_free_preview: bool | None = None

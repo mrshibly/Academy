@@ -89,7 +89,7 @@ export default function ClientDashboard() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "3rem", flexWrap: "wrap" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "3rem" }} className="responsive-grid-split">
           
           {/* Left Panel: Invoices */}
           <div>

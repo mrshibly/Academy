@@ -80,3 +80,33 @@ class CourseRepository:
         self.db.add(lesson)
         await self.db.flush()
         return lesson
+
+    async def get_module_by_id(self, module_id: UUID) -> Module | None:
+        stmt = select(Module).where(Module.id == module_id)
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_lesson_by_id(self, lesson_id: UUID) -> Lesson | None:
+        stmt = select(Lesson).where(Lesson.id == lesson_id)
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def update_module(self, module: Module, **kwargs: object) -> Module:
+        for k, v in kwargs.items():
+            setattr(module, k, v)
+        await self.db.flush()
+        return module
+
+    async def update_lesson(self, lesson: Lesson, **kwargs: object) -> Lesson:
+        for k, v in kwargs.items():
+            setattr(lesson, k, v)
+        await self.db.flush()
+        return lesson
+
+    async def delete_module(self, module: Module) -> None:
+        await self.db.delete(module)
+        await self.db.flush()
+
+    async def delete_lesson(self, lesson: Lesson) -> None:
+        await self.db.delete(lesson)
+        await self.db.flush()
