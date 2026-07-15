@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { BookOpen, Award, CheckCircle, Clock, ExternalLink, Shield, Cpu, Terminal } from "lucide-react";
+import { BookOpen, Award, CheckCircle, Clock, ExternalLink, Shield, Cpu, Terminal, Share2 } from "lucide-react";
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -348,47 +348,98 @@ export default function StudentDashboard() {
                   </p>
                 </div>
               ) : (
-                certificates.map((cert) => (
-                  <div key={cert.id} className="certificate-card">
-                    <div style={{ maxWidth: "70%" }}>
-                      <h4 style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {cert.course?.title}
-                      </h4>
-                      <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 500 }}>
-                        Issued: {new Date(cert.issued_at).toLocaleDateString()}
-                      </span>
+                certificates.map((cert) => {
+                  const verifyUrl = typeof window !== "undefined"
+                    ? `${window.location.origin}/verify/${cert.verification_id}`
+                    : "";
+                  const linkedInUrl = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME` +
+                    `&name=${encodeURIComponent(cert.course?.title || "Specialized Tech Certificate")}` +
+                    `&organizationName=${encodeURIComponent("Academy")}` +
+                    `&certUrl=${encodeURIComponent(verifyUrl)}` +
+                    `&certId=${encodeURIComponent(cert.verification_id)}`;
+
+                  return (
+                    <div key={cert.id} className="certificate-card" style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "1.25rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", width: "100%" }}>
+                        <div>
+                          <h4 style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)", marginBottom: "0.25rem" }}>
+                            {cert.course?.title}
+                          </h4>
+                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>
+                            Issued: {new Date(cert.issued_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <Award size={20} style={{ color: "var(--accent-violet)", flexShrink: 0 }} />
+                      </div>
+                      
+                      <div style={{ display: "flex", gap: "0.75rem", width: "100%", marginTop: "0.5rem" }}>
+                        <a
+                          href={cert.pdf_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            background: "rgba(139, 92, 246, 0.08)",
+                            color: "var(--accent-violet)",
+                            padding: "0.45rem 0.9rem",
+                            borderRadius: "6px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.35rem",
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                            textDecoration: "none",
+                            border: "1px solid rgba(139, 92, 246, 0.15)",
+                            transition: "all 0.2s ease",
+                            flex: 1
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "var(--accent-violet)";
+                            e.currentTarget.style.color = "white";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "rgba(139, 92, 246, 0.08)";
+                            e.currentTarget.style.color = "var(--accent-violet)";
+                          }}
+                        >
+                          <ExternalLink size={12} /> PDF
+                        </a>
+
+                        <a
+                          href={linkedInUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            background: "rgba(10, 102, 194, 0.08)",
+                            color: "#0a66c2",
+                            padding: "0.45rem 0.9rem",
+                            borderRadius: "6px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.35rem",
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                            textDecoration: "none",
+                            border: "1px solid rgba(10, 102, 194, 0.15)",
+                            transition: "all 0.2s ease",
+                            flex: 1
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "#0a66c2";
+                            e.currentTarget.style.color = "white";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "rgba(10, 102, 194, 0.08)";
+                            e.currentTarget.style.color = "#0a66c2";
+                          }}
+                        >
+                          <Share2 size={12} /> Share
+                        </a>
+                      </div>
                     </div>
-                    <a
-                      href={cert.pdf_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        background: "rgba(139, 92, 246, 0.08)",
-                        color: "var(--accent-violet)",
-                        padding: "0.45rem 0.9rem",
-                        borderRadius: "6px",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.35rem",
-                        fontSize: "0.8rem",
-                        fontWeight: 700,
-                        textDecoration: "none",
-                        border: "1px solid rgba(139, 92, 246, 0.15)",
-                        transition: "all 0.2s ease"
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "var(--accent-violet)";
-                        e.currentTarget.style.color = "white";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "rgba(139, 92, 246, 0.08)";
-                        e.currentTarget.style.color = "var(--accent-violet)";
-                      }}
-                    >
-                      <ExternalLink size={12} /> PDF
-                    </a>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
