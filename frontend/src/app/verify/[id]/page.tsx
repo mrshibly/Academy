@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Award, CheckCircle, XCircle, ShieldCheck, Download, Home, Loader, ExternalLink, Calendar, Key, Shield } from "lucide-react";
-import Navbar from "@/app/Navbar";
 
 interface VerificationData {
   is_valid: boolean;
@@ -56,7 +55,6 @@ export default function CertificateVerificationPage() {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-secondary)" }}>
-      <Navbar />
 
       <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "3rem 1.5rem" }}>
         {loading ? (
