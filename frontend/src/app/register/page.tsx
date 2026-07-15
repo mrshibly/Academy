@@ -197,13 +197,57 @@ export default function RegisterPage() {
       </div>
 
       {/* Right Column - Visual Graphic (Hidden on mobile via css media query) */}
-      <div className="login-graphic" style={{ flex: "1 1 55%", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "5rem", borderLeft: "1px solid var(--border-color)" }}>
-        <img
-          src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&q=80&auto=format&fit=crop"
-          alt="Cybersecurity code hacker terminal graphic"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
-        />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(11, 15, 25, 0.95) 0%, rgba(11, 15, 25, 0.5) 50%, rgba(11, 15, 25, 0.1) 100%)", zIndex: 1 }} />
+      <div className="login-graphic" style={{ flex: "1 1 55%", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "5rem", borderLeft: "1px solid var(--border-color)", background: "#0b0f19" }}>
+        {/* Futuristic SVG Cyber Vector Graphic */}
+        <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.85, zIndex: 0 }}>
+          <svg width="100%" height="100%" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="cyberGlow2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0.12" />
+                <stop offset="100%" stopColor="#000" stopOpacity="0" />
+              </radialGradient>
+              <linearGradient id="academicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#10b981" />
+                <stop offset="50%" stopColor="#0ea5e9" />
+                <stop offset="100%" stopColor="#8b5cf6" />
+              </linearGradient>
+            </defs>
+            <rect width="800" height="800" fill="#0b0f19" />
+            <circle cx="400" cy="350" r="320" fill="url(#cyberGlow2)" />
+            
+            {/* Grid Pattern overlay */}
+            <path d="M 0,150 L 800,150 M 0,250 L 800,250 M 0,350 L 800,350 M 0,450 L 800,450 M 0,550 L 800,550 M 0,650 L 800,650" stroke="rgba(255,255,255,0.015)" strokeWidth="1" />
+            <path d="M 150,0 L 150,800 M 250,0 L 250,800 M 350,0 L 350,800 M 450,0 L 450,800 M 550,0 L 550,800 M 650,0 L 650,800" stroke="rgba(255,255,255,0.015)" strokeWidth="1" />
+            
+            {/* Academic Concentric Network Rings */}
+            <circle cx="400" cy="350" r="160" fill="none" stroke="rgba(16, 185, 129, 0.15)" strokeWidth="2" strokeDasharray="20, 10" />
+            <circle cx="400" cy="350" r="210" fill="none" stroke="rgba(14, 165, 233, 0.12)" strokeWidth="1" />
+            <circle cx="400" cy="350" r="270" fill="none" stroke="rgba(139, 92, 246, 0.08)" strokeWidth="1.5" strokeDasharray="40, 40" />
+            
+            {/* Connecting Pathways */}
+            <path d="M400,350 L250,250 H200" stroke="rgba(16, 185, 129, 0.3)" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M400,350 L550,250 H600" stroke="rgba(14, 165, 233, 0.3)" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M400,350 L300,480 H240" stroke="rgba(139, 92, 246, 0.25)" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M400,350 L500,480 H560" stroke="rgba(16, 185, 129, 0.25)" strokeWidth="1.5" strokeLinecap="round" />
+            
+            {/* Nodes */}
+            <circle cx="200" cy="250" r="8" fill="#10b981" />
+            <circle cx="200" cy="250" r="14" fill="none" stroke="#10b981" strokeWidth="1.5" opacity="0.4" />
+            <circle cx="600" cy="250" r="8" fill="#0ea5e9" />
+            <circle cx="600" cy="250" r="14" fill="none" stroke="#0ea5e9" strokeWidth="1.5" opacity="0.4" />
+            <circle cx="240" cy="480" r="8" fill="#8b5cf6" />
+            <circle cx="560" cy="480" r="8" fill="#10b981" />
+            
+            {/* Knowledge Core Emblem */}
+            <circle cx="400" cy="350" r="60" fill="url(#academicGrad)" />
+            {/* Graduation Cap Vector inside Core */}
+            <path d="M400,325 L435,340 L400,355 L365,340 Z" fill="#ffffff" />
+            <path d="M375,346 V362 C375,372 425,372 425,362 V346" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M430,342 V358" fill="none" stroke="#ffffff" strokeWidth="2" />
+            <circle cx="430" cy="359" r="2" fill="#ffffff" />
+          </svg>
+        </div>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(11, 15, 25, 0.98) 0%, rgba(11, 15, 25, 0.4) 60%, rgba(11, 15, 25, 0.1) 100%)", zIndex: 1 }} />
         <div style={{ position: "relative", zIndex: 2, color: "#ffffff", maxWidth: "34rem" }}>
           <span style={{ background: "rgba(16, 185, 129, 0.2)", border: "1px solid rgba(16, 185, 129, 0.4)", color: "#a7f3d0", padding: "0.4rem 0.8rem", borderRadius: "9999px", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", display: "inline-block", marginBottom: "1.5rem" }}>
             Certified Professional Education

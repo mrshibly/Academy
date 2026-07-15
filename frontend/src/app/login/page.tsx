@@ -194,13 +194,56 @@ export default function LoginPage() {
       </div>
 
       {/* Right Column - Visual Graphic (Hidden on mobile via css media query) */}
-      <div className="login-graphic" style={{ flex: "1 1 55%", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "5rem", borderLeft: "1px solid var(--border-color)" }}>
-        <img
-          src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=1200&q=80&auto=format&fit=crop"
-          alt="Cybersecurity defense operation center network graphic"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
-        />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(11, 15, 25, 0.95) 0%, rgba(11, 15, 25, 0.5) 50%, rgba(11, 15, 25, 0.1) 100%)", zIndex: 1 }} />
+      <div className="login-graphic" style={{ flex: "1 1 55%", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "5rem", borderLeft: "1px solid var(--border-color)", background: "#0b0f19" }}>
+        {/* Futuristic SVG Cyber Vector Graphic */}
+        <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.85, zIndex: 0 }}>
+          <svg width="100%" height="100%" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="cyberGlow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" stopColor="#0eabec" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="#000" stopOpacity="0" />
+              </radialGradient>
+              <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#0ea5e9" />
+                <stop offset="50%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#0d9488" />
+              </linearGradient>
+            </defs>
+            <rect width="800" height="800" fill="#0b0f19" />
+            <circle cx="400" cy="350" r="300" fill="url(#cyberGlow)" />
+            
+            {/* Grid Pattern overlay */}
+            <path d="M 0,100 L 800,100 M 0,200 L 800,200 M 0,300 L 800,300 M 0,400 L 800,400 M 0,500 L 800,500 M 0,600 L 800,600 M 0,700 L 800,700" stroke="rgba(255,255,255,0.02)" strokeWidth="1" />
+            <path d="M 100,0 L 100,800 M 200,0 L 200,800 M 300,0 L 300,800 M 400,0 L 400,800 M 500,0 L 500,800 M 600,0 L 600,800 M 700,0 L 700,800" stroke="rgba(255,255,255,0.02)" strokeWidth="1" />
+            
+            {/* Rotating Orbits */}
+            <circle cx="400" cy="350" r="180" fill="none" stroke="rgba(14, 165, 233, 0.15)" strokeWidth="1.5" strokeDasharray="15, 10" />
+            <circle cx="400" cy="350" r="230" fill="none" stroke="rgba(139, 92, 246, 0.1)" strokeWidth="1" strokeDasharray="30, 20" />
+            <circle cx="400" cy="350" r="120" fill="none" stroke="rgba(13, 148, 136, 0.2)" strokeWidth="2" strokeDasharray="5, 5" />
+            
+            {/* Tech Nodes & Connecting Vectors */}
+            <line x1="400" y1="350" x2="280" y2="230" stroke="rgba(14, 165, 233, 0.3)" strokeWidth="1.5" />
+            <line x1="400" y1="350" x2="520" y2="230" stroke="rgba(139, 92, 246, 0.3)" strokeWidth="1.5" />
+            <line x1="400" y1="350" x2="400" y2="170" stroke="rgba(13, 148, 136, 0.3)" strokeWidth="1.5" />
+            <line x1="400" y1="350" x2="240" y2="350" stroke="rgba(14, 165, 233, 0.2)" strokeWidth="1.5" />
+            <line x1="400" y1="350" x2="560" y2="350" stroke="rgba(139, 92, 246, 0.2)" strokeWidth="1.5" />
+            
+            {/* Outer Nodes */}
+            <circle cx="280" cy="230" r="8" fill="#0ea5e9" />
+            <circle cx="280" cy="230" r="16" fill="none" stroke="#0ea5e9" strokeWidth="1" opacity="0.5" />
+            <circle cx="520" cy="230" r="8" fill="#8b5cf6" />
+            <circle cx="520" cy="230" r="16" fill="none" stroke="#8b5cf6" strokeWidth="1" opacity="0.5" />
+            <circle cx="400" cy="170" r="6" fill="#0d9488" />
+            <circle cx="240" cy="350" r="5" fill="#0ea5e9" />
+            <circle cx="560" cy="350" r="5" fill="#8b5cf6" />
+            
+            {/* Core Shield Vector */}
+            <path d="M400,280 L460,300 L460,370 C460,420 400,450 400,450 C400,450 340,420 340,370 L340,300 L400,280 Z" fill="url(#shieldGrad)" />
+            {/* Innermost Core Icon */}
+            <path d="M400,320 L370,350 H390 L380,390 L420,350 H400 L410,320 Z" fill="#ffffff" />
+          </svg>
+        </div>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(11, 15, 25, 0.98) 0%, rgba(11, 15, 25, 0.4) 60%, rgba(11, 15, 25, 0.1) 100%)", zIndex: 1 }} />
         <div style={{ position: "relative", zIndex: 2, color: "#ffffff", maxWidth: "34rem" }}>
           <span style={{ background: "rgba(14, 165, 233, 0.2)", border: "1px solid rgba(14, 165, 233, 0.4)", color: "#7dd3fc", padding: "0.4rem 0.8rem", borderRadius: "9999px", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", display: "inline-block", marginBottom: "1.5rem" }}>
             Offensive Security & AI
