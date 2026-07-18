@@ -20,8 +20,9 @@ def build_certificate_html(
     instructor_name: str,
     signature_img_html: str
 ) -> str:
-    """Build a high-fidelity HTML layout matching the teal wave modern certificate design."""
-    sig_html = signature_img_html if signature_img_html else f'<span style="font-family: \'Great Vibes\', \'Dancing Script\', cursive, Georgia, serif; font-size: 24px; color: #0c6478; font-weight: 700;">{instructor_name}</span>'
+    """Build a high-fidelity HTML layout matching the HackerRank Certificate of Accomplishment design."""
+    sig_html = signature_img_html if signature_img_html else f'<span style="font-family: \'Dancing Script\', \'Great Vibes\', cursive, Georgia, serif; font-size: 24px; color: #18181b; font-style: italic; font-weight: 700;">{instructor_name}</span>'
+    short_id = str(verification_id).replace("-", "")[:12].upper()
     
     return f"""
     <!DOCTYPE html>
@@ -29,7 +30,7 @@ def build_certificate_html(
     <head>
       <meta charset="utf-8">
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap');
         
         @page {{
           size: A4 landscape;
@@ -39,7 +40,7 @@ def build_certificate_html(
           margin: 0;
           padding: 0;
           font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-          background-color: #0c6478;
+          background-color: #f4f4f5;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -51,124 +52,127 @@ def build_certificate_html(
           height: 210mm;
           position: relative;
           box-sizing: border-box;
-          background: linear-gradient(135deg, #0a4f5f 0%, #0c6478 50%, #073844 100%);
+          background: #ffffff;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          padding: 42px 56px;
+          overflow: hidden;
+          border: 1px solid #e4e4e7;
+        }}
+
+        /* Outer Guilloché Multi-Wavy Frame Border */
+        .guilloche-border {{
+          position: absolute;
+          top: 16px; left: 16px; right: 16px; bottom: 16px;
+          border: 2px solid #e4e4e7;
+          border-radius: 6px;
+          pointer-events: none;
+        }}
+        .guilloche-inner-border {{
+          position: absolute;
+          top: 22px; left: 22px; right: 22px; bottom: 22px;
+          border: 1px dashed #d4d4d8;
+          border-radius: 4px;
+          pointer-events: none;
+        }}
+
+        /* Top Circular Stamp Emblem */
+        .top-emblem {{
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          border: 2px solid #18181b;
           display: flex;
           align-items: center;
           justify-content: center;
-          overflow: hidden;
-        }}
-
-        /* Abstract Flowing Teal & Yellow Waves Background Graphics */
-        .wave-bg-svg {{
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          width: 100%; height: 100%;
-          pointer-events: none;
-          z-index: 1;
-        }}
-
-        /* Top Left Academy Box Logo */
-        .top-logo-box {{
-          position: absolute;
-          top: 24px;
-          left: 36px;
-          border: 2px solid #ffffff;
-          padding: 8px 12px;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          z-index: 10;
-          background: rgba(12, 100, 120, 0.4);
-          backdrop-filter: blur(4px);
-        }}
-        .top-logo-icon {{
-          width: 28px;
-          height: 28px;
-          color: #ffffff;
-        }}
-        .top-logo-text {{
-          color: #ffffff;
-          font-size: 11px;
-          font-weight: 800;
-          line-height: 1.15;
-          letter-spacing: 0.05em;
-        }}
-
-        /* Inner White Sheet Card */
-        .cert-card {{
-          width: 248mm;
-          height: 156mm;
           background: #ffffff;
-          border-radius: 8px;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-          position: relative;
-          z-index: 5;
-          box-sizing: border-box;
-          padding: 36px 48px;
+          margin-top: 6px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }}
+        .top-emblem-inner {{
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: #18181b;
+          color: #ffffff;
           display: flex;
-          flex-direction: column;
-          justify-content: space-between;
           align-items: center;
+          justify-content: center;
+          font-weight: 900;
+          font-size: 20px;
+          letter-spacing: -0.05em;
         }}
 
-        /* Main Title Block Grid */
-        .title-block {{
+        /* Main Serif Title */
+        .cert-main-title {{
+          font-family: 'Playfair Display', Georgia, serif;
+          font-size: 38px;
+          font-weight: 800;
+          color: #18181b;
+          margin: 14px 0 16px 0;
+          letter-spacing: -0.01em;
+          text-align: center;
+        }}
+
+        /* Dark Chevron Ribbon Banner */
+        .course-ribbon-wrapper {{
           display: flex;
           align-items: center;
-          gap: 24px;
-          width: 100%;
-          margin-top: 10px;
+          justify-content: center;
+          margin-bottom: 24px;
         }}
-        .title-left {{
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          text-align: right;
-          width: 40%;
-        }}
-        .title-left h1 {{
-          font-size: 32px;
-          font-weight: 900;
-          color: #1e293b;
-          margin: 0;
-          letter-spacing: 0.06em;
-          line-height: 1.05;
-        }}
-        .title-left h3 {{
+        .course-ribbon {{
+          position: relative;
+          background: #18181b;
+          color: #ffffff;
+          padding: 8px 48px;
           font-size: 15px;
           font-weight: 700;
-          color: #475569;
-          margin: 4px 0 0 0;
-          letter-spacing: 0.12em;
-        }}
-
-        .vertical-teal-bar {{
-          width: 5px;
-          height: 70px;
-          background: #0c6478;
-          border-radius: 4px;
-          flex-shrink: 0;
-        }}
-
-        .title-right {{
+          letter-spacing: 0.05em;
           display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          text-align: left;
-          width: 55%;
+          align-items: center;
+          gap: 12px;
         }}
+        .ribbon-chevron-left {{
+          width: 0; height: 0;
+          border-top: 17px solid transparent;
+          border-bottom: 17px solid transparent;
+          border-right: 16px solid #18181b;
+          margin-right: -16px;
+        }}
+        .ribbon-chevron-right {{
+          width: 0; height: 0;
+          border-top: 17px solid transparent;
+          border-bottom: 17px solid transparent;
+          border-left: 16px solid #18181b;
+          margin-left: -16px;
+        }}
+
+        /* Presented To & Recipient Name */
         .presented-tag {{
-          font-size: 10.5px;
-          font-weight: 800;
-          color: #475569;
-          letter-spacing: 0.15em;
+          font-size: 10px;
+          font-weight: 700;
+          color: #71717a;
+          letter-spacing: 0.25em;
           text-transform: uppercase;
+          margin-bottom: 8px;
+          text-align: center;
+        }}
+        .recipient-name-box {{
+          width: 70%;
+          border-bottom: 1px solid #d4d4d8;
+          padding-bottom: 4px;
+          margin-bottom: 16px;
+          text-align: center;
         }}
         .recipient-name {{
-          font-family: 'Great Vibes', 'Dancing Script', cursive, Georgia, serif;
-          font-size: 46px;
+          font-family: 'Playfair Display', 'Dancing Script', Georgia, serif;
+          font-style: italic;
+          font-size: 38px;
           font-weight: 700;
-          color: #0c6478;
+          color: #18181b;
           margin: 0;
           line-height: 1.1;
         }}
@@ -176,15 +180,11 @@ def build_certificate_html(
         /* Body Statement */
         .cert-statement {{
           font-size: 13px;
-          color: #334155;
+          color: #52525b;
           text-align: center;
-          max-width: 650px;
-          line-height: 1.65;
-          margin: 10px 0;
-        }}
-        .course-title-highlight {{
-          font-weight: 800;
-          color: #0f172a;
+          max-width: 580px;
+          line-height: 1.5;
+          margin-bottom: 20px;
         }}
 
         /* Footer Section */
@@ -192,186 +192,111 @@ def build_certificate_html(
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          width: 100%;
-          margin-bottom: 4px;
+          width: 92%;
+          margin-bottom: 10px;
         }}
 
-        .sig-column {{
-          width: 200px;
+        /* Bottom Left Metadata */
+        .meta-left {{
           display: flex;
           flex-direction: column;
-          align-items: center;
+          gap: 2px;
+          font-size: 11px;
+          color: #71717a;
+        }}
+        .meta-left-label {{
+          font-weight: 500;
+        }}
+        .meta-left-val {{
+          font-weight: 800;
+          color: #18181b;
+        }}
+        .meta-left-id {{
+          font-family: monospace;
+          font-size: 10px;
+          color: #a1a1aa;
+        }}
+
+        /* Bottom Right Signature Block */
+        .sig-block {{
+          display: flex;
+          flex-direction: column;
+          align-items: flex-center;
           text-align: center;
+          width: 180px;
         }}
         .sig-container {{
-          height: 48px;
+          height: 40px;
           display: flex;
           align-items: flex-end;
           justify-content: center;
           margin-bottom: 4px;
           width: 100%;
-          position: relative;
         }}
-        .sig-rule {{
-          width: 100%;
-          height: 2px;
-          background-color: #334155;
-          margin-bottom: 6px;
-        }}
-        .sig-role-title {{
-          font-size: 11px;
+        .sig-name {{
           font-weight: 800;
-          color: #1e293b;
-          margin: 0;
+          font-size: 12px;
+          color: #18181b;
         }}
-        .sig-person-name {{
-          font-size: 11px;
+        .sig-title {{
+          font-size: 10px;
+          color: #71717a;
           font-weight: 600;
-          color: #64748b;
-          margin-top: 1px;
-        }}
-
-        /* Ribbon Medal Award Badge */
-        .medal-badge {{
-          position: relative;
-          width: 76px;
-          height: 76px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }}
-        .medal-circle {{
-          width: 68px;
-          height: 68px;
-          border-radius: 50%;
-          background: #0284c7;
-          border: 4px dashed #ffffff;
-          box-shadow: 0 0 0 2px #0284c7, 0 6px 15px rgba(2, 132, 199, 0.4);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          color: #ffffff;
-          z-index: 2;
-        }}
-        .medal-ribbon-left, .medal-ribbon-right {{
-          position: absolute;
-          bottom: -12px;
-          width: 16px;
-          height: 32px;
-          background: #0369a1;
-          z-index: 1;
-        }}
-        .medal-ribbon-left {{ left: 20px; transform: rotate(18deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); }}
-        .medal-ribbon-right {{ right: 20px; transform: rotate(-18deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); }}
-
-        /* Security Bar at Bottom */
-        .security-bar {{
-          width: 100%;
-          border-top: 1px solid #f1f5f9;
-          padding-top: 6px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-family: monospace;
-          font-size: 8px;
-          color: #94a3b8;
         }}
       </style>
     </head>
     <body>
       <div class="cert-outer-canvas">
-        <!-- SVG Background Shapes & Golden Curves -->
-        <svg class="wave-bg-svg" viewBox="0 0 1000 700" preserveAspectRatio="none">
-          <!-- Translucent Teal Circles -->
-          <circle cx="260" cy="120" r="140" fill="#0891b2" opacity="0.25" />
-          <circle cx="920" cy="560" r="160" fill="#0891b2" opacity="0.25" />
-          
-          <!-- Golden Yellow Waves -->
-          <path d="M 380 0 Q 600 150 900 0 Z" fill="#f59e0b" opacity="0.85" />
-          <path d="M 240 700 Q 500 520 750 700 Z" fill="#fbbf24" opacity="0.75" />
-          
-          <!-- Golden Fine Contour Lines (Guilloché curves) -->
-          <path d="M 500 0 C 700 120, 850 150, 1000 50 M 500 10 C 700 130, 850 160, 1000 60 M 500 20 C 700 140, 850 170, 1000 70" fill="none" stroke="#fcd34d" stroke-width="1.5" opacity="0.6" />
-          <path d="M 0 350 C 200 450, 350 500, 600 700 M 0 360 C 200 460, 350 510, 600 710" fill="none" stroke="#fcd34d" stroke-width="1.5" opacity="0.6" />
-        </svg>
+        <!-- Guilloché Borders -->
+        <div class="guilloche-border"></div>
+        <div class="guilloche-inner-border"></div>
 
-        <!-- Top Left Academy Box Logo -->
-        <div class="top-logo-box">
-          <svg class="top-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="3" width="20" height="14" rx="2" />
-            <line x1="8" y1="21" x2="16" y2="21" />
-            <line x1="12" y1="17" x2="12" y2="21" />
-            <path d="M7 9l2 2-2 2M13 13h4" stroke-width="1.5" />
-          </svg>
-          <div class="top-logo-text">
-            ACADEMY<br>CREDENTIAL
+        <!-- Top Circular Emblem -->
+        <div class="top-emblem">
+          <div class="top-emblem-inner">
+            A
           </div>
         </div>
 
-        <!-- Central White Sheet Card -->
-        <div class="cert-card">
-          <!-- Title & Recipient Header Block -->
-          <div class="title-block">
-            <div class="title-left">
-              <h1>CERTIFICATE</h1>
-              <h3>OF COMPLETION</h3>
+        <!-- Main Title -->
+        <h1 class="cert-main-title">Certificate of Accomplishment</h1>
+
+        <!-- Dark Chevron Course Ribbon -->
+        <div class="course-ribbon-wrapper">
+          <div class="ribbon-chevron-left"></div>
+          <div class="course-ribbon">
+            <span>{course_title}</span>
+          </div>
+          <div class="ribbon-chevron-right"></div>
+        </div>
+
+        <!-- Presented To Tag & Cursive Recipient Name -->
+        <span class="presented-tag">PRESENTED TO</span>
+        <div class="recipient-name-box">
+          <h2 class="recipient-name">{user_name}</h2>
+        </div>
+
+        <!-- Body Statement -->
+        <div class="cert-statement">
+          The bearer of this certificate has passed the Academy skill certification test
+        </div>
+
+        <!-- Footer Section: Left Metadata & Right Signature -->
+        <div class="cert-footer-row">
+          <div class="meta-left">
+            <div>
+              <span class="meta-left-label">Earned on: </span>
+              <span class="meta-left-val">{issued_at_str}</span>
             </div>
-            
-            <div class="vertical-teal-bar"></div>
-            
-            <div class="title-right">
-              <span class="presented-tag">THIS IS PROUDLY PRESENTED TO</span>
-              <h2 class="recipient-name">{user_name}</h2>
-            </div>
+            <div class="meta-left-id">ID: {short_id}</div>
           </div>
 
-          <!-- Body Description -->
-          <div class="cert-statement">
-            This certificate is presented for completing the 
-            <span class="course-title-highlight">"{course_title}"</span> 
-            from Academy on {issued_at_str}.
-          </div>
-
-          <!-- Footer Signatures & Ribbon Badge -->
-          <div class="cert-footer-row">
-            <!-- Left Teacher Signature -->
-            <div class="sig-column">
-              <div class="sig-container">
-                {sig_html}
-              </div>
-              <div class="sig-rule"></div>
-              <div class="sig-role-title">Teacher</div>
-              <div class="sig-person-name">{instructor_name}</div>
+          <div class="sig-block">
+            <div class="sig-container">
+              {sig_html}
             </div>
-
-            <!-- Central Ribbon Medal Award Badge -->
-            <div class="medal-badge">
-              <div class="medal-ribbon-left"></div>
-              <div class="medal-ribbon-right"></div>
-              <div class="medal-circle">
-                <span style="font-size: 7px; font-weight: 800; text-transform: uppercase; opacity: 0.9;">The</span>
-                <span style="font-size: 11px; font-weight: 900; letter-spacing: 0.05em;">BEST</span>
-                <span style="font-size: 7px; font-weight: 800; text-transform: uppercase; opacity: 0.9;">Award</span>
-              </div>
-            </div>
-
-            <!-- Right Principal Signature -->
-            <div class="sig-column">
-              <div class="sig-container" style="font-family: 'Great Vibes', 'Dancing Script', cursive; font-size: 22px; color: #0c6478; font-weight: 700;">
-                Academic Board
-              </div>
-              <div class="sig-rule"></div>
-              <div class="sig-role-title">Principal</div>
-              <div class="sig-person-name">Academic Senate</div>
-            </div>
-          </div>
-
-          <!-- Bottom Security Bar -->
-          <div class="security-bar">
-            <span>VERIFICATION ID: {verification_id}</span>
-            <span>OFFICIALLY REGISTERED</span>
-            <span>VERIFY AT: www.academy.dev/verify/{verification_id}</span>
+            <div class="sig-name">{instructor_name}</div>
+            <div class="sig-title">Lead Instructor, Academy</div>
           </div>
         </div>
       </div>

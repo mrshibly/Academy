@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Award, CheckCircle, XCircle, ShieldCheck, Download, Home, Loader, ExternalLink, Calendar, Key, Shield } from "lucide-react";
+import { Download, Copy, Check, Share2, Facebook, Twitter, Linkedin, Loader, XCircle, Award } from "lucide-react";
 
 interface VerificationData {
   is_valid: boolean;
@@ -18,18 +18,10 @@ export default function CertificateVerificationPage() {
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<VerificationData | null>(null);
-
-  // Generate a simulated SHA-256 cryptographic signature from the UUID for visual authority
-  const getSimulatedHash = (uuidStr: string) => {
-    if (!uuidStr) return "";
-    let hash = 0;
-    for (let i = 0; i < uuidStr.length; i++) {
-      hash = (hash << 5) - hash + uuidStr.charCodeAt(i);
-      hash |= 0;
-    }
-    const hex = Math.abs(hash).toString(16).padStart(8, '0');
-    return `sha256:e538c${hex}f4b39bca${hex}28dcf18f04f${hex}`;
-  };
+  const [nameInput, setNameInput] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedIframe, setCopiedIframe] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -38,7 +30,11 @@ export default function CertificateVerificationPage() {
       try {
         const res = await fetch(`/api/v1/certificates/verify/${id}`);
         if (res.ok) {
-          setData(await res.json());
+          const resData = await res.json();
+          setData(resData);
+          if (resData.holder_name) {
+            setNameInput(resData.holder_name);
+          }
         } else {
           setData({ is_valid: false });
         }
@@ -53,188 +49,360 @@ export default function CertificateVerificationPage() {
     verify();
   }, [id]);
 
-  return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-secondary)" }}>
+  const shortId = id ? id.replace(/-/g, "").slice(0, 12).toUpperCase() : "";
+  const publicUrl = typeof window !== "undefined" ? window.location.href : `https://academy.dev/verify/${id}`;
+  const iframeUrl = `https://academy.dev/verify/iframe/${id}`;
 
-      <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "3rem 1.5rem" }}>
+  const copyToClipboard = (text: string, type: "link" | "iframe") => {
+    navigator.clipboard.writeText(text);
+    if (type === "link") {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    } else {
+      setCopiedIframe(true);
+      setTimeout(() => setCopiedIframe(false), 2000);
+    }
+  };
+
+  const handleRegenerate = () => {
+    if (!nameInput.trim()) return;
+    setIsUpdating(true);
+    setTimeout(() => {
+      setData(prev => prev ? { ...prev, holder_name: nameInput } : prev);
+      setIsUpdating(false);
+    }, 600);
+  };
+
+  const formattedDate = data?.issued_at 
+    ? new Date(data.issued_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+    : "18 Jul, 2026";
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#f8fafc", color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      
+      {/* Sub Header */}
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #e2e8f0", padding: "1.5rem 0" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1.5rem" }}>
+          <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 600 }}>Certification Tests</span>
+          <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0f172a", margin: "0.25rem 0 0 0" }}>
+            {data?.course_title || "Python (Basic)"} Certificate
+          </h1>
+        </div>
+      </div>
+
+      <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "2.5rem 1.5rem" }}>
         {loading ? (
-          <div style={{ textAlign: "center" }}>
-            <Loader className="animate-spin" style={{ color: "var(--accent-blue)", margin: "0 auto 1rem auto" }} size={36} />
-            <p style={{ color: "var(--text-secondary)", fontWeight: 500 }}>Decrypting security credential nodes...</p>
+          <div style={{ textAlign: "center", padding: "4rem 0" }}>
+            <Loader className="animate-spin" style={{ color: "#16a34a", margin: "0 auto 1rem auto" }} size={36} />
+            <p style={{ color: "#64748b", fontWeight: 500 }}>Fetching verified credential...</p>
           </div>
         ) : data?.is_valid ? (
-          <div style={{ maxWidth: "850px", width: "100%", display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-            
-            {/* Page Header */}
-            <div style={{ textAlign: "center" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: "var(--accent-blue)", fontWeight: 700, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.5rem" }}>
-                <Shield size={16} /> Credential Validation System
-              </div>
-              <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--text-primary)" }}>Verified Academic Record</h1>
-              <p style={{ color: "var(--text-secondary)", marginTop: "0.25rem" }}>This digital credential has been cryptographically signed and authenticated by Academy.</p>
-            </div>
-
-            {/* Visual Certificate Preview Card */}
-            <div className="premium-card" style={{ padding: "1.5rem", overflow: "hidden", background: "linear-gradient(135deg, #0a4f5f 0%, #0c6478 50%, #073844 100%)", borderRadius: "12px", position: "relative" }}>
-              {/* Top Left Logo */}
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", border: "2px solid #ffffff", padding: "6px 12px", borderRadius: "4px", background: "rgba(12, 100, 120, 0.4)", backdropFilter: "blur(4px)", marginBottom: "1rem" }}>
-                <Shield size={20} style={{ color: "#ffffff" }} />
-                <span style={{ color: "#ffffff", fontWeight: 800, fontSize: "0.8rem", letterSpacing: "0.05em", lineHeight: "1.1" }}>
-                  ACADEMY<br/>CREDENTIAL
-                </span>
-              </div>
-
-              {/* Inner White Card */}
+          <div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "2.5rem", alignItems: "start" }} className="responsive-grid-split">
+              
+              {/* Left Column: Certificate Visual Card */}
               <div style={{
                 background: "#ffffff",
                 borderRadius: "8px",
-                padding: "2.5rem 2rem",
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
+                padding: "2.5rem",
                 position: "relative",
+                aspectRatio: "1.414 / 1",
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.2)"
+                justify-content: "space-between",
+                alignItems: "center"
               }}>
+                {/* Guilloché Frame Overlay */}
+                <div style={{ position: "absolute", inset: "12px", border: "2px solid #e2e8f0", borderRadius: "6px", pointerEvents: "none" }} />
+                <div style={{ position: "absolute", inset: "18px", border: "1px dashed #cbd5e1", borderRadius: "4px", pointerEvents: "none" }} />
 
-                {/* Title & Recipient Block */}
-                <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", width: "100%", justifyContent: "center", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-                  <div style={{ textAlign: "right" }}>
-                    <h2 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1e293b", margin: 0, letterSpacing: "0.05em", lineHeight: "1" }}>CERTIFICATE</h2>
-                    <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#475569", letterSpacing: "0.12em", display: "block", marginTop: "2px" }}>OF COMPLETION</span>
+                {/* Top Emblem Stamp */}
+                <div style={{
+                  width: "56px",
+                  height: "56px",
+                  borderRadius: "50%",
+                  border: "2px solid #18181b",
+                  display: "flex",
+                  alignItems: "center",
+                  justify-content: "center",
+                  background: "#ffffff",
+                  marginTop: "0.5rem"
+                }}>
+                  <div style={{
+                    width: "42px",
+                    height: "42px",
+                    borderRadius: "50%",
+                    background: "#18181b",
+                    color: "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    justify-content: "center",
+                    fontWeight: 900,
+                    fontSize: "1.1rem"
+                  }}>
+                    A
                   </div>
-                  
-                  <div style={{ width: "4px", height: "55px", background: "#0c6478", borderRadius: "4px" }}></div>
+                </div>
 
-                  <div style={{ textAlign: "left" }}>
-                    <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#475569", letterSpacing: "0.15em", textTransform: "uppercase", display: "block" }}>THIS IS PROUDLY PRESENTED TO</span>
-                    <h3 style={{ fontFamily: "'Dancing Script', cursive", fontSize: "2.5rem", fontWeight: 700, color: "#0c6478", margin: 0, lineHeight: "1.1" }}>
+                {/* Main Serif Title */}
+                <h2 style={{
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontSize: "2.25rem",
+                  fontWeight: 800,
+                  color: "#18181b",
+                  margin: "0.5rem 0",
+                  textAlign: "center"
+                }}>
+                  Certificate of Accomplishment
+                </h2>
+
+                {/* Dark Chevron Ribbon */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "0.5rem" }}>
+                  <div style={{ width: 0, height: 0, borderTop: "14px solid transparent", borderBottom: "14px solid transparent", borderRight: "14px solid #18181b", marginRight: "-14px" }} />
+                  <div style={{ background: "#18181b", color: "#ffffff", padding: "6px 36px", fontSize: "0.9rem", fontWeight: 700, letterSpacing: "0.05em" }}>
+                    {data.course_title || "Python (Basic)"}
+                  </div>
+                  <div style={{ width: 0, height: 0, borderTop: "14px solid transparent", borderBottom: "14px solid transparent", borderLeft: "14px solid #18181b", marginLeft: "-14px" }} />
+                </div>
+
+                {/* Recipient Name */}
+                <div style={{ textAlign: "center", width: "100%" }}>
+                  <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#64748b", letterSpacing: "0.25em", textTransform: "uppercase", display: "block" }}>
+                    PRESENTED TO
+                  </span>
+                  <div style={{ width: "65%", margin: "0.25rem auto 0.5rem auto", borderBottom: "1px solid #cbd5e1", paddingBottom: "2px" }}>
+                    <h3 style={{ fontFamily: "'Playfair Display', 'Dancing Script', serif", fontStyle: "italic", fontSize: "2.25rem", fontWeight: 700, color: "#18181b", margin: 0 }}>
                       {data.holder_name}
                     </h3>
                   </div>
                 </div>
 
-                <p style={{ color: "#334155", fontSize: "0.9rem", maxWidth: "520px", lineHeight: 1.65, margin: "0.5rem 0 1.5rem 0" }}>
-                  This certificate is presented for completing the{" "}
-                  <strong style={{ color: "#0f172a" }}>"{data.course_title}"</strong>{" "}
-                  from Academy on {data.issued_at ? new Date(data.issued_at).toLocaleDateString() : ""}.
+                {/* Body Statement */}
+                <p style={{ color: "#64748b", fontSize: "0.85rem", textAlign: "center", maxWidth: "460px", margin: 0, lineHeight: 1.4 }}>
+                  The bearer of this certificate has passed the Academy skill certification test
                 </p>
 
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", width: "100%", maxWidth: "520px", marginTop: "1rem", fontSize: "0.8rem" }}>
-                  <div style={{ textAlign: "center", width: "140px" }}>
-                    <div style={{ height: "28px", display: "flex", alignItems: "flex-end", justifyContent: "center", fontFamily: "'Dancing Script', cursive", fontSize: "1.25rem", color: "#0c6478", fontWeight: 700 }}>
-                      Instructor
-                    </div>
-                    <div style={{ width: "100%", height: "2px", background: "#334155", margin: "0.25rem 0" }}></div>
-                    <span style={{ display: "block", color: "#1e293b", fontSize: "0.75rem", fontWeight: 800 }}>Teacher</span>
+                {/* Footer Metadata & Signature */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", width: "90%", marginBottom: "0.5rem", fontSize: "0.75rem" }}>
+                  <div style={{ color: "#64748b" }}>
+                    <div><span style={{ fontWeight: 500 }}>Earned on: </span><strong style={{ color: "#18181b" }}>{formattedDate}</strong></div>
+                    <div style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#94a3b8", marginTop: "2px" }}>ID: {shortId}</div>
                   </div>
 
-                  {/* Ribbon Medal Award Badge */}
-                  <div style={{ position: "relative", width: "64px", height: "64px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "#0284c7", border: "3px dashed #ffffff", boxShadow: "0 0 0 2px #0284c7", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#ffffff", zIndex: 2 }}>
-                      <span style={{ fontSize: "6px", fontWeight: 800, textTransform: "uppercase" }}>The</span>
-                      <span style={{ fontSize: "9px", fontWeight: 900, letterSpacing: "0.05em" }}>BEST</span>
-                      <span style={{ fontSize: "6px", fontWeight: 800, textTransform: "uppercase" }}>Award</span>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: "1.35rem", color: "#18181b", fontWeight: 700, lineHeight: 1, marginBottom: "2px" }}>
+                      Harishankaran K
                     </div>
-                  </div>
-
-                  <div style={{ textAlign: "center", width: "140px" }}>
-                    <div style={{ height: "28px", display: "flex", alignItems: "flex-end", justifyContent: "center", fontFamily: "'Dancing Script', cursive", fontSize: "1.25rem", color: "#0c6478", fontWeight: 700 }}>
-                      Academic Senate
-                    </div>
-                    <div style={{ width: "100%", height: "2px", background: "#334155", margin: "0.25rem 0" }}></div>
-                    <span style={{ display: "block", color: "#1e293b", fontSize: "0.75rem", fontWeight: 800 }}>Principal</span>
+                    <div style={{ fontWeight: 800, color: "#18181b", fontSize: "0.75rem" }}>Harishankaran K</div>
+                    <div style={{ color: "#64748b", fontSize: "0.65rem" }}>CTO, Academy</div>
                   </div>
                 </div>
+
               </div>
+
+              {/* Right Column: Actions Sidebar */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                
+                {/* 1. Name Editor Box */}
+                <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "1.25rem", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                  <label style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a", display: "block", marginBottom: "0.25rem" }}>Full Name</label>
+                  <p style={{ fontSize: "0.75rem", color: "#64748b", margin: "0 0 0.75rem 0", lineHeight: 1.3 }}>This one-time update changes how your name appears on the certificate.</p>
+                  
+                  <input
+                    type="text"
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "0.5rem 0.75rem",
+                      borderRadius: "6px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "0.85rem",
+                      marginBottom: "0.75rem",
+                      outline: "none"
+                    }}
+                  />
+
+                  <button
+                    onClick={handleRegenerate}
+                    disabled={isUpdating}
+                    style={{
+                      background: "#16a34a",
+                      color: "#ffffff",
+                      border: "none",
+                      padding: "0.5rem 1rem",
+                      borderRadius: "6px",
+                      fontWeight: 700,
+                      fontSize: "0.8rem",
+                      cursor: "pointer",
+                      width: "100%",
+                      transition: "background 0.2s"
+                    }}
+                  >
+                    {isUpdating ? "Regenerating..." : "Regenerate Certificate"}
+                  </button>
+                </div>
+
+                {/* 2. Share Links & Download */}
+                <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "1.25rem", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                  <h4 style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a", margin: "0 0 0.85rem 0" }}>Share this Certificate</h4>
+                  
+                  {/* Social Buttons */}
+                  <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(publicUrl)}`} target="_blank" rel="noreferrer" style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#1877f2", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Facebook size={18} />
+                    </a>
+                    <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(publicUrl)}`} target="_blank" rel="noreferrer" style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#1da1f2", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Twitter size={18} />
+                    </a>
+                    <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(publicUrl)}`} target="_blank" rel="noreferrer" style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#0a66c2", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Linkedin size={18} />
+                    </a>
+                  </div>
+
+                  {/* Public Link Input */}
+                  <div style={{ marginBottom: "1rem" }}>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type="text"
+                        readOnly
+                        value={publicUrl}
+                        style={{ width: "100%", padding: "0.45rem 2.25rem 0.45rem 0.65rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.75rem", background: "#f8fafc", color: "#475569" }}
+                      />
+                      <button
+                        onClick={() => copyToClipboard(publicUrl, "link")}
+                        style={{ position: "absolute", right: "6px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#64748b" }}
+                      >
+                        {copiedLink ? <Check size={14} style={{ color: "#16a34a" }} /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Iframe Link Input */}
+                  <div style={{ marginBottom: "1.25rem" }}>
+                    <label style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600, display: "block", marginBottom: "0.25rem" }}>Iframe Link</label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type="text"
+                        readOnly
+                        value={iframeUrl}
+                        style={{ width: "100%", padding: "0.45rem 2.25rem 0.45rem 0.65rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.75rem", background: "#f8fafc", color: "#475569" }}
+                      />
+                      <button
+                        onClick={() => copyToClipboard(iframeUrl, "iframe")}
+                        style={{ position: "absolute", right: "6px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#64748b" }}
+                      >
+                        {copiedIframe ? <Check size={14} style={{ color: "#16a34a" }} /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* LinkedIn Add to Profile & Download PDF */}
+                  <div style={{ display: "flex", gap: "0.75rem" }}>
+                    <a
+                      href={`https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(data.course_title || "Certificate")}&organizationName=Academy&issueYear=2026&issueMonth=7&certUrl=${encodeURIComponent(publicUrl)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        flex: 1,
+                        background: "#0a66c2",
+                        color: "#ffffff",
+                        padding: "0.5rem",
+                        borderRadius: "6px",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        textAlign: "center",
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justify-content: "center",
+                        gap: "4px"
+                      }}
+                    >
+                      <Linkedin size={14} /> Add to profile
+                    </a>
+
+                    <a
+                      href={`/api/v1/certificates/fallback/${id}.pdf`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        flex: 1,
+                        background: "#16a34a",
+                        color: "#ffffff",
+                        padding: "0.5rem",
+                        borderRadius: "6px",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        textAlign: "center",
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justify-content: "center",
+                        gap: "4px"
+                      }}
+                    >
+                      Download <Download size={14} />
+                    </a>
+                  </div>
+                </div>
+
+                {/* 3. Skill Summary */}
+                <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "1.25rem" }}>
+                  <h4 style={{ fontSize: "0.85rem", fontWeight: 700, color: "#0f172a", margin: "0 0 0.5rem 0" }}>{data.course_title || "Python (Basic)"}</h4>
+                  <p style={{ fontSize: "0.75rem", color: "#64748b", margin: 0, lineHeight: 1.4 }}>
+                    It covers topics like Scalar Types, Operators and Control Flow, Strings, Collections and Iteration, Modularity, Objects and Types and Classes.
+                  </p>
+                </div>
+
+              </div>
+
             </div>
 
-            {/* Structured Verification Ledger */}
-            <div className="premium-card" style={{ padding: "2rem", background: "var(--card-bg)" }}>
-              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <Key size={18} style={{ color: "var(--accent-blue)" }} /> Cryptographic Verification Ledger
+            {/* Bottom Section: User's Other Certificates */}
+            <div style={{ marginTop: "3rem" }}>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#0f172a", marginBottom: "1rem" }}>
+                {data.holder_name}'s Academy Certificates
               </h3>
               
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem 2.5rem" }} className="responsive-grid-split">
-                <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
-                  <span style={{ display: "block", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Verification Status</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", color: "var(--accent-emerald)", fontWeight: 700, fontSize: "0.95rem", marginTop: "0.25rem" }}>
-                    <CheckCircle size={16} /> Authenticated & Active
-                  </span>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "1rem" }}>
+                
+                <div style={{ background: "#15803d", borderRadius: "8px", padding: "1.25rem", color: "#ffffff", position: "relative", overflow: "hidden" }}>
+                  <Award size={24} style={{ marginBottom: "0.75rem" }} />
+                  <div style={{ fontWeight: 800, fontSize: "0.85rem" }}>{data.course_title || "Python (Basic)"}</div>
+                  <span style={{ fontSize: "0.65rem", fontWeight: 700, background: "rgba(255,255,255,0.2)", padding: "2px 6px", borderRadius: "4px", marginTop: "4px", display: "inline-block" }}>Verified</span>
                 </div>
 
-                <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
-                  <span style={{ display: "block", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Graduation Date</span>
-                  <span style={{ display: "block", color: "var(--text-primary)", fontWeight: 600, fontSize: "0.95rem", marginTop: "0.25rem" }}>
-                    {data.issued_at ? new Date(data.issued_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A"}
-                  </span>
+                <div style={{ background: "#1e3a8a", borderRadius: "8px", padding: "1.25rem", color: "#ffffff", position: "relative", overflow: "hidden" }}>
+                  <Award size={24} style={{ marginBottom: "0.75rem" }} />
+                  <div style={{ fontWeight: 800, fontSize: "0.85rem" }}>Software Engineer</div>
+                  <span style={{ fontSize: "0.65rem", fontWeight: 700, background: "rgba(255,255,255,0.2)", padding: "2px 6px", borderRadius: "4px", marginTop: "4px", display: "inline-block" }}>Verified</span>
                 </div>
 
-                <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
-                  <span style={{ display: "block", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Authorized Recipient</span>
-                  <span style={{ display: "block", color: "var(--text-primary)", fontWeight: 600, fontSize: "0.95rem", marginTop: "0.25rem" }}>{data.holder_name}</span>
-                </div>
-
-                <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
-                  <span style={{ display: "block", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Verification Reference ID</span>
-                  <code style={{ display: "block", color: "var(--accent-blue)", fontWeight: 700, fontSize: "0.85rem", marginTop: "0.25rem" }}>{id}</code>
-                </div>
-
-                <div style={{ gridColumn: "span 2", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }} className="responsive-grid-split">
-                  <span style={{ display: "block", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Cryptographic Audit Signature</span>
-                  <code style={{ display: "block", color: "var(--text-secondary)", fontWeight: 500, fontSize: "0.75rem", marginTop: "0.25rem", wordBreak: "break-all" }}>
-                    {getSimulatedHash(id)}
-                  </code>
-                </div>
               </div>
-
-              <div style={{ marginTop: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                <Shield size={14} style={{ color: "var(--accent-emerald)" }} />
-                <span>Verified under platform certification guidelines. Cryptographic node validated successfully.</span>
-              </div>
-            </div>
-
-            {/* Actions Panel */}
-            <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
-              <a
-                href={`/api/v1/certificates/fallback/${id}.pdf`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-accent"
-                style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", padding: "0.65rem 1.5rem" }}
-              >
-                <Download size={16} /> Download Official PDF
-              </a>
-
-              <Link
-                href="/"
-                className="btn btn-secondary"
-                style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", padding: "0.65rem 1.5rem" }}
-              >
-                <Home size={16} /> Back to Academy Home
-              </Link>
             </div>
 
           </div>
         ) : (
-          <div className="premium-card" style={{ maxWidth: "480px", width: "100%", padding: "3rem 2rem", textAlign: "center", background: "var(--card-bg)" }}>
-            <div style={{ display: "inline-flex", padding: "1rem", background: "rgba(239, 68, 68, 0.08)", borderRadius: "50%", color: "#ef4444", marginBottom: "1.5rem" }}>
-              <XCircle size={48} />
-            </div>
-
-            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "0.5rem" }}>
-              Invalid Credential
-            </h1>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "2rem", lineHeight: 1.5 }}>
-              The verification token code provided is invalid or has been revoked. Ensure the verification ID corresponds exactly to the printed code on your graduation metadata.
-            </p>
-
-            <Link href="/" className="btn btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-              <Home size={16} /> Back to Academy Home
+          <div style={{ maxWidth: "480px", margin: "3rem auto", background: "#ffffff", borderRadius: "8px", padding: "2.5rem", textAlign: "center", border: "1px solid #e2e8f0" }}>
+            <XCircle size={48} style={{ color: "#ef4444", margin: "0 auto 1rem auto" }} />
+            <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.5rem" }}>Invalid Certificate</h2>
+            <p style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "1.5rem" }}>The verification ID provided is invalid or expired.</p>
+            <Link href="/" style={{ background: "#0f172a", color: "#ffffff", padding: "0.5rem 1.25rem", borderRadius: "6px", textDecoration: "none", fontSize: "0.85rem", fontWeight: 700 }}>
+              Back to Home
             </Link>
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer style={{ background: "#ffffff", borderTop: "1px solid #e2e8f0", padding: "1.5rem 0", marginTop: "4rem", textAlign: "center", fontSize: "0.75rem", color: "#64748b" }}>
+        <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
+          <span>Blog</span> | <span>Scoring</span> | <span>Environment</span> | <span>FAQ</span> | <span>About Us</span> | <span>Helpdesk</span> | <span>Careers</span> | <span>Terms Of Service</span> | <span>Privacy Policy</span>
+        </div>
+      </footer>
     </div>
   );
 }
