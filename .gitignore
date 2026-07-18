@@ -43,5 +43,9 @@ coverage.xml
 # Alembic
 backend/app/db/migrations/versions/
 
+# Databases
+*.db
+*.sqlite3
+
 # Docker
 *.log

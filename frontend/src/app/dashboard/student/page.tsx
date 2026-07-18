@@ -76,7 +76,7 @@ export default function StudentDashboard() {
   };
 
   return (
-    <div style={{ padding: "2.5rem 0", minHeight: "95vh", backgroundColor: "var(--bg-secondary)" }}>
+    <div style={{ minHeight: "95vh" }}>
       {/* Styles for dynamic interactions and glassmorphism elements */}
       <style>{`
         .academic-header {
@@ -422,6 +422,7 @@ export default function StudentDashboard() {
                       <div style={{ display: "flex", gap: "0.75rem" }}>
                         <a
                           href={cert.pdf_url}
+                          download={`certificate-${cert.verification_id || 'completion'}.pdf`}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{

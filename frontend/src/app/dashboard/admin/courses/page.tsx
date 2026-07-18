@@ -84,7 +84,8 @@ export default function AdminCoursesPage() {
         showMessage("Course published successfully!");
         fetchCourses();
       } else {
-        showMessage("Failed to publish course.", "error");
+        const err = await res.json().catch(() => ({}));
+        showMessage(err.detail || err.error?.message || "Failed to publish course.", "error");
       }
     } catch {
       showMessage("Error connecting to server.", "error");
@@ -124,7 +125,7 @@ export default function AdminCoursesPage() {
       )}
 
       {/* Tab Selector */}
-      <div style={{ display: "flex", gap: "1.5rem", borderBottom: "1px solid var(--border-color)", marginBottom: "2rem", paddingBottom: "0.25rem" }}>
+      <div className="tab-bar-scrollable">
         {[
           { id: "all", label: "All Courses", count: courses.length },
           { id: "pending", label: "Pending Approval", count: pendingCount },
@@ -167,14 +168,14 @@ export default function AdminCoursesPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "2.5rem" }} className="responsive-grid-split">
         {/* Course List */}
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "1.25rem" }}>
             <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>Course Directory ({filtered.length})</h2>
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: "220px" }}>
               <Search size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
               <input
                 type="text" placeholder="Search courses..."
                 value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "220px" }}
+                style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "100%" }}
               />
             </div>
           </div>
@@ -193,8 +194,8 @@ export default function AdminCoursesPage() {
                   background: "white", border: editId === course.id ? "2px solid var(--accent-blue)" : "1px solid var(--border-color)",
                   borderRadius: "12px", padding: "1.25rem", transition: "all 0.15s"
                 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem" }}>
+                    <div style={{ flex: 1, minWidth: "200px" }}>
                       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.4rem" }}>
                         <span style={{ fontSize: "0.7rem", background: "rgba(14, 165, 233, 0.1)", color: "var(--accent-blue)", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: 600 }}>{course.level}</span>
                         <span style={{ fontSize: "0.7rem", background: course.status === "published" ? "rgba(16, 185, 129, 0.1)" : "rgba(234, 179, 8, 0.1)", color: course.status === "published" ? "var(--accent-emerald)" : "#ca8a04", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: 600 }}>{course.status.toUpperCase()}</span>
@@ -205,7 +206,7 @@ export default function AdminCoursesPage() {
                         ৳{course.price} BDT &bull; {course.duration_hours || 0}h
                       </p>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0, marginLeft: "1rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
                       {course.status === "draft" && (
                         <button onClick={() => handleApprove(course.id)} style={{ padding: "0.3rem 0.6rem", fontSize: "0.75rem", background: "var(--accent-emerald)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 600 }}>
                           Approve

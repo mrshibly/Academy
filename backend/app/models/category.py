@@ -7,8 +7,7 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import ForeignKey, String, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import ForeignKey, String, Uuid, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -25,7 +24,7 @@ class Category(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     slug: Mapped[str] = mapped_column(String(200), unique=True, index=True, nullable=False)
     parent_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("categories.id"), nullable=True, index=True
+        Uuid, ForeignKey("categories.id"), nullable=True, index=True
     )
 
     # Relationships
@@ -50,9 +49,9 @@ class CourseTag(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __table_args__ = (UniqueConstraint("course_id", "tag_id", name="uq_course_tag"),)
 
     course_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("courses.id"), nullable=False, index=True
+        Uuid, ForeignKey("courses.id"), nullable=False, index=True
     )
-    tag_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("tags.id"), nullable=False, index=True)
+    tag_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tags.id"), nullable=False, index=True)
 
     # Relationships
     course: Mapped["Course"] = relationship("Course", back_populates="tags")

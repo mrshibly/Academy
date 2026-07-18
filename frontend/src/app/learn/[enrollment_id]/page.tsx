@@ -248,6 +248,7 @@ export default function LearnPage() {
                 {certificate?.pdf_url ? (
                   <a
                     href={certificate.pdf_url}
+                    download={`certificate-${certificate.verification_id || 'completion'}.pdf`}
                     target="_blank"
                     rel="noreferrer"
                     style={{

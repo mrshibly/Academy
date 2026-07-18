@@ -93,6 +93,13 @@ export default function DashboardLayout({
         </button>
       </div>
 
+      {/* Mobile Drawer Overlay Backdrop */}
+      <div 
+        className={`mobile-sidebar-backdrop ${mobileOpen ? "open" : ""}`} 
+        onClick={() => setMobileOpen(false)} 
+        aria-label="Close menu"
+      />
+
       {/* Sidebar Component */}
       <DashboardSidebar
         collapsed={collapsed}

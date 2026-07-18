@@ -1,69 +1,141 @@
 "use client";
 
-import { useState } from "react";
-import { Calendar, Clock, Video, User, Mail, Phone, ChevronRight, CheckCircle2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Calendar, Clock, Video, User, Mail, Phone, ChevronRight, CheckCircle2, AlertCircle } from "lucide-react";
+
+interface SlotData {
+  id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  is_available: boolean;
+}
+
+function getNextWeekdays(count: number): { label: string; value: string }[] {
+  const days: { label: string; value: string }[] = [];
+  const now = new Date();
+  let d = new Date(now);
+  // Start from tomorrow
+  d.setDate(d.getDate() + 1);
+
+  while (days.length < count) {
+    const day = d.getDay();
+    if (day !== 0 && day !== 6) {
+      const iso = d.toISOString().slice(0, 10);
+      const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+      days.push({ label, value: iso });
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  return days;
+}
+
+const SERVICE_TYPES = [
+  "Security Consultation",
+  "AI & LLM Development",
+  "Penetration Testing",
+  "Corporate Training",
+  "Cloud Security Audit",
+  "Other"
+];
+
+const FALLBACK_SLOTS = [
+  "09:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "02:00 PM",
+  "03:00 PM",
+  "04:00 PM"
+];
 
 export default function BookPage() {
-  const [selectedDate, setSelectedDate] = useState("2026-07-13");
+  const dates = getNextWeekdays(5);
+  const [selectedDate, setSelectedDate] = useState(dates[0]?.value || "");
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [serviceType, setServiceType] = useState(SERVICE_TYPES[0]);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const dates = [
-    { label: "Mon, Jul 13", value: "2026-07-13" },
-    { label: "Tue, Jul 14", value: "2026-07-14" },
-    { label: "Wed, Jul 15", value: "2026-07-15" },
-    { label: "Thu, Jul 16", value: "2026-07-16" },
-    { label: "Fri, Jul 17", value: "2026-07-17" }
-  ];
+  // API slots state
+  const [apiSlots, setApiSlots] = useState<SlotData[]>([]);
+  const [slotsLoaded, setSlotsLoaded] = useState(false);
 
-  const slots = [
-    "09:00 AM",
-    "10:00 AM",
-    "11:00 AM",
-    "02:00 PM",
-    "03:00 PM",
-    "04:00 PM"
-  ];
+  // Fetch available time slots from the API
+  useEffect(() => {
+    fetch("/api/v1/bookings/slots")
+      .then(res => {
+        if (res.ok) return res.json();
+        throw new Error("Failed to fetch slots");
+      })
+      .then((data: SlotData[]) => {
+        setApiSlots(data);
+        setSlotsLoaded(true);
+      })
+      .catch(() => {
+        setSlotsLoaded(true); // Use fallback slots
+      });
+  }, []);
+
+  // Determine which slots to show for the selected date
+  const slotsForDate = apiSlots.filter(s => s.date === selectedDate && s.is_available);
+  const useApiSlots = slotsLoaded && apiSlots.length > 0;
+
+  const displaySlots = useApiSlots
+    ? slotsForDate.map(s => ({
+        label: formatTime(s.start_time) + " – " + formatTime(s.end_time),
+        id: s.id,
+      }))
+    : FALLBACK_SLOTS.map(s => ({ label: s, id: null as string | null }));
+
+  function formatTime(t: string): string {
+    const [h, m] = t.split(":");
+    const hour = parseInt(h, 10);
+    const suffix = hour >= 12 ? "PM" : "AM";
+    const h12 = hour % 12 || 12;
+    return `${h12}:${m} ${suffix}`;
+  }
 
   const handleBook = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSlot) return;
+    setError(null);
 
     setLoading(true);
     try {
-      const [time, modifier] = selectedSlot.split(" ");
-      let [hoursStr, minutes] = time.split(":");
-      let hours = parseInt(hoursStr, 10);
-      if (modifier === "PM" && hours !== 12) hours += 12;
-      if (modifier === "AM" && hours === 12) hours = 0;
-      
-      const scheduled_time = `${selectedDate}T${String(hours).padStart(2, "0")}:${minutes}:00Z`;
+      const payload: Record<string, unknown> = {
+        name,
+        email,
+        phone: phone || null,
+        service_type: serviceType,
+        notes: notes || null,
+      };
+
+      // If we matched an API slot, include the time_slot_id
+      if (selectedSlotId) {
+        payload.time_slot_id = selectedSlotId;
+      }
 
       const response = await fetch("/api/v1/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          scheduled_time,
-          client_name: name,
-          client_email: email,
-          company_name: phone ? `Phone: ${phone}` : "Individual",
-          notes
-        })
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
-        throw new Error("Unable to register consultation slot.");
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.detail || body.error?.message || "Unable to register consultation slot.");
       }
 
       setSuccess(true);
-    } catch (err) {
-      console.error(err);
-      alert("Error scheduling appointment slot. Please try another slot.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error scheduling appointment. Please try another slot.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -105,12 +177,25 @@ export default function BookPage() {
                 <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "1.5rem" }}>
                   A calendar invite and Google Meet link have been sent to <strong>{email}</strong>.
                 </p>
-                <button className="btn btn-outline" onClick={() => setSuccess(false)}>
+                <button className="btn btn-outline" onClick={() => { setSuccess(false); setError(null); }}>
                   Book another slot
                 </button>
               </div>
             ) : (
               <form onSubmit={handleBook}>
+                {/* Error Banner */}
+                {error && (
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: "0.5rem",
+                    padding: "0.75rem 1rem", marginBottom: "1.5rem",
+                    background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)",
+                    borderRadius: "8px", color: "#ef4444", fontSize: "0.85rem", fontWeight: 500
+                  }}>
+                    <AlertCircle size={16} />
+                    <span>{error}</span>
+                  </div>
+                )}
+
                 {/* 1. Date Picker */}
                 <h4 style={{ fontWeight: 600, marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <Calendar size={18} /> Select Date
@@ -120,7 +205,7 @@ export default function BookPage() {
                     <button
                       key={date.value}
                       type="button"
-                      onClick={() => { setSelectedDate(date.value); setSelectedSlot(null); }}
+                      onClick={() => { setSelectedDate(date.value); setSelectedSlot(null); setSelectedSlotId(null); }}
                       style={{
                         padding: "0.6rem 0.8rem",
                         borderRadius: "8px",
@@ -144,26 +229,28 @@ export default function BookPage() {
                 <h4 style={{ fontWeight: 600, marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <Clock size={18} /> Select Time
                 </h4>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "0.75rem", marginBottom: "2rem" }}>
-                  {slots.map((slot) => (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: "0.75rem", marginBottom: "2rem" }}>
+                  {displaySlots.length === 0 ? (
+                    <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", gridColumn: "1 / -1" }}>No available slots for this date.</p>
+                  ) : displaySlots.map((slot) => (
                     <button
-                      key={slot}
+                      key={slot.label}
                       type="button"
-                      onClick={() => setSelectedSlot(slot)}
+                      onClick={() => { setSelectedSlot(slot.label); setSelectedSlotId(slot.id); }}
                       style={{
                         padding: "0.6rem 0.5rem",
                         borderRadius: "8px",
                         border: "1px solid",
-                        borderColor: selectedSlot === slot ? "var(--accent-blue)" : "var(--border-color)",
-                        background: selectedSlot === slot ? "rgba(14, 165, 233, 0.05)" : "white",
-                        color: selectedSlot === slot ? "var(--accent-blue)" : "var(--text-secondary)",
+                        borderColor: selectedSlot === slot.label ? "var(--accent-blue)" : "var(--border-color)",
+                        background: selectedSlot === slot.label ? "rgba(14, 165, 233, 0.05)" : "white",
+                        color: selectedSlot === slot.label ? "var(--accent-blue)" : "var(--text-secondary)",
                         cursor: "pointer",
-                        fontWeight: selectedSlot === slot ? 600 : 500,
+                        fontWeight: selectedSlot === slot.label ? 600 : 500,
                         fontSize: "0.85rem",
                         transition: "all 0.15s ease"
                       }}
                     >
-                      {slot}
+                      {slot.label}
                     </button>
                   ))}
                 </div>
@@ -187,6 +274,15 @@ export default function BookPage() {
                     <div>
                       <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)" }}>Email Address</label>
                       <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%", padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--border-color)", marginTop: "0.25rem", outline: "none" }} />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)" }}>Service Type</label>
+                      <select value={serviceType} onChange={(e) => setServiceType(e.target.value)} style={{ width: "100%", padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--border-color)", marginTop: "0.25rem", outline: "none", background: "white", fontFamily: "inherit", fontSize: "0.9rem" }}>
+                        {SERVICE_TYPES.map(st => (
+                          <option key={st} value={st}>{st}</option>
+                        ))}
+                      </select>
                     </div>
 
                     <div>

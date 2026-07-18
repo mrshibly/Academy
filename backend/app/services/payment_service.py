@@ -33,6 +33,8 @@ class PaymentService:
         line_items = []
         order_items_data = []
         total = 0.0
+        collected_currency = "USD"
+        collected_product_name = "Course Tuition"
 
         for item in items:
             if item["item_type"] == "course":
@@ -51,9 +53,11 @@ class PaymentService:
                 })
                 order_items_data.append({"item_type": ItemType.COURSE, "item_id": course.id, "unit_price": float(course.price), "quantity": 1})
                 total += float(course.price)
+                collected_currency = course.currency.upper()
+                collected_product_name = course.title
 
         # Create pending order
-        order_currency = "BDT" if (len(order_items_data) > 0 and course.currency.upper() == "BDT") else "USD"
+        order_currency = "BDT" if (len(order_items_data) > 0 and collected_currency == "BDT") else "USD"
         order = Order(user_id=user_id, total_amount=total, currency=order_currency)
         self.db.add(order)
         await self.db.flush()
@@ -95,7 +99,7 @@ class PaymentService:
                 "cus_city": "Dhaka",
                 "cus_country": "Bangladesh",
                 "shipping_method": "NO",
-                "product_name": course.title if len(order_items_data) > 0 else "Course Tuition",
+                "product_name": collected_product_name,
                 "product_category": "Education",
                 "product_profile": "non-physical-goods"
             }

@@ -53,13 +53,17 @@ class AuthService:
         verification_token = create_email_verification_token(str(user.id))
         
         # Trigger welcome/verification email background task
-        from app.workers.tasks.email_tasks import send_email_task
-        verification_url = f"{get_settings().ALLOWED_ORIGINS}/verify-email?token={verification_token}"
-        send_email_task.delay(
-            to_email=user.email,
-            subject="Verify Your Email — Academy",
-            body_html=f"<h3>Welcome to Academy!</h3><p>Please click the link below to verify your email address:</p><p><a href='{verification_url}'>Verify Email</a></p>"
-        )
+        try:
+            from app.workers.tasks.email_tasks import send_email_task
+            verification_url = f"{get_settings().ALLOWED_ORIGINS}/verify-email?token={verification_token}"
+            send_email_task.delay(
+                to_email=user.email,
+                subject="Verify Your Email — Academy",
+                body_html=f"<h3>Welcome to Academy!</h3><p>Please click the link below to verify your email address:</p><p><a href='{verification_url}'>Verify Email</a></p>"
+            )
+        except Exception:
+            import structlog
+            structlog.get_logger().warning("email_task_failed", event="registration_verification", user_email=user.email)
 
         return {"user_id": str(user.id), "verification_token": verification_token}
 
@@ -237,13 +241,17 @@ class AuthService:
         token = create_password_reset_token(str(user.id))
         
         # Trigger reset email background task
-        from app.workers.tasks.email_tasks import send_email_task
-        reset_url = f"{get_settings().ALLOWED_ORIGINS}/reset-password?token={token}"
-        send_email_task.delay(
-            to_email=user.email,
-            subject="Reset Your Password — Academy",
-            body_html=f"<h3>Password Reset Request</h3><p>Please click the link below to reset your password:</p><p><a href='{reset_url}'>Reset Password</a></p>"
-        )
+        try:
+            from app.workers.tasks.email_tasks import send_email_task
+            reset_url = f"{get_settings().ALLOWED_ORIGINS}/reset-password?token={token}"
+            send_email_task.delay(
+                to_email=user.email,
+                subject="Reset Your Password — Academy",
+                body_html=f"<h3>Password Reset Request</h3><p>Please click the link below to reset your password:</p><p><a href='{reset_url}'>Reset Password</a></p>"
+            )
+        except Exception:
+            import structlog
+            structlog.get_logger().warning("email_task_failed", event="password_reset", user_email=user.email)
 
         return token
 

@@ -8,8 +8,7 @@ import enum
 import uuid
 from datetime import date
 
-from sqlalchemy import Date, Enum, ForeignKey, Integer, String
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Date, Enum, ForeignKey, Integer, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -28,17 +27,17 @@ class Cohort(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "cohorts"
 
     course_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("courses.id"), nullable=False, index=True
+        Uuid, ForeignKey("courses.id"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     end_date: Mapped[date] = mapped_column(Date, nullable=False)
     capacity: Mapped[int] = mapped_column(Integer, nullable=False, default=30)
     instructor_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        Uuid, ForeignKey("users.id"), nullable=False, index=True
     )
     organization_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=True, index=True
+        Uuid, ForeignKey("organizations.id"), nullable=True, index=True
     )
     status: Mapped[CohortStatus] = mapped_column(Enum(CohortStatus), nullable=False, default=CohortStatus.UPCOMING)
 

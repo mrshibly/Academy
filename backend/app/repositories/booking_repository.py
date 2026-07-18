@@ -19,12 +19,18 @@ class BookingRepository:
         return list(result.scalars().all())
 
     async def get_slot_for_update(self, slot_id: UUID) -> TimeSlot | None:
-        """Acquire a row-level lock on the slot to prevent race conditions."""
-        result = await self.db.execute(
+        """Acquire a row-level lock on the slot to prevent race conditions.
+        Falls back to a plain SELECT on SQLite (which doesn't support FOR UPDATE).
+        """
+        stmt = (
             select(TimeSlot)
             .where(TimeSlot.id == slot_id, TimeSlot.is_available == True)  # noqa: E712
-            .with_for_update()
         )
+        # SQLite does not support SELECT ... FOR UPDATE; skip it for SQLite
+        dialect_name = self.db.bind.dialect.name if self.db.bind else ""
+        if dialect_name != "sqlite":
+            stmt = stmt.with_for_update()
+        result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
 
     async def create_booking(self, **kwargs: object) -> Booking:

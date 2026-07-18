@@ -125,3 +125,33 @@ class EnrollmentService:
         if enrollment is None:
             raise NotFoundError(resource="Enrollment")
         return enrollment
+
+    async def get_enrollment_detail_with_certificate(self, enrollment_id: UUID):
+        """Retrieve enrollment detail and auto-generate certificate if enrollment is
+        completed but no certificate exists yet."""
+        from sqlalchemy import select
+        from app.models.user import User
+        from app.models.course import Course
+        from app.services.certificate_service import CertificateService
+
+        enrollment = await self.get_enrollment_detail(enrollment_id)
+        cert_svc = CertificateService(self.db)
+        certificate = await cert_svc.get_by_enrollment_id(enrollment_id)
+
+        if not certificate and enrollment.status.value == "completed":
+            from app.services.certificate_utils import generate_certificate_in_process
+
+            user_stmt = select(User).where(User.id == enrollment.user_id)
+            grad_user = (await self.db.execute(user_stmt)).scalar_one()
+
+            course_stmt = select(Course).where(Course.id == enrollment.course_id)
+            course = (await self.db.execute(course_stmt)).scalar_one()
+
+            certificate = await generate_certificate_in_process(
+                self.db, enrollment_id, grad_user.full_name, course.title
+            )
+            if certificate:
+                await self.db.commit()
+
+        return enrollment, certificate
+

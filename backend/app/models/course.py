@@ -8,8 +8,7 @@ import enum
 import uuid
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import Boolean, Enum, Float, ForeignKey, Integer, Numeric, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Boolean, Enum, Float, ForeignKey, Integer, Numeric, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
@@ -49,10 +48,10 @@ class Course(Base, UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin):
     thumbnail_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     duration_hours: Mapped[float | None] = mapped_column(Float, nullable=True)
     instructor_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        Uuid, ForeignKey("users.id"), nullable=False, index=True
     )
     category_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("categories.id"), nullable=True, index=True
+        Uuid, ForeignKey("categories.id"), nullable=True, index=True
     )
 
     # Relationships
@@ -68,7 +67,7 @@ class Module(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "modules"
 
     course_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("courses.id"), nullable=False, index=True
+        Uuid, ForeignKey("courses.id"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -85,7 +84,7 @@ class Lesson(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "lessons"
 
     module_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("modules.id"), nullable=False, index=True
+        Uuid, ForeignKey("modules.id"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

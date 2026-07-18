@@ -8,8 +8,7 @@ import enum
 import uuid
 from datetime import date
 
-from sqlalchemy import Date, Enum, ForeignKey, Integer, Numeric, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Date, Enum, ForeignKey, Integer, Numeric, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -37,7 +36,7 @@ class InvoiceStatus(str, enum.Enum):
 
 class Order(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "orders"
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), nullable=False, index=True)
     status: Mapped[OrderStatus] = mapped_column(Enum(OrderStatus), nullable=False, default=OrderStatus.PENDING)
     total_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="USD")
@@ -51,9 +50,9 @@ class Order(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
 class OrderItem(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "order_items"
-    order_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("orders.id"), nullable=False, index=True)
+    order_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("orders.id"), nullable=False, index=True)
     item_type: Mapped[ItemType] = mapped_column(Enum(ItemType), nullable=False)
-    item_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    item_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     unit_price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
     order: Mapped["Order"] = relationship("Order", back_populates="items")
@@ -61,8 +60,8 @@ class OrderItem(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
 class Invoice(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "invoices"
-    order_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("orders.id"), nullable=True, index=True)
-    organization_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=True, index=True)
+    order_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("orders.id"), nullable=True, index=True)
+    organization_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("organizations.id"), nullable=True, index=True)
     invoice_number: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     pdf_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     status: Mapped[InvoiceStatus] = mapped_column(Enum(InvoiceStatus), nullable=False, default=InvoiceStatus.DRAFT)

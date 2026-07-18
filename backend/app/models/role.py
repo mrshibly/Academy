@@ -10,8 +10,7 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import ForeignKey, String, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import ForeignKey, String, Uuid, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -52,9 +51,9 @@ class RolePermission(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "role_permissions"
     __table_args__ = (UniqueConstraint("role_id", "permission_id", name="uq_role_permission"),)
 
-    role_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("roles.id"), nullable=False, index=True)
+    role_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("roles.id"), nullable=False, index=True)
     permission_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("permissions.id"), nullable=False, index=True
+        Uuid, ForeignKey("permissions.id"), nullable=False, index=True
     )
 
     # Relationships
@@ -68,8 +67,8 @@ class UserRole(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "user_roles"
     __table_args__ = (UniqueConstraint("user_id", "role_id", name="uq_user_role"),)
 
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
-    role_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("roles.id"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), nullable=False, index=True)
+    role_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("roles.id"), nullable=False, index=True)
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="user_roles")

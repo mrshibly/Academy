@@ -1,8 +1,7 @@
 """Job postings and applications — careers page."""
 from __future__ import annotations
 import enum, uuid
-from sqlalchemy import Enum, ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Enum, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
 
@@ -37,7 +36,7 @@ class JobPosting(Base, UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin):
 
 class JobApplication(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "job_applications"
-    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("job_postings.id"), nullable=False, index=True)
+    job_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("job_postings.id"), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(320), nullable=False)
     resume_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)

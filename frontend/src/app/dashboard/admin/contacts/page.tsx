@@ -58,14 +58,14 @@ export default function AdminContactsPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem" }} className="responsive-grid-split">
         {/* Contact submissions */}
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
             <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>General Submissions ({filteredContacts.length})</h2>
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: "180px" }}>
               <Search size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
               <input
                 type="text" placeholder="Search inbox..."
                 value={contactSearch} onChange={(e) => setContactSearch(e.target.value)}
-                style={{ padding: "0.45rem 0.45rem 0.45rem 2.15rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.8rem", width: "180px" }}
+                style={{ padding: "0.45rem 0.45rem 0.45rem 2.15rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.8rem", width: "100%" }}
               />
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function AdminContactsPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {filteredContacts.map((c) => (
                 <div key={c.id} style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "1.25rem" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
                     <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>{c.name}</span>
                     <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "monospace" }}>{c.email}</span>
                   </div>
@@ -92,14 +92,14 @@ export default function AdminContactsPage() {
 
         {/* Custom B2B quote requests */}
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
             <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>Quote Inquiries ({filteredQuotes.length})</h2>
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: "180px" }}>
               <Search size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
               <input
                 type="text" placeholder="Search quotes..."
                 value={quoteSearch} onChange={(e) => setQuoteSearch(e.target.value)}
-                style={{ padding: "0.45rem 0.45rem 0.45rem 2.15rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.8rem", width: "180px" }}
+                style={{ padding: "0.45rem 0.45rem 0.45rem 2.15rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.8rem", width: "100%" }}
               />
             </div>
           </div>

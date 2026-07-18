@@ -56,15 +56,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    // Optionally trigger backend logout to clear HTTPOnly cookie
-    fetch("/api/v1/auth/logout", { method: "POST" }).catch(() => {});
+    // Trigger backend logout to clear HTTPOnly cookie
+    fetch("/api/v1/auth/logout", { method: "POST", credentials: "include" }).catch(() => {});
   };
 
   const performRefresh = async () => {
     try {
       const res = await fetch("/api/v1/auth/refresh", {
         method: "POST",
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
+        credentials: "include"
       });
       if (res.ok) {
         const data = await res.json();

@@ -67,10 +67,8 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div style={{ padding: "3rem 0" }}>
-      <div className="container">
-        
-        {/* Banner */}
+    <div>
+      {/* Banner */}
         <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "2.5rem", marginBottom: "3rem", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "2rem" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--accent-blue)" }}>
@@ -175,8 +173,6 @@ export default function ClientDashboard() {
           </div>
 
         </div>
-
-      </div>
     </div>
   );
 }

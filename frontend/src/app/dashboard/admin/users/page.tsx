@@ -128,14 +128,14 @@ export default function AdminUsersPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "2.5rem" }} className="responsive-grid-split">
         {/* User List */}
         <div style={{ background: "var(--card-bg)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "1.5rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
             <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>Registered Users ({filtered.length})</h2>
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: "240px" }}>
               <Search size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
               <input
                 type="text" placeholder="Search by name or email..."
                 value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "220px" }}
+                style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "100%" }}
               />
             </div>
           </div>

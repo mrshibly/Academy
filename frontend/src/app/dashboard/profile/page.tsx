@@ -28,8 +28,34 @@ export default function ProfileSettingsPage() {
     }
   }, [user]);
 
-  // Canvas drawing functions
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  // Canvas drawing functions (Mouse & Touch supported)
+  const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    let clientX = 0;
+    let clientY = 0;
+
+    if ("touches" in e) {
+      if (e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      }
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  };
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -39,21 +65,21 @@ export default function ProfileSettingsPage() {
     ctx.lineCap = "round";
     ctx.strokeStyle = "#0f172a"; // dark slate signature color
     
-    const rect = canvas.getBoundingClientRect();
+    const coords = getCoordinates(e);
     ctx.beginPath();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.moveTo(coords.x, coords.y);
     setIsDrawing(true);
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     
-    const rect = canvas.getBoundingClientRect();
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    const coords = getCoordinates(e);
+    ctx.lineTo(coords.x, coords.y);
     ctx.stroke();
   };
 
@@ -190,7 +216,18 @@ export default function ProfileSettingsPage() {
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing}
-                style={{ border: "2px dashed var(--border-color)", borderRadius: "8px", background: "var(--bg-secondary)", cursor: "crosshair" }}
+                onTouchStart={startDrawing}
+                onTouchMove={draw}
+                onTouchEnd={stopDrawing}
+                onTouchCancel={stopDrawing}
+                style={{
+                  border: "2px dashed var(--border-color)",
+                  borderRadius: "8px",
+                  background: "var(--bg-secondary)",
+                  cursor: "crosshair",
+                  touchAction: "none",
+                  maxWidth: "100%"
+                }}
               />
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button

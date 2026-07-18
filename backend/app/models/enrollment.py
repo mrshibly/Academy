@@ -8,8 +8,7 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import DateTime, Enum, ForeignKey, Uuid, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -33,15 +32,15 @@ class Enrollment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "enrollments"
     __table_args__ = (UniqueConstraint("user_id", "course_id", name="uq_enrollment_user_course"),)
 
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), nullable=False, index=True)
     course_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("courses.id"), nullable=False, index=True
+        Uuid, ForeignKey("courses.id"), nullable=False, index=True
     )
     cohort_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("cohorts.id"), nullable=True, index=True
+        Uuid, ForeignKey("cohorts.id"), nullable=True, index=True
     )
     organization_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=True, index=True
+        Uuid, ForeignKey("organizations.id"), nullable=True, index=True
     )
     status: Mapped[EnrollmentStatus] = mapped_column(
         Enum(EnrollmentStatus), nullable=False, default=EnrollmentStatus.ACTIVE
@@ -62,10 +61,10 @@ class LessonProgress(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __table_args__ = (UniqueConstraint("enrollment_id", "lesson_id", name="uq_lesson_progress"),)
 
     enrollment_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("enrollments.id"), nullable=False, index=True
+        Uuid, ForeignKey("enrollments.id"), nullable=False, index=True
     )
     lesson_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("lessons.id"), nullable=False, index=True
+        Uuid, ForeignKey("lessons.id"), nullable=False, index=True
     )
     status: Mapped[ProgressStatus] = mapped_column(
         Enum(ProgressStatus), nullable=False, default=ProgressStatus.NOT_STARTED

@@ -46,14 +46,14 @@ export default function AdminCertificatesPage() {
       </div>
 
       <div style={{ background: "white", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "1.5rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
           <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>Generated Certificates ({filtered.length})</h2>
-          <div style={{ position: "relative" }}>
+          <div style={{ position: "relative", width: "100%", maxWidth: "260px" }}>
             <Search size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
             <input
               type="text" placeholder="Search registry..."
               value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "260px" }}
+              style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "100%" }}
             />
           </div>
         </div>
@@ -63,7 +63,7 @@ export default function AdminCertificatesPage() {
         ) : filtered.length === 0 ? (
           <p style={{ color: "var(--text-secondary)", textAlign: "center", padding: "3rem 0" }}>No certificates issued.</p>
         ) : (
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-responsive">
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
               <thead>
                 <tr style={{ background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)", color: "var(--text-secondary)", fontWeight: 600 }}>

@@ -39,7 +39,12 @@ async def fallback_certificate(
     if res is None:
         raise NotFoundError(resource="Certificate")
     pdf_bytes, media_type = res
-    return Response(content=pdf_bytes, media_type=media_type)
+    filename = f"certificate-{verification_id}.pdf" if media_type == "application/pdf" else f"certificate-{verification_id}.html"
+    return Response(
+        content=pdf_bytes,
+        media_type=media_type,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+    )
 
 @router.get("", status_code=200, dependencies=[Depends(require_role("admin"))])
 async def list_certificates(db: AsyncSession = Depends(get_db)):

@@ -2,8 +2,7 @@
 from __future__ import annotations
 import enum, uuid
 from datetime import datetime
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, Uuid, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
 
@@ -18,8 +17,8 @@ class BlogPost(Base, UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin):
     slug: Mapped[str] = mapped_column(String(500), unique=True, index=True, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     excerpt: Mapped[str | None] = mapped_column(String(1000), nullable=True)
-    author_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
-    category_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("categories.id"), nullable=True, index=True)
+    author_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), nullable=False, index=True)
+    category_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("categories.id"), nullable=True, index=True)
     status: Mapped[PostStatus] = mapped_column(Enum(PostStatus), nullable=False, default=PostStatus.DRAFT)
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     featured_image_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
@@ -30,5 +29,5 @@ class BlogPost(Base, UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin):
 class BlogPostTag(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "blog_post_tags"
     __table_args__ = (UniqueConstraint("post_id", "tag_id", name="uq_blog_post_tag"),)
-    post_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("blog_posts.id"), nullable=False, index=True)
-    tag_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("tags.id"), nullable=False, index=True)
+    post_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("blog_posts.id"), nullable=False, index=True)
+    tag_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tags.id"), nullable=False, index=True)

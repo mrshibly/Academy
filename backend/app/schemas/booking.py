@@ -1,7 +1,7 @@
 """Booking schemas."""
 from __future__ import annotations
 from uuid import UUID
-from datetime import date, time
+from datetime import date, time, datetime
 from pydantic import BaseModel, EmailStr, Field
 
 class TimeSlotRead(BaseModel):
@@ -27,5 +27,5 @@ class BookingRead(BaseModel):
     service_type: str
     status: str
     time_slot: TimeSlotRead | None = None
-    created_at: str
+    created_at: datetime
     model_config = {"from_attributes": True}

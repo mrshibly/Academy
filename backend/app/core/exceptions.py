@@ -149,11 +149,17 @@ def register_exception_handlers(app: FastAPI) -> None:
             code = "ALREADY_EXISTS"
             status_code = 409
             
+        # Scrub raw DB error details in production to prevent info leakage
+        from app.core.config import get_settings
+        details = {}
+        if get_settings().ENVIRONMENT not in ("production", "staging"):
+            details["error_message"] = error_msg
+
         return _error_response(
             status_code=status_code,
             code=code,
             message=message,
-            details={"error_message": error_msg}
+            details=details
         )
 
     @app.exception_handler(Exception)

@@ -7,8 +7,7 @@ from __future__ import annotations
 import enum
 import uuid
 
-from sqlalchemy import Enum, ForeignKey, String, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Enum, ForeignKey, String, Uuid, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
@@ -39,9 +38,9 @@ class OrganizationMember(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __table_args__ = (UniqueConstraint("organization_id", "user_id", name="uq_org_member"),)
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False, index=True
+        Uuid, ForeignKey("organizations.id"), nullable=False, index=True
     )
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), nullable=False, index=True)
     role: Mapped[OrgMemberRole] = mapped_column(Enum(OrgMemberRole), nullable=False, default=OrgMemberRole.EMPLOYEE)
 
     # Relationships

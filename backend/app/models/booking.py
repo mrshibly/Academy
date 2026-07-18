@@ -2,8 +2,7 @@
 from __future__ import annotations
 import enum, uuid
 from datetime import date, time
-from sqlalchemy import Date, Enum, ForeignKey, String, Text, Time, Boolean
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Date, Enum, ForeignKey, String, Text, Time, Boolean, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
@@ -22,12 +21,12 @@ class TimeSlot(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
 class Booking(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "bookings"
-    user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True)
+    user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id"), nullable=True, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(320), nullable=False)
     phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
     service_type: Mapped[str] = mapped_column(String(200), nullable=False)
-    time_slot_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("time_slots.id"), nullable=True, index=True)
+    time_slot_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("time_slots.id"), nullable=True, index=True)
     status: Mapped[BookingStatus] = mapped_column(Enum(BookingStatus), nullable=False, default=BookingStatus.PENDING)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     time_slot: Mapped["TimeSlot | None"] = relationship("TimeSlot")

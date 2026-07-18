@@ -137,7 +137,7 @@ export default function AdminBlogPage() {
       )}
 
       {/* Tab Selector */}
-      <div style={{ display: "flex", gap: "1.5rem", borderBottom: "1px solid var(--border-color)", marginBottom: "2rem", paddingBottom: "0.25rem" }}>
+      <div className="tab-bar-scrollable">
         {[
           { id: "all", label: "All Articles", count: blogs.length },
           { id: "pending", label: "Pending Approval", count: pendingCount },
@@ -180,14 +180,14 @@ export default function AdminBlogPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "2.5rem" }} className="responsive-grid-split">
         {/* Listing */}
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "1.25rem" }}>
             <h2 style={{ fontSize: "1.15rem", fontWeight: 700 }}>Blog Articles ({filtered.length})</h2>
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: "220px" }}>
               <Search size={16} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
               <input
                 type="text" placeholder="Search articles..."
                 value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "220px" }}
+                style={{ padding: "0.5rem 0.5rem 0.5rem 2.25rem", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem", width: "100%" }}
               />
             </div>
           </div>
@@ -206,8 +206,8 @@ export default function AdminBlogPage() {
                   background: "white", border: editId === post.id ? "2px solid var(--accent-blue)" : "1px solid var(--border-color)",
                   borderRadius: "12px", padding: "1.25rem"
                 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem" }}>
+                    <div style={{ flex: 1, minWidth: "200px" }}>
                       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.4rem" }}>
                         <span style={{ fontSize: "0.7rem", background: post.status === "published" ? "rgba(16, 185, 129, 0.1)" : "rgba(148, 163, 184, 0.1)", color: post.status === "published" ? "var(--accent-emerald)" : "var(--text-muted)", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: 600 }}>{post.status.toUpperCase()}</span>
                       </div>
@@ -215,7 +215,7 @@ export default function AdminBlogPage() {
                       <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: "0.15rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{post.excerpt || "No summary provided."}</p>
                       <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.4rem", fontFamily: "monospace" }}>Slug: {post.slug}</p>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0, marginLeft: "1rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
                       {post.status === "draft" && (
                         <button onClick={() => handleApprove(post.id)} style={{ padding: "0.3rem 0.6rem", fontSize: "0.75rem", background: "var(--accent-emerald)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 600 }}>
                           Approve

@@ -75,58 +75,75 @@ export default function CertificateVerificationPage() {
             </div>
 
             {/* Visual Certificate Preview Card */}
-            <div className="premium-card" style={{ padding: "0.5rem", overflow: "hidden", background: "var(--card-bg)" }}>
+            <div className="premium-card" style={{ padding: "1.5rem", overflow: "hidden", background: "linear-gradient(135deg, #0a4f5f 0%, #0c6478 50%, #073844 100%)", borderRadius: "12px", position: "relative" }}>
+              {/* Top Left Logo */}
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", border: "2px solid #ffffff", padding: "6px 12px", borderRadius: "4px", background: "rgba(12, 100, 120, 0.4)", backdropFilter: "blur(4px)", marginBottom: "1rem" }}>
+                <Shield size={20} style={{ color: "#ffffff" }} />
+                <span style={{ color: "#ffffff", fontWeight: 800, fontSize: "0.8rem", letterSpacing: "0.05em", lineHeight: "1.1" }}>
+                  ACADEMY<br/>CREDENTIAL
+                </span>
+              </div>
+
+              {/* Inner White Card */}
               <div style={{
-                border: "4px double var(--border-color)",
-                borderRadius: "calc(var(--radius-md) - 4px)",
-                padding: "3rem 2.5rem",
-                backgroundImage: "radial-gradient(rgba(14, 165, 233, 0.015) 1px, transparent 1px)",
-                backgroundSize: "24px 24px",
+                background: "#ffffff",
+                borderRadius: "8px",
+                padding: "2.5rem 2rem",
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                textAlign: "center"
+                textAlign: "center",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.2)"
               }}>
-                {/* Gold Seal / Badge watermark */}
-                <div style={{ position: "absolute", right: "2rem", top: "2rem", opacity: 0.1, pointerEvents: "none" }}>
-                  <Award size={100} style={{ color: "var(--text-primary)" }} />
+
+                {/* Title & Recipient Block */}
+                <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", width: "100%", justifyContent: "center", marginBottom: "1.5rem", flexWrap: "wrap" }}>
+                  <div style={{ textAlign: "right" }}>
+                    <h2 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1e293b", margin: 0, letterSpacing: "0.05em", lineHeight: "1" }}>CERTIFICATE</h2>
+                    <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#475569", letterSpacing: "0.12em", display: "block", marginTop: "2px" }}>OF COMPLETION</span>
+                  </div>
+                  
+                  <div style={{ width: "4px", height: "55px", background: "#0c6478", borderRadius: "4px" }}></div>
+
+                  <div style={{ textAlign: "left" }}>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#475569", letterSpacing: "0.15em", textTransform: "uppercase", display: "block" }}>THIS IS PROUDLY PRESENTED TO</span>
+                    <h3 style={{ fontFamily: "'Dancing Script', cursive", fontSize: "2.5rem", fontWeight: 700, color: "#0c6478", margin: 0, lineHeight: "1.1" }}>
+                      {data.holder_name}
+                    </h3>
+                  </div>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "2rem" }}>
-                  <Shield size={28} style={{ color: "var(--accent-blue)" }} />
-                  <span style={{ fontWeight: 800, fontSize: "1.1rem", color: "var(--text-primary)", letterSpacing: "0.05em" }}>ACADEMY.</span>
-                </div>
-
-                <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.15em", color: "var(--text-muted)", fontWeight: 700 }}>
-                  Certificate of Completion
-                </span>
-
-                <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: "0.5rem" }}>
-                  is proudly presented to
-                </span>
-
-                <h2 style={{ fontSize: "2.25rem", fontWeight: 800, color: "var(--text-primary)", margin: "1rem 0", fontFamily: "inherit" }}>
-                  {data.holder_name}
-                </h2>
-
-                <div style={{ width: "160px", height: "1px", background: "var(--border-color)", margin: "0.5rem 0 1rem 0" }}></div>
-
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", maxWidth: "480px", lineHeight: 1.6 }}>
-                  for successfully passing all practical laboratory guidelines and completing the specialized track curriculum of:
-                  <span style={{ display: "block", color: "var(--accent-blue)", fontWeight: 700, fontSize: "1.15rem", marginTop: "0.5rem" }}>
-                    {data.course_title}
-                  </span>
+                <p style={{ color: "#334155", fontSize: "0.9rem", maxWidth: "520px", lineHeight: 1.65, margin: "0.5rem 0 1.5rem 0" }}>
+                  This certificate is presented for completing the{" "}
+                  <strong style={{ color: "#0f172a" }}>"{data.course_title}"</strong>{" "}
+                  from Academy on {data.issued_at ? new Date(data.issued_at).toLocaleDateString() : ""}.
                 </p>
 
-                <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: "480px", marginTop: "2.5rem", fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                  <div style={{ textAlign: "left" }}>
-                    <span style={{ display: "block", fontWeight: 600 }}>Date Issued</span>
-                    <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>{data.issued_at ? new Date(data.issued_at).toLocaleDateString() : ""}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", width: "100%", maxWidth: "520px", marginTop: "1rem", fontSize: "0.8rem" }}>
+                  <div style={{ textAlign: "center", width: "140px" }}>
+                    <div style={{ height: "28px", display: "flex", alignItems: "flex-end", justifyContent: "center", fontFamily: "'Dancing Script', cursive", fontSize: "1.25rem", color: "#0c6478", fontWeight: 700 }}>
+                      Instructor
+                    </div>
+                    <div style={{ width: "100%", height: "2px", background: "#334155", margin: "0.25rem 0" }}></div>
+                    <span style={{ display: "block", color: "#1e293b", fontSize: "0.75rem", fontWeight: 800 }}>Teacher</span>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <span style={{ display: "block", fontWeight: 600 }}>Validation Authority</span>
-                    <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>Academy Board</span>
+
+                  {/* Ribbon Medal Award Badge */}
+                  <div style={{ position: "relative", width: "64px", height: "64px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "#0284c7", border: "3px dashed #ffffff", boxShadow: "0 0 0 2px #0284c7", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#ffffff", zIndex: 2 }}>
+                      <span style={{ fontSize: "6px", fontWeight: 800, textTransform: "uppercase" }}>The</span>
+                      <span style={{ fontSize: "9px", fontWeight: 900, letterSpacing: "0.05em" }}>BEST</span>
+                      <span style={{ fontSize: "6px", fontWeight: 800, textTransform: "uppercase" }}>Award</span>
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: "center", width: "140px" }}>
+                    <div style={{ height: "28px", display: "flex", alignItems: "flex-end", justifyContent: "center", fontFamily: "'Dancing Script', cursive", fontSize: "1.25rem", color: "#0c6478", fontWeight: 700 }}>
+                      Academic Senate
+                    </div>
+                    <div style={{ width: "100%", height: "2px", background: "#334155", margin: "0.25rem 0" }}></div>
+                    <span style={{ display: "block", color: "#1e293b", fontSize: "0.75rem", fontWeight: 800 }}>Principal</span>
                   </div>
                 </div>
               </div>

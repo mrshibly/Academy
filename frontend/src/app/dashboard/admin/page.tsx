@@ -65,26 +65,26 @@ export default function AdminDashboard() {
       </div>
 
       {/* Metrics Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "2rem", marginBottom: "4rem" }}>
-        <div className="premium-card" style={{ padding: "1.5rem" }}>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Total Users</span>
-          <h3 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--text-primary)", marginTop: "0.25rem" }}>{metrics.total_users}</h3>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "1rem", marginBottom: "3rem" }}>
+        <div className="premium-card" style={{ padding: "1.25rem" }}>
+          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Total Users</span>
+          <h3 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text-primary)", marginTop: "0.25rem" }}>{metrics.total_users}</h3>
         </div>
-        <div className="premium-card" style={{ padding: "1.5rem" }}>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Active Courses</span>
-          <h3 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--accent-blue)", marginTop: "0.25rem" }}>{metrics.total_courses}</h3>
+        <div className="premium-card" style={{ padding: "1.25rem" }}>
+          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Active Courses</span>
+          <h3 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--accent-blue)", marginTop: "0.25rem" }}>{metrics.total_courses}</h3>
         </div>
-        <div className="premium-card" style={{ padding: "1.5rem" }}>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Enrollments</span>
-          <h3 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--accent-teal)", marginTop: "0.25rem" }}>{metrics.total_enrollments}</h3>
+        <div className="premium-card" style={{ padding: "1.25rem" }}>
+          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Enrollments</span>
+          <h3 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--accent-teal)", marginTop: "0.25rem" }}>{metrics.total_enrollments}</h3>
         </div>
-        <div className="premium-card" style={{ padding: "1.5rem" }}>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Consultations</span>
-          <h3 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--accent-violet)", marginTop: "0.25rem" }}>{metrics.total_bookings}</h3>
+        <div className="premium-card" style={{ padding: "1.25rem" }}>
+          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Consultations</span>
+          <h3 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--accent-violet)", marginTop: "0.25rem" }}>{metrics.total_bookings}</h3>
         </div>
-        <div className="premium-card" style={{ padding: "1.5rem" }}>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Total Revenue</span>
-          <h3 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--accent-emerald)", marginTop: "0.25rem" }}>
+        <div className="premium-card" style={{ padding: "1.25rem" }}>
+          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Total Revenue</span>
+          <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--accent-emerald)", marginTop: "0.25rem" }}>
             ৳{metrics.total_revenue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} BDT
           </h3>
         </div>
@@ -95,7 +95,7 @@ export default function AdminDashboard() {
         <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--text-primary)" }}>
           <History size={22} style={{ color: "var(--text-primary)" }} /> Audit log stream
         </h2>
-        <div style={{ background: "var(--card-bg)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
+        <div className="table-responsive" style={{ background: "var(--card-bg)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)" }}>
           {auditLogs.length === 0 ? (
             <p style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
               No operations logs recorded yet.

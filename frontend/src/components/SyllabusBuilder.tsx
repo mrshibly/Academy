@@ -211,12 +211,21 @@ export default function SyllabusBuilder({ courseId, courseSlug, token, onClose }
   };
 
   return (
-    <div style={{
-      position: "fixed", top: 0, right: 0, bottom: 0, width: "34rem", maxWidth: "100%",
-      background: "var(--card-bg)", boxShadow: "-4px 0 30px rgba(0,0,0,0.15)",
-      zIndex: 100, display: "flex", flexDirection: "column",
-      borderLeft: "1px solid var(--border-color)", animation: "slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
-    }}>
+    <>
+      <div 
+        onClick={onClose}
+        style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)",
+          WebkitBackdropFilter: "blur(4px)", zIndex: 1000, animation: "fadeIn 0.2s ease"
+        }}
+      />
+      <div style={{
+        position: "fixed", top: 0, right: 0, bottom: 0, width: "34rem", maxWidth: "100vw",
+        background: "var(--card-bg)", boxShadow: "-4px 0 30px rgba(0,0,0,0.15)",
+        zIndex: 1001, display: "flex", flexDirection: "column",
+        borderLeft: "1px solid var(--border-color)", animation: "slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
+      }}>
       {/* Drawer Header */}
       <div style={{
         padding: "1.5rem", borderBottom: "1px solid var(--border-color)",
@@ -520,5 +529,6 @@ export default function SyllabusBuilder({ courseId, courseSlug, token, onClose }
         }
       `}</style>
     </div>
+    </>
   );
 }

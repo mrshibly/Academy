@@ -48,10 +48,10 @@ export default function RootLayout({
                   <div>
                     <h4 style={{ color: "#ffffff", fontSize: "1.05rem", fontWeight: 600, marginBottom: "1.25rem" }}>Services</h4>
                     <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.9rem", color: "#cbd5e1" }}>
-                      <li><Link href="/services/ai-dev">AI Agent Architectures</Link></li>
-                      <li><Link href="/services/pentesting">Offensive Penetration Testing</Link></li>
-                      <li><Link href="/services/cloud-sec">Cloud Security</Link></li>
-                      <li><Link href="/services/app-pentest">Web & Mobile Pentesting</Link></li>
+                      <li><Link href="/services">AI Agent Architectures</Link></li>
+                      <li><Link href="/services">Offensive Penetration Testing</Link></li>
+                      <li><Link href="/services">Cloud Security</Link></li>
+                      <li><Link href="/services">Web & Mobile Pentesting</Link></li>
                     </ul>
                   </div>
                   <div>
@@ -67,8 +67,8 @@ export default function RootLayout({
                     <h4 style={{ color: "#ffffff", fontSize: "1.05rem", fontWeight: 600, marginBottom: "1.25rem" }}>Contact</h4>
                     <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.9rem", color: "#cbd5e1" }}>
                       <li>Email: info@academy.dev</li>
-                      <li>Phone: +1 (555) 019-2831</li>
-                      <li>Address: Silicon Valley, CA</li>
+                      <li>Phone: +880 1XXX-XXXXXX</li>
+                      <li>Address: Dhaka, Bangladesh</li>
                     </ul>
                   </div>
                 </div>

@@ -10,8 +10,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import DateTime, Uuid, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -53,7 +52,7 @@ class UUIDPrimaryKeyMixin:
     """Mixin that adds a UUID primary key column named `id`."""
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid,
         primary_key=True,
         default=uuid.uuid4,
         nullable=False,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Shield, PhoneCall, User, LogOut, Layout, Menu, X } from "lucide-react";
@@ -9,6 +9,19 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click (VIS-5)
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpen]);
 
   const getDashboardLink = () => {
     if (!user) return "/login";
@@ -69,7 +82,7 @@ export default function Navbar() {
             </Link>
 
             {user ? (
-              <div style={{ position: "relative" }}>
+              <div style={{ position: "relative" }} ref={dropdownRef}>
                 <button 
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   style={{

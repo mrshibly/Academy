@@ -152,8 +152,18 @@ export default function DashboardSidebar({
             onClick={() => setCollapsed(true)}
             style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", display: "flex", alignItems: "center" }}
             className="desktop-only-table"
+            title="Collapse Sidebar"
           >
             <ChevronLeft size={18} />
+          </button>
+        )}
+        {mobileOpen && (
+          <button
+            onClick={() => setMobileOpen(false)}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-primary)", display: "flex", alignItems: "center" }}
+            title="Close Navigation Drawer"
+          >
+            <X size={20} />
           </button>
         )}
       </div>
@@ -169,6 +179,7 @@ export default function DashboardSidebar({
                 <Link
                   key={idx}
                   href={item.href}
+                  onClick={() => setMobileOpen(false)}
                   className={`dashboard-sidebar-item ${isActive ? "active" : ""}`}
                   title={collapsed ? item.label : undefined}
                 >
