@@ -143,19 +143,45 @@ export default function DashboardSidebar({
     <aside className={`dashboard-sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
       {/* Sidebar Header */}
       <div className="dashboard-sidebar-header">
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 800, fontSize: "1.25rem", color: "var(--text-primary)", textDecoration: "none" }}>
-          <Shield style={{ color: "var(--accent-blue)" }} size={26} />
-          {!collapsed && <span>Academy<span style={{ color: "var(--accent-blue)" }}>.</span></span>}
-        </Link>
-        {!collapsed && (
-          <button
-            onClick={() => setCollapsed(true)}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", display: "flex", alignItems: "center" }}
-            className="desktop-only-table"
-            title="Collapse Sidebar"
-          >
-            <ChevronLeft size={18} />
-          </button>
+        {collapsed ? (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", gap: "0.25rem" }}>
+            <Link href="/" style={{ display: "flex", alignItems: "center", color: "var(--text-primary)", textDecoration: "none" }} title="Academy Home">
+              <Shield style={{ color: "var(--accent-blue)" }} size={24} />
+            </Link>
+            <button
+              onClick={() => setCollapsed(false)}
+              style={{
+                background: "rgba(14, 165, 233, 0.1)",
+                border: "1px solid rgba(14, 165, 233, 0.2)",
+                borderRadius: "6px",
+                padding: "4px",
+                cursor: "pointer",
+                color: "var(--accent-blue)",
+                display: "flex",
+                alignItems: "center",
+                justify-content: "center"
+              }}
+              className="desktop-only-table"
+              title="Expand Sidebar"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        ) : (
+          <>
+            <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 800, fontSize: "1.25rem", color: "var(--text-primary)", textDecoration: "none" }}>
+              <Shield style={{ color: "var(--accent-blue)" }} size={26} />
+              <span>Academy<span style={{ color: "var(--accent-blue)" }}>.</span></span>
+            </Link>
+            <button
+              onClick={() => setCollapsed(true)}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", display: "flex", alignItems: "center", padding: "4px" }}
+              className="desktop-only-table"
+              title="Collapse Sidebar"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          </>
         )}
         {mobileOpen && (
           <button
@@ -194,6 +220,29 @@ export default function DashboardSidebar({
 
       {/* Sidebar Footer */}
       <div className="dashboard-sidebar-footer">
+        {collapsed && (
+          <button
+            onClick={() => setCollapsed(false)}
+            style={{
+              background: "rgba(14, 165, 233, 0.08)",
+              border: "1px solid rgba(14, 165, 233, 0.2)",
+              color: "var(--accent-blue)",
+              borderRadius: "50%",
+              width: "2.5rem",
+              height: "2.5rem",
+              display: "flex",
+              alignItems: "center",
+              justify-content: "center",
+              cursor: "pointer",
+              margin: "0 auto 0.5rem auto"
+            }}
+            className="desktop-only-table"
+            title="Expand Sidebar"
+          >
+            <ChevronRight size={18} />
+          </button>
+        )}
+
         {/* Workspace Switcher */}
         {user && user.roles.length > 1 && !collapsed && (
           <div style={{ position: "relative", width: "100%", marginBottom: "0.5rem" }}>
