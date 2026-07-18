@@ -125,10 +125,26 @@ export default function DashboardSidebar({
 
   const studentCategories: NavCategory[] = [
     {
-      title: "Sandbox",
+      title: "My Portal",
       items: [
-        { label: "My Lab Overview", href: "/dashboard/student", icon: <Home size={18} />, description: "Check progress roadmaps and download certificates" },
-        { label: "Browse Academy", href: "/academy", icon: <BookOpen size={18} />, description: "Explore cyber security and AI courses catalog" }
+        { label: "Lab Overview", href: "/dashboard/student", icon: <Home size={18} />, description: "Track active course enrollments and certificates" },
+        { label: "Profile Settings", href: "/dashboard/profile", icon: <User size={18} />, description: "Update personal details and signature" },
+      ]
+    },
+    {
+      title: "Explore Academy",
+      items: [
+        { label: "Course Catalog", href: "/academy", icon: <BookOpen size={18} />, description: "Browse security and AI courses" },
+        { label: "Research Publications", href: "/research", icon: <Sliders size={18} />, description: "Read technical whitepapers & security advisories" },
+        { label: "Blog & Insights", href: "/blog", icon: <FileText size={18} />, description: "Stay updated with platform announcements" },
+      ]
+    },
+    {
+      title: "Corporate Services",
+      items: [
+        { label: "B2B Consulting", href: "/services", icon: <Settings size={18} />, description: "View cybersecurity consulting service details" },
+        { label: "Book Consultation", href: "/book", icon: <Calendar size={18} />, description: "Schedule a meeting slot with solution engineers" },
+        { label: "Careers Board", href: "/careers", icon: <Briefcase size={18} />, description: "Explore open job listings and corporate training roles" },
       ]
     }
   ];
