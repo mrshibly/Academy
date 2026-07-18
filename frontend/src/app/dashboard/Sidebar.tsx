@@ -159,7 +159,7 @@ export default function DashboardSidebar({
                 color: "var(--accent-blue)",
                 display: "flex",
                 alignItems: "center",
-                justify-content: "center"
+                justifyContent: "center"
               }}
               className="desktop-only-table"
               title="Expand Sidebar"
@@ -232,7 +232,7 @@ export default function DashboardSidebar({
               height: "2.5rem",
               display: "flex",
               alignItems: "center",
-              justify-content: "center",
+              justifyContent: "center",
               cursor: "pointer",
               margin: "0 auto 0.5rem auto"
             }}
